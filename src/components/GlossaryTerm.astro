@@ -23,7 +23,7 @@ const termSlug = term.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
 
   .glossary-term {
     text-decoration: none;
-    border-bottom: 1.5px dotted var(--color-copper-light);
+    border-bottom: 1.5px dotted var(--color-peach);
     color: inherit;
     position: relative;
     cursor: help;
@@ -31,7 +31,7 @@ const termSlug = term.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
   }
 
   .glossary-term:hover {
-    border-bottom-color: var(--color-copper);
+    border-bottom-color: var(--color-peach-dark);
     color: inherit;
   }
 
@@ -40,8 +40,8 @@ const termSlug = term.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
     bottom: calc(100% + 8px);
     left: 50%;
     transform: translateX(-50%);
-    background-color: var(--color-charcoal);
-    color: var(--color-cream);
+    background-color: var(--color-racing-green);
+    color: var(--color-white);
     font-family: var(--font-body);
     font-size: 0.8rem;
     font-weight: 400;
@@ -56,7 +56,7 @@ const termSlug = term.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
     visibility: hidden;
     transition: opacity 0.2s ease, visibility 0.2s ease;
     z-index: 100;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(13, 77, 43, 0.2);
   }
 
   /* Tooltip arrow */
@@ -67,7 +67,7 @@ const termSlug = term.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
     left: 50%;
     transform: translateX(-50%);
     border: 5px solid transparent;
-    border-top-color: var(--color-charcoal);
+    border-top-color: var(--color-racing-green);
   }
 
   .glossary-term:hover .glossary-tooltip {
@@ -77,11 +77,11 @@ const termSlug = term.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
 
   @media (prefers-color-scheme: dark) {
     .glossary-term {
-      border-bottom-color: var(--color-night-copper);
+      border-bottom-color: var(--color-night-accent);
     }
 
     .glossary-term:hover {
-      border-bottom-color: var(--color-amber-light);
+      border-bottom-color: var(--color-peach-dark);
     }
 
     .glossary-tooltip {

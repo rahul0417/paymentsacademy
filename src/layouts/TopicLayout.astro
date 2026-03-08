@@ -24,16 +24,16 @@ const {
 } = Astro.props;
 
 const themeColors: Record<string, string> = {
-  'Foundations': 'var(--color-sage)',
-  'Transaction Lifecycle': 'var(--color-copper)',
-  'Card Ecosystem': 'var(--color-amber)',
-  'Non-Card Payments': 'var(--color-sage-light)',
-  'Moving Money': 'var(--color-copper-light)',
-  'Products & Use Cases': 'var(--color-amber-light)',
-  'Trust & Compliance': 'var(--color-stone)',
+  'Foundations': 'var(--color-racing-green)',
+  'Transaction Lifecycle': 'var(--color-peach-dark)',
+  'Card Ecosystem': 'var(--color-peach-dark)',
+  'Non-Card Payments': 'var(--color-racing-green-light)',
+  'Moving Money': 'var(--color-racing-green)',
+  'Products & Use Cases': 'var(--color-peach)',
+  'Trust & Compliance': 'var(--color-text-medium)',
 };
 
-const badgeColor = themeColors[theme] || 'var(--color-stone)';
+const badgeColor = themeColors[theme] || 'var(--color-text-medium)';
 ---
 
 <BaseLayout title={title} description={description}>
@@ -130,21 +130,21 @@ const badgeColor = themeColors[theme] || 'var(--color-stone)';
 
   .reading-time {
     font-size: 0.8rem;
-    color: var(--color-stone-light);
+    color: var(--color-text-light);
   }
 
   .topic-title {
     font-family: var(--font-heading);
     font-size: 2.5rem;
-    font-weight: 600;
+    font-weight: 700;
     line-height: 1.15;
-    color: var(--color-charcoal);
+    color: var(--color-racing-green);
     margin: 0 0 1.5rem 0;
   }
 
   .tldr-box {
-    background-color: var(--color-cream-dark);
-    border-left: 3px solid var(--color-copper);
+    background-color: var(--color-pale-mint);
+    border-left: 3px solid var(--color-peach);
     border-radius: 0 0.5rem 0.5rem 0;
     padding: 1rem 1.25rem;
   }
@@ -153,16 +153,16 @@ const badgeColor = themeColors[theme] || 'var(--color-stone)';
     display: inline-block;
     font-family: var(--font-heading);
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--color-copper);
+    color: var(--color-peach-dark);
     margin-bottom: 0.25rem;
   }
 
   .tldr-text {
     font-size: 0.95rem;
-    color: var(--color-charcoal-light);
+    color: var(--color-text-medium);
     margin: 0;
     line-height: 1.6;
   }
@@ -177,20 +177,20 @@ const badgeColor = themeColors[theme] || 'var(--color-stone)';
     align-items: center;
     gap: 0.5rem;
     padding: 0.6rem 1rem;
-    background-color: var(--color-charcoal);
-    color: var(--color-cream);
+    background-color: var(--color-racing-green);
+    color: var(--color-white);
     border: none;
-    border-radius: 2rem;
+    border-radius: 9999px;
     font-family: var(--font-body);
     font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 16px rgba(13, 77, 43, 0.2);
     transition: background-color 0.2s ease;
   }
 
   .sidebar-mobile-toggle:hover {
-    background-color: var(--color-charcoal-light);
+    background-color: var(--color-racing-green-light);
   }
 
   .sidebar-overlay {
@@ -213,8 +213,8 @@ const badgeColor = themeColors[theme] || 'var(--color-stone)';
     bottom: 0;
     width: 300px;
     z-index: 50;
-    background-color: var(--color-cream);
-    border-right: 1px solid var(--color-parchment);
+    background-color: var(--color-white);
+    border-right: 1px solid var(--color-pale-mint-dark);
     padding: 1.25rem;
     overflow-y: auto;
     transform: translateX(-100%);
@@ -231,21 +231,21 @@ const badgeColor = themeColors[theme] || 'var(--color-stone)';
     justify-content: space-between;
     margin-bottom: 1rem;
     padding-bottom: 0.75rem;
-    border-bottom: 1px solid var(--color-parchment);
+    border-bottom: 1px solid var(--color-pale-mint-dark);
   }
 
   .sidebar-close {
     padding: 0.25rem;
     background: none;
     border: none;
-    color: var(--color-stone);
+    color: var(--color-text-light);
     cursor: pointer;
     border-radius: 0.25rem;
     transition: color 0.2s ease;
   }
 
   .sidebar-close:hover {
-    color: var(--color-charcoal);
+    color: var(--color-racing-green);
   }
 
   /* Force nested sidebar to show in mobile drawer */
@@ -286,11 +286,11 @@ const badgeColor = themeColors[theme] || 'var(--color-stone)';
 
     .tldr-box {
       background-color: var(--color-night-surface);
-      border-left-color: var(--color-night-copper);
+      border-left-color: var(--color-night-accent);
     }
 
     .tldr-label {
-      color: var(--color-night-copper);
+      color: var(--color-night-accent);
     }
 
     .tldr-text {

@@ -25,8 +25,8 @@ const diagramId = `mermaid-${Math.random().toString(36).slice(2, 9)}`;
   }
 
   .mermaid-diagram {
-    background-color: var(--color-cream-dark);
-    border: 1px solid var(--color-parchment);
+    background-color: var(--color-pale-mint);
+    border: 1px solid var(--color-pale-mint-dark);
     border-radius: 0.75rem;
     padding: 1.5rem;
     overflow-x: auto;
@@ -42,7 +42,7 @@ const diagramId = `mermaid-${Math.random().toString(36).slice(2, 9)}`;
   }
 
   .mermaid-loading {
-    color: var(--color-stone-light);
+    color: var(--color-text-light);
     font-size: 0.85rem;
     font-style: italic;
   }
@@ -50,7 +50,7 @@ const diagramId = `mermaid-${Math.random().toString(36).slice(2, 9)}`;
   .mermaid-caption {
     text-align: center;
     font-size: 0.85rem;
-    color: var(--color-stone);
+    color: var(--color-text-medium);
     margin-top: 0.75rem;
     font-style: italic;
     font-family: var(--font-body);
@@ -82,24 +82,24 @@ const diagramId = `mermaid-${Math.random().toString(36).slice(2, 9)}`;
       startOnLoad: false,
       theme: 'base',
       themeVariables: {
-        primaryColor: isDark ? '#2E2B28' : '#FAF6F1',
-        primaryTextColor: isDark ? '#E8E0D6' : '#2C2825',
-        primaryBorderColor: isDark ? '#D4955A' : '#B87333',
-        lineColor: isDark ? '#A89E94' : '#6B6560',
-        secondaryColor: isDark ? '#242120' : '#F0EAE0',
-        tertiaryColor: isDark ? '#1A1816' : '#EDE7DC',
-        noteBkgColor: isDark ? '#2E2B28' : '#EDE7DC',
-        noteTextColor: isDark ? '#E8E0D6' : '#2C2825',
-        noteBorderColor: isDark ? '#D4955A' : '#B87333',
-        actorBkg: isDark ? '#2E2B28' : '#FAF6F1',
-        actorBorder: isDark ? '#D4955A' : '#B87333',
-        actorTextColor: isDark ? '#E8E0D6' : '#2C2825',
-        signalColor: isDark ? '#E8E0D6' : '#2C2825',
-        signalTextColor: isDark ? '#E8E0D6' : '#2C2825',
-        labelBoxBkgColor: isDark ? '#2E2B28' : '#FAF6F1',
-        labelBoxBorderColor: isDark ? '#D4955A' : '#B87333',
-        labelTextColor: isDark ? '#E8E0D6' : '#2C2825',
-        fontFamily: 'Source Sans 3, system-ui, sans-serif',
+        primaryColor: isDark ? '#1D3526' : '#E8F5E9',
+        primaryTextColor: isDark ? '#E8F5E9' : '#0D4D2B',
+        primaryBorderColor: isDark ? '#FFDAB3' : '#0D4D2B',
+        lineColor: isDark ? '#9CB8A2' : '#4A4A4A',
+        secondaryColor: isDark ? '#162A1E' : '#C8E6C9',
+        tertiaryColor: isDark ? '#0F1F17' : '#E8F5E9',
+        noteBkgColor: isDark ? '#1D3526' : '#E8F5E9',
+        noteTextColor: isDark ? '#E8F5E9' : '#0D4D2B',
+        noteBorderColor: isDark ? '#FFDAB3' : '#0D4D2B',
+        actorBkg: isDark ? '#1D3526' : '#E8F5E9',
+        actorBorder: isDark ? '#FFDAB3' : '#0D4D2B',
+        actorTextColor: isDark ? '#E8F5E9' : '#0D4D2B',
+        signalColor: isDark ? '#E8F5E9' : '#0D4D2B',
+        signalTextColor: isDark ? '#E8F5E9' : '#0D4D2B',
+        labelBoxBkgColor: isDark ? '#1D3526' : '#E8F5E9',
+        labelBoxBorderColor: isDark ? '#FFDAB3' : '#0D4D2B',
+        labelTextColor: isDark ? '#E8F5E9' : '#0D4D2B',
+        fontFamily: 'Inter, system-ui, sans-serif',
         fontSize: '14px',
       },
     });
@@ -122,7 +122,7 @@ const diagramId = `mermaid-${Math.random().toString(36).slice(2, 9)}`;
       } catch (err) {
         console.error('Mermaid render error:', err);
         if (loading) {
-          loading.innerHTML = '<span style="color: var(--color-copper);">Diagram could not be rendered.</span>';
+          loading.innerHTML = '<span style="color: var(--color-peach-dark);">Diagram could not be rendered.</span>';
         }
       }
     }

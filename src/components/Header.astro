@@ -20,8 +20,8 @@ const navItems = [
             <path d="M8 10h12M8 14h8M8 18h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
           </svg>
         </span>
-        <span class="font-heading text-xl font-semibold tracking-tight">
-          Fintech<span class="text-copper">Academy</span>
+        <span class="font-heading text-xl font-semibold tracking-tight" style="color: var(--color-racing-green);">
+          Fintech<span style="color: var(--color-peach-dark);">Academy</span>
         </span>
       </a>
 
@@ -61,7 +61,7 @@ const navItems = [
       <button
         type="button"
         id="mobile-menu-btn"
-        class="md:hidden p-2 -mr-2 rounded-lg hover:bg-[var(--color-parchment)] transition-colors"
+        class="md:hidden p-2 -mr-2 rounded-lg hover:bg-[var(--color-pale-mint)] transition-colors"
         aria-label="Toggle menu"
         aria-expanded="false"
       >
@@ -72,7 +72,7 @@ const navItems = [
     </nav>
 
     <!-- Mobile Navigation -->
-    <div id="mobile-menu" class="md:hidden hidden border-t border-[var(--color-parchment)]">
+    <div id="mobile-menu" class="md:hidden hidden border-t border-[var(--color-pale-mint-dark)]">
       <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col gap-3">
         {navItems.map(({ label, href }) => (
           <a
@@ -100,7 +100,7 @@ const navItems = [
 
 <style>
   .header-inner {
-    background-color: color-mix(in srgb, var(--color-cream) 85%, transparent);
+    background-color: color-mix(in srgb, var(--color-white) 85%, transparent);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid transparent;
@@ -108,12 +108,12 @@ const navItems = [
   }
 
   .header-scrolled .header-inner {
-    border-bottom-color: var(--color-parchment);
-    background-color: color-mix(in srgb, var(--color-cream) 92%, transparent);
+    border-bottom-color: var(--color-pale-mint-dark);
+    background-color: color-mix(in srgb, var(--color-white) 92%, transparent);
   }
 
   .wordmark-icon {
-    color: var(--color-copper);
+    color: var(--color-racing-green);
     transition: transform 0.3s ease;
   }
 
@@ -122,7 +122,7 @@ const navItems = [
   }
 
   .nav-link {
-    color: var(--color-stone);
+    color: var(--color-text-light);
     text-decoration: none;
     position: relative;
     transition: color 0.2s ease;
@@ -135,12 +135,12 @@ const navItems = [
     left: 0;
     width: 0;
     height: 1.5px;
-    background-color: var(--color-copper);
+    background-color: var(--color-racing-green);
     transition: width 0.25s ease;
   }
 
   .nav-link:hover {
-    color: var(--color-charcoal);
+    color: var(--color-racing-green);
   }
 
   .nav-link:hover::after {
@@ -152,18 +152,18 @@ const navItems = [
     align-items: center;
     gap: 0.5rem;
     padding: 0.4rem 0.75rem;
-    border: 1px solid var(--color-parchment);
+    border: 1px solid var(--color-pale-mint-dark);
     border-radius: 0.5rem;
-    background-color: var(--color-ivory);
-    color: var(--color-stone-light);
+    background-color: var(--color-pale-mint);
+    color: var(--color-text-light);
     font-size: 0.85rem;
     cursor: pointer;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
   .search-trigger:hover {
-    border-color: var(--color-copper-light);
-    box-shadow: 0 1px 4px rgba(184, 115, 51, 0.08);
+    border-color: var(--color-racing-green-light);
+    box-shadow: 0 1px 4px rgba(13, 77, 43, 0.08);
   }
 
   .search-kbd {
@@ -173,11 +173,11 @@ const navItems = [
     min-width: 1.25rem;
     height: 1.25rem;
     padding: 0 0.3rem;
-    background: var(--color-cream-dark);
-    border: 1px solid var(--color-parchment);
+    background: var(--color-white);
+    border: 1px solid var(--color-pale-mint-dark);
     border-radius: 0.25rem;
     font-family: var(--font-body);
-    color: var(--color-stone);
+    color: var(--color-text-light);
     line-height: 1;
   }
 
@@ -199,6 +199,10 @@ const navItems = [
       color: var(--color-night-text);
     }
 
+    .nav-link::after {
+      background-color: var(--color-night-accent);
+    }
+
     .search-trigger {
       background-color: var(--color-night-surface);
       border-color: var(--color-night-elevated);
@@ -206,7 +210,7 @@ const navItems = [
     }
 
     .search-trigger:hover {
-      border-color: var(--color-night-copper);
+      border-color: var(--color-night-accent);
     }
 
     .search-kbd {

@@ -11,48 +11,48 @@ const { title, description, theme, readingTime, href } = Astro.props;
 
 const isComingSoon = !href;
 
-// Theme color mapping for badges
+// Theme color mapping for badges using new brand palette
 const themeColors: Record<string, { bg: string; text: string; darkBg: string; darkText: string }> = {
   'Foundations': {
-    bg: 'rgba(184, 115, 51, 0.1)',
-    text: 'var(--color-copper)',
-    darkBg: 'rgba(212, 149, 90, 0.15)',
-    darkText: 'var(--color-night-copper)',
+    bg: 'rgba(13, 77, 43, 0.1)',
+    text: 'var(--color-racing-green)',
+    darkBg: 'rgba(26, 107, 60, 0.2)',
+    darkText: 'var(--color-pale-mint)',
   },
   'Transaction Lifecycle': {
-    bg: 'rgba(122, 139, 111, 0.12)',
-    text: 'var(--color-sage)',
-    darkBg: 'rgba(163, 179, 150, 0.15)',
-    darkText: 'var(--color-sage-light)',
+    bg: 'rgba(255, 218, 179, 0.4)',
+    text: 'var(--color-racing-green)',
+    darkBg: 'rgba(255, 183, 77, 0.2)',
+    darkText: 'var(--color-night-accent)',
   },
   'Card Ecosystem': {
-    bg: 'rgba(212, 160, 69, 0.1)',
-    text: 'var(--color-amber)',
-    darkBg: 'rgba(232, 196, 120, 0.15)',
-    darkText: 'var(--color-amber-light)',
+    bg: 'rgba(255, 183, 77, 0.15)',
+    text: '#B8860B',
+    darkBg: 'rgba(255, 183, 77, 0.2)',
+    darkText: 'var(--color-peach)',
   },
   'Non-Card Payments': {
-    bg: 'rgba(107, 101, 96, 0.1)',
-    text: 'var(--color-stone)',
-    darkBg: 'rgba(168, 158, 148, 0.12)',
+    bg: 'rgba(200, 230, 201, 0.5)',
+    text: 'var(--color-racing-green)',
+    darkBg: 'rgba(156, 184, 162, 0.2)',
     darkText: 'var(--color-night-text-muted)',
   },
   'Moving Money': {
-    bg: 'rgba(154, 95, 40, 0.1)',
-    text: 'var(--color-copper-dark)',
-    darkBg: 'rgba(184, 115, 51, 0.15)',
-    darkText: 'var(--color-copper-light)',
+    bg: 'rgba(13, 77, 43, 0.08)',
+    text: 'var(--color-racing-green-light)',
+    darkBg: 'rgba(26, 107, 60, 0.2)',
+    darkText: 'var(--color-pale-mint)',
   },
   'Products & Use Cases': {
-    bg: 'rgba(122, 139, 111, 0.1)',
-    text: '#5E7A52',
-    darkBg: 'rgba(122, 139, 111, 0.15)',
-    darkText: 'var(--color-sage-light)',
+    bg: 'rgba(255, 232, 204, 0.5)',
+    text: '#A0522D',
+    darkBg: 'rgba(255, 218, 179, 0.15)',
+    darkText: 'var(--color-peach-light)',
   },
   'Trust & Compliance': {
-    bg: 'rgba(74, 69, 64, 0.08)',
-    text: 'var(--color-charcoal-light)',
-    darkBg: 'rgba(168, 158, 148, 0.1)',
+    bg: 'rgba(74, 74, 74, 0.08)',
+    text: 'var(--color-text-medium)',
+    darkBg: 'rgba(156, 184, 162, 0.12)',
     darkText: 'var(--color-night-text-muted)',
   },
 };
@@ -104,22 +104,22 @@ const colors = themeColors[theme] || themeColors['Foundations'];
   .card {
     display: block;
     padding: 1.5rem;
-    border: 1px solid var(--color-parchment);
+    border: 1px solid var(--color-pale-mint-dark);
     border-radius: 0.75rem;
-    background-color: var(--color-ivory);
+    background-color: var(--color-white);
     text-decoration: none;
     transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
   }
 
   .card--active:hover {
-    border-color: var(--color-copper-light);
-    box-shadow: 0 4px 24px rgba(184, 115, 51, 0.08);
+    border-color: var(--color-pale-mint-dark);
+    box-shadow: 0 4px 24px rgba(13, 77, 43, 0.08);
     transform: translateY(-3px);
   }
 
   .card--coming-soon {
     opacity: 0.55;
-    background-color: var(--color-cream-dark);
+    background-color: var(--color-pale-mint);
     border-color: transparent;
     cursor: default;
   }
@@ -150,8 +150,8 @@ const colors = themeColors[theme] || themeColors['Foundations'];
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--color-stone-light);
-    background-color: var(--color-parchment);
+    color: var(--color-text-light);
+    background-color: var(--color-pale-mint-dark);
     padding: 0.15rem 0.5rem;
     border-radius: 9999px;
     line-height: 1.4;
@@ -160,36 +160,36 @@ const colors = themeColors[theme] || themeColors['Foundations'];
   .card-title {
     font-family: var(--font-heading);
     font-size: 1.15rem;
-    font-weight: 500;
-    color: var(--color-charcoal);
+    font-weight: 600;
+    color: var(--color-text-dark);
     margin-bottom: 0.4rem;
     line-height: 1.3;
     transition: color 0.2s ease;
   }
 
   .card--active:hover .card-title {
-    color: var(--color-copper);
+    color: var(--color-racing-green);
   }
 
   .card-title--muted {
-    color: var(--color-stone);
+    color: var(--color-text-light);
   }
 
   .card-description {
     font-size: 0.9rem;
     line-height: 1.6;
-    color: var(--color-stone);
+    color: var(--color-text-medium);
     margin-bottom: 0.5rem;
   }
 
   .card-description--muted {
-    color: var(--color-stone-light);
+    color: var(--color-text-light);
   }
 
   .card-reading-time {
     display: inline-block;
     font-size: 0.75rem;
-    color: var(--color-stone-light);
+    color: var(--color-text-light);
     font-weight: 500;
     margin-top: 0.25rem;
   }
@@ -202,8 +202,8 @@ const colors = themeColors[theme] || themeColors['Foundations'];
     }
 
     .card--active:hover {
-      border-color: var(--color-night-copper);
-      box-shadow: 0 4px 24px rgba(212, 149, 90, 0.1);
+      border-color: var(--color-night-accent);
+      box-shadow: 0 4px 24px rgba(255, 183, 77, 0.1);
     }
 
     .card--coming-soon {
@@ -217,7 +217,7 @@ const colors = themeColors[theme] || themeColors['Foundations'];
     }
 
     .card--active:hover .card-title {
-      color: var(--color-night-copper);
+      color: var(--color-night-accent);
     }
 
     .card-title--muted {

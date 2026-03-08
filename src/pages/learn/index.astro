@@ -1,0 +1,737 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { learningPaths, quickStart, getTotalReadingTime } from '../../data/learning-paths';
+
+const totalMinutes = getTotalReadingTime();
+const totalHours = (totalMinutes / 60).toFixed(1);
+const totalArticles = learningPaths.reduce((sum, p) => sum + p.steps.length, 0);
+
+const difficultyColors: Record<string, { bg: string; text: string; darkBg: string; darkText: string }> = {
+  Beginner: { bg: 'var(--color-pale-mint)', text: 'var(--color-racing-green)', darkBg: 'rgba(76, 175, 80, 0.15)', darkText: 'var(--color-night-accent)' },
+  Intermediate: { bg: 'var(--color-peach)', text: 'var(--color-racing-green)', darkBg: 'rgba(255, 183, 77, 0.15)', darkText: 'var(--color-peach)' },
+  Advanced: { bg: 'var(--color-peach-dark)', text: 'var(--color-white)', darkBg: 'rgba(255, 152, 0, 0.2)', darkText: 'var(--color-peach-dark)' },
+};
+---
+
+<BaseLayout title="Learning Paths" description="Guided learning paths through the payments ecosystem">
+
+  <!-- Hero -->
+  <section class="lp-hero">
+    <div class="lp-hero-inner">
+      <div class="lp-ornament" aria-hidden="true">
+        <svg width="48" height="6" viewBox="0 0 48 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="3" cy="3" r="3" fill="currentColor" opacity="0.3" />
+          <line x1="12" y1="3" x2="36" y2="3" stroke="currentColor" stroke-width="1.5" opacity="0.2" />
+          <circle cx="45" cy="3" r="3" fill="currentColor" opacity="0.3" />
+        </svg>
+      </div>
+
+      <h1 class="lp-heading">Learning Paths</h1>
+
+      <p class="lp-subtitle">
+        A guided journey through the payments ecosystem &mdash; from your first
+        swipe to cross-border settlements. Pick a path, or chart your own course.
+      </p>
+
+      <p class="lp-stats">
+        {learningPaths.length} paths &middot; {totalArticles} articles &middot; ~{totalHours} hours of reading
+      </p>
+
+      <div class="lp-hero-rule" aria-hidden="true">
+        <div class="lp-hero-rule-line"></div>
+        <div class="lp-hero-rule-diamond"></div>
+        <div class="lp-hero-rule-line"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Start Callout -->
+  <section class="lp-quickstart-section">
+    <a href={`/topics/${quickStart.steps[0].slug}`} class="lp-quickstart">
+      <div class="lp-quickstart-left">
+        <div class="lp-quickstart-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d={quickStart.icon} />
+          </svg>
+        </div>
+        <div class="lp-quickstart-content">
+          <div class="lp-quickstart-title-row">
+            <h2 class="lp-quickstart-title">{quickStart.title}</h2>
+            <span class="lp-quickstart-badge">{quickStart.estimatedMinutes} min</span>
+          </div>
+          <p class="lp-quickstart-desc">{quickStart.description}</p>
+          <p class="lp-quickstart-steps">
+            {quickStart.steps.map((step, i) => (
+              <span>
+                {step.title}{i < quickStart.steps.length - 1 ? <span class="lp-quickstart-sep" aria-hidden="true"> &rarr; </span> : ''}
+              </span>
+            ))}
+          </p>
+        </div>
+      </div>
+      <span class="lp-quickstart-cta" aria-hidden="true">&rarr;</span>
+    </a>
+  </section>
+
+  <!-- Path Cards Grid -->
+  <section class="lp-paths-section">
+    <div class="lp-paths-grid">
+      {learningPaths.map((path, pathIndex) => (
+        <a
+          href={`/topics/${path.steps[0].slug}`}
+          class="lp-card"
+          style={`animation-delay: ${0.1 + pathIndex * 0.1}s;`}
+          data-difficulty={path.difficulty}
+        >
+          <div class="lp-card-header">
+            <span class="lp-card-numeral" aria-hidden="true">{path.numeral}</span>
+            <div class="lp-card-meta">
+              <h3 class="lp-card-title">{path.title}</h3>
+              <span class="lp-card-subtitle">{path.subtitle}</span>
+            </div>
+            <span
+              class="lp-card-difficulty"
+              data-level={path.difficulty}
+            >
+              {path.difficulty}
+            </span>
+          </div>
+
+          <p class="lp-card-desc">{path.description}</p>
+
+          <ol class="lp-card-steps">
+            {path.steps.map((step, stepIndex) => (
+              <li class="lp-step">
+                <div class="lp-step-marker">
+                  <span class="lp-step-dot"></span>
+                  {stepIndex < path.steps.length - 1 && (
+                    <span class="lp-step-line" aria-hidden="true"></span>
+                  )}
+                </div>
+                <div class="lp-step-content">
+                  <span class="lp-step-title">{step.title}</span>
+                  <span class="lp-step-time">{step.readingTime}</span>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          <div class="lp-card-footer">
+            <span class="lp-card-total">~{path.estimatedMinutes} min total</span>
+            <span class="lp-card-start">Start path &rarr;</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+  /* ===== Hero ===== */
+  .lp-hero {
+    padding: 5rem 1.5rem 2.5rem;
+    text-align: center;
+  }
+
+  .lp-hero-inner {
+    max-width: 40rem;
+    margin: 0 auto;
+  }
+
+  .lp-ornament {
+    color: var(--color-peach-dark);
+    margin-bottom: 2rem;
+    animation: lpFadeInDown 0.6s ease both;
+  }
+
+  .lp-heading {
+    font-family: var(--font-heading);
+    font-size: clamp(2.25rem, 5.5vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    color: var(--color-racing-green);
+    margin-bottom: 1.25rem;
+    animation: lpFadeInUp 0.7s ease both;
+    animation-delay: 0.1s;
+  }
+
+  .lp-subtitle {
+    font-family: var(--font-body);
+    font-size: clamp(1.02rem, 2vw, 1.18rem);
+    line-height: 1.7;
+    color: var(--color-text-medium);
+    max-width: 34rem;
+    margin: 0 auto 1.25rem;
+    animation: lpFadeInUp 0.7s ease both;
+    animation-delay: 0.25s;
+  }
+
+  .lp-stats {
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: var(--color-text-light);
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    animation: lpFadeInUp 0.7s ease both;
+    animation-delay: 0.35s;
+  }
+
+  .lp-hero-rule {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 2.5rem;
+    animation: lpFadeIn 0.8s ease both;
+    animation-delay: 0.5s;
+  }
+
+  .lp-hero-rule-line {
+    width: 3rem;
+    height: 1px;
+    background-color: var(--color-pale-mint-dark);
+  }
+
+  .lp-hero-rule-diamond {
+    width: 6px;
+    height: 6px;
+    background-color: var(--color-peach);
+    transform: rotate(45deg);
+    opacity: 0.5;
+  }
+
+  /* ===== Quick Start ===== */
+  .lp-quickstart-section {
+    padding: 0 1.5rem 2rem;
+    max-width: 72rem;
+    margin: 0 auto;
+    animation: lpFadeInUp 0.7s ease both;
+    animation-delay: 0.45s;
+  }
+
+  .lp-quickstart {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    background-color: var(--color-pale-mint);
+    border: 1px solid var(--color-pale-mint-dark);
+    border-left: 4px solid var(--color-peach-dark);
+    border-radius: 0.75rem;
+    padding: 1.5rem 2rem;
+    text-decoration: none;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+
+  .lp-quickstart:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    border-left-color: var(--color-peach);
+  }
+
+  .lp-quickstart-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+
+  .lp-quickstart-icon {
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-peach);
+    border-radius: 0.5rem;
+    color: var(--color-racing-green);
+  }
+
+  .lp-quickstart-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .lp-quickstart-title {
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-racing-green);
+    margin: 0;
+  }
+
+  .lp-quickstart-badge {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-peach-dark);
+    background-color: var(--color-white);
+    border: 1px solid var(--color-peach);
+    padding: 0.15rem 0.55rem;
+    border-radius: 9999px;
+  }
+
+  .lp-quickstart-desc {
+    font-family: var(--font-body);
+    font-size: 0.92rem;
+    color: var(--color-text-medium);
+    line-height: 1.6;
+    margin: 0 0 0.5rem;
+  }
+
+  .lp-quickstart-steps {
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--color-racing-green);
+    margin: 0;
+  }
+
+  .lp-quickstart-sep {
+    color: var(--color-peach-dark);
+    margin: 0 0.1rem;
+  }
+
+  .lp-quickstart-cta {
+    flex-shrink: 0;
+    font-size: 1.5rem;
+    color: var(--color-peach-dark);
+    transition: transform 0.2s ease;
+  }
+
+  .lp-quickstart:hover .lp-quickstart-cta {
+    transform: translateX(4px);
+  }
+
+  /* ===== Path Cards Grid ===== */
+  .lp-paths-section {
+    padding: 1rem 1.5rem 5rem;
+    max-width: 72rem;
+    margin: 0 auto;
+  }
+
+  .lp-paths-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .lp-paths-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  /* ===== Individual Card ===== */
+  .lp-card {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-pale-mint-dark);
+    border-radius: 0.75rem;
+    padding: 2rem 1.75rem 1.5rem;
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    animation: lpFadeInUp 0.6s ease both;
+  }
+
+  .lp-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-peach);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Card Header */
+  .lp-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .lp-card-numeral {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 2.5rem;
+    font-weight: 400;
+    line-height: 1;
+    color: var(--color-peach-dark);
+    opacity: 0.75;
+    flex-shrink: 0;
+    min-width: 2.5rem;
+  }
+
+  .lp-card-meta {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .lp-card-title {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-racing-green);
+    margin: 0 0 0.2rem;
+    line-height: 1.3;
+  }
+
+  .lp-card-subtitle {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-light);
+  }
+
+  .lp-card-difficulty {
+    flex-shrink: 0;
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+    white-space: nowrap;
+  }
+
+  .lp-card-difficulty[data-level="Beginner"] {
+    background-color: var(--color-pale-mint);
+    color: var(--color-racing-green);
+  }
+
+  .lp-card-difficulty[data-level="Intermediate"] {
+    background-color: var(--color-peach);
+    color: var(--color-racing-green);
+  }
+
+  .lp-card-difficulty[data-level="Advanced"] {
+    background-color: var(--color-peach-dark);
+    color: var(--color-white);
+  }
+
+  .lp-card-desc {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--color-text-medium);
+    line-height: 1.65;
+    margin: 0 0 1.25rem;
+  }
+
+  /* ===== Step List (Waypoints) ===== */
+  .lp-card-steps {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.25rem;
+    flex: 1;
+  }
+
+  .lp-step {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    position: relative;
+  }
+
+  .lp-step-marker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    width: 1rem;
+    padding-top: 0.35rem;
+  }
+
+  .lp-step-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--color-peach-dark);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .lp-step-line {
+    width: 1.5px;
+    flex: 1;
+    min-height: 100%;
+    background-color: var(--color-peach);
+    opacity: 0.4;
+  }
+
+  .lp-step-content {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.3rem 0 0.6rem;
+    border-bottom: 1px solid transparent;
+  }
+
+  .lp-step:last-child .lp-step-content {
+    padding-bottom: 0.3rem;
+  }
+
+  .lp-step-title {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-racing-green);
+    line-height: 1.4;
+  }
+
+  .lp-step-time {
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    color: var(--color-text-light);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Card Footer */
+  .lp-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-pale-mint-dark);
+  }
+
+  .lp-card-total {
+    font-family: var(--font-body);
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-text-light);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  .lp-card-start {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-peach-dark);
+    transition: transform 0.2s ease;
+  }
+
+  .lp-card:hover .lp-card-start {
+    transform: translateX(3px);
+  }
+
+  /* ===== Animations ===== */
+  @keyframes lpFadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes lpFadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes lpFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* ===== Dark Mode ===== */
+  html[data-theme="dark"] {
+    .lp-heading {
+      color: var(--color-night-text);
+    }
+
+    .lp-subtitle {
+      color: var(--color-night-text-muted);
+    }
+
+    .lp-stats {
+      color: var(--color-night-text-muted);
+    }
+
+    .lp-hero-rule-line {
+      background-color: var(--color-night-elevated);
+    }
+
+    .lp-hero-rule-diamond {
+      background-color: var(--color-night-accent);
+    }
+
+    /* Quick Start dark */
+    .lp-quickstart {
+      background-color: var(--color-night-surface);
+      border-color: var(--color-night-elevated);
+      border-left-color: var(--color-night-accent);
+    }
+
+    .lp-quickstart:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      border-left-color: var(--color-peach);
+    }
+
+    .lp-quickstart-icon {
+      background-color: rgba(255, 183, 77, 0.15);
+      color: var(--color-night-accent);
+    }
+
+    .lp-quickstart-title {
+      color: var(--color-night-text);
+    }
+
+    .lp-quickstart-badge {
+      background-color: var(--color-night-elevated);
+      border-color: var(--color-night-accent);
+      color: var(--color-night-accent);
+    }
+
+    .lp-quickstart-desc {
+      color: var(--color-night-text-muted);
+    }
+
+    .lp-quickstart-steps {
+      color: var(--color-night-text);
+    }
+
+    .lp-quickstart-sep {
+      color: var(--color-night-accent);
+    }
+
+    .lp-quickstart-cta {
+      color: var(--color-night-accent);
+    }
+
+    /* Cards dark */
+    .lp-card {
+      background-color: var(--color-night-surface);
+      border-color: var(--color-night-elevated);
+    }
+
+    .lp-card:hover {
+      border-color: var(--color-night-accent);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .lp-card-numeral {
+      color: var(--color-night-accent);
+      opacity: 0.6;
+    }
+
+    .lp-card-title {
+      color: var(--color-night-text);
+    }
+
+    .lp-card-subtitle {
+      color: var(--color-night-text-muted);
+    }
+
+    .lp-card-difficulty[data-level="Beginner"] {
+      background-color: rgba(76, 175, 80, 0.15);
+      color: var(--color-night-accent);
+    }
+
+    .lp-card-difficulty[data-level="Intermediate"] {
+      background-color: rgba(255, 183, 77, 0.15);
+      color: var(--color-peach);
+    }
+
+    .lp-card-difficulty[data-level="Advanced"] {
+      background-color: rgba(255, 152, 0, 0.2);
+      color: var(--color-peach-dark);
+    }
+
+    .lp-card-desc {
+      color: var(--color-night-text-muted);
+    }
+
+    .lp-step-dot {
+      background-color: var(--color-night-accent);
+    }
+
+    .lp-step-line {
+      background-color: var(--color-night-accent);
+      opacity: 0.25;
+    }
+
+    .lp-step-title {
+      color: var(--color-night-text);
+    }
+
+    .lp-step-time {
+      color: var(--color-night-text-muted);
+    }
+
+    .lp-card-footer {
+      border-top-color: var(--color-night-elevated);
+    }
+
+    .lp-card-total {
+      color: var(--color-night-text-muted);
+    }
+
+    .lp-card-start {
+      color: var(--color-night-accent);
+    }
+  }
+
+  /* ===== Responsive ===== */
+  @media (min-width: 768px) {
+    .lp-hero {
+      padding: 7rem 2rem 3rem;
+    }
+
+    .lp-quickstart-section {
+      padding: 0 2rem 2rem;
+    }
+
+    .lp-paths-section {
+      padding: 1rem 2rem 6rem;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .lp-quickstart {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1.25rem 1.25rem;
+    }
+
+    .lp-quickstart-left {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .lp-quickstart-cta {
+      align-self: flex-end;
+    }
+
+    .lp-card {
+      padding: 1.5rem 1.25rem 1.25rem;
+    }
+
+    .lp-card-numeral {
+      font-size: 2rem;
+      min-width: 2rem;
+    }
+  }
+</style>

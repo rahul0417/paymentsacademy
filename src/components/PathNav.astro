@@ -1,0 +1,208 @@
+---
+interface Props {
+  pathId: string;
+  pathTitle: string;
+  pathNumeral: string;
+  currentIndex: number;
+  totalSteps: number;
+  prevStep: { slug: string; title: string } | null;
+  nextStep: { slug: string; title: string } | null;
+}
+
+const {
+  pathId,
+  pathTitle,
+  pathNumeral,
+  currentIndex,
+  totalSteps,
+  prevStep,
+  nextStep,
+} = Astro.props;
+
+const progressPercent = ((currentIndex + 1) / totalSteps) * 100;
+const isFirst = currentIndex === 0;
+const isLast = currentIndex === totalSteps - 1;
+---
+
+<nav class="path-nav" aria-label={`Learning path navigation: ${pathTitle}`}>
+  <div class="path-nav-header">
+    <span class="path-nav-label">Learning Path {pathNumeral} · {pathTitle}</span>
+    <span class="path-nav-step">Step {currentIndex + 1} of {totalSteps}</span>
+  </div>
+
+  <div class="path-nav-progress" role="progressbar" aria-valuenow={currentIndex + 1} aria-valuemin={1} aria-valuemax={totalSteps}>
+    <div class="path-nav-progress-fill" style={`width: ${progressPercent}%`}></div>
+  </div>
+
+  <div class="path-nav-links">
+    <div class="path-nav-prev">
+      {prevStep ? (
+        <a href={`/topics/${prevStep.slug}`} class="path-nav-link">
+          &larr; Previous: {prevStep.title}
+        </a>
+      ) : (
+        <span class="path-nav-edge">Start of path</span>
+      )}
+    </div>
+    <div class="path-nav-next">
+      {nextStep ? (
+        <a href={`/topics/${nextStep.slug}`} class="path-nav-link">
+          Next: {nextStep.title} &rarr;
+        </a>
+      ) : (
+        <div class="path-nav-complete">
+          <span class="path-nav-complete-msg">You've completed this path!</span>
+          <a href="/learn" class="path-nav-link">Complete path &#10003;</a>
+        </div>
+      )}
+    </div>
+  </div>
+</nav>
+
+<style>
+  .path-nav {
+    background-color: var(--color-pale-mint);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-top: 3rem;
+  }
+
+  .path-nav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+
+  .path-nav-label {
+    font-family: var(--font-heading);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-light);
+  }
+
+  .path-nav-step {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: var(--color-text-light);
+  }
+
+  .path-nav-progress {
+    width: 100%;
+    height: 4px;
+    background-color: var(--color-pale-mint-dark);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+  }
+
+  .path-nav-progress-fill {
+    height: 100%;
+    background-color: var(--color-peach-dark);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+
+  .path-nav-links {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .path-nav-prev {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .path-nav-next {
+    flex: 1;
+    min-width: 0;
+    text-align: right;
+  }
+
+  .path-nav-link {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-racing-green);
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .path-nav-link:hover {
+    opacity: 0.7;
+    text-decoration: underline;
+  }
+
+  .path-nav-edge {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: var(--color-text-light);
+    font-style: italic;
+  }
+
+  .path-nav-complete {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.25rem;
+  }
+
+  .path-nav-complete-msg {
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    color: var(--color-text-medium);
+  }
+
+  /* Dark mode */
+  html[data-theme="dark"] .path-nav {
+    background-color: var(--color-night-surface);
+  }
+
+  html[data-theme="dark"] .path-nav-label,
+  html[data-theme="dark"] .path-nav-step {
+    color: var(--color-night-text-muted);
+  }
+
+  html[data-theme="dark"] .path-nav-progress {
+    background-color: var(--color-night-elevated);
+  }
+
+  html[data-theme="dark"] .path-nav-progress-fill {
+    background-color: var(--color-night-accent);
+  }
+
+  html[data-theme="dark"] .path-nav-link {
+    color: var(--color-night-accent);
+  }
+
+  html[data-theme="dark"] .path-nav-edge {
+    color: var(--color-night-text-muted);
+  }
+
+  html[data-theme="dark"] .path-nav-complete-msg {
+    color: var(--color-night-text-muted);
+  }
+
+  @media (max-width: 640px) {
+    .path-nav {
+      padding: 1.25rem 1rem;
+    }
+
+    .path-nav-links {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .path-nav-next {
+      text-align: left;
+    }
+
+    .path-nav-complete {
+      align-items: flex-start;
+    }
+  }
+</style>

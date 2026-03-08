@@ -2,6 +2,8 @@
 import BaseLayout from './BaseLayout.astro';
 import Sidebar from '../components/Sidebar.astro';
 import RelatedTopics from '../components/RelatedTopics.astro';
+import PathNav from '../components/PathNav.astro';
+import { getPathForSlug } from '../data/learning-paths';
 
 interface Props {
   title: string;
@@ -34,6 +36,8 @@ const themeColors: Record<string, string> = {
 };
 
 const badgeColor = themeColors[theme] || 'var(--color-text-medium)';
+
+const pathInfo = getPathForSlug(slug);
 ---
 
 <BaseLayout title={title} description={description}>
@@ -62,6 +66,18 @@ const badgeColor = themeColors[theme] || 'var(--color-text-medium)';
       <!-- Related topics -->
       {relatedTopics.length > 0 && (
         <RelatedTopics slugs={relatedTopics} />
+      )}
+
+      {pathInfo && (
+        <PathNav
+          pathId={pathInfo.path.id}
+          pathTitle={pathInfo.path.title}
+          pathNumeral={pathInfo.path.numeral}
+          currentIndex={pathInfo.stepIndex}
+          totalSteps={pathInfo.path.steps.length}
+          prevStep={pathInfo.stepIndex > 0 ? pathInfo.path.steps[pathInfo.stepIndex - 1] : null}
+          nextStep={pathInfo.stepIndex < pathInfo.path.steps.length - 1 ? pathInfo.path.steps[pathInfo.stepIndex + 1] : null}
+        />
       )}
     </article>
   </div>

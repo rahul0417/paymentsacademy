@@ -1,0 +1,153 @@
+---
+title: "Fraud & Risk"
+description: "The three types of payment fraud, where it gets caught, and why fighting fraud is a delicate balance between security and customer experience."
+theme: "Trust & Compliance"
+readingTime: "8 min read"
+order: 3
+relatedTopics: ["chargebacks-and-disputes", "authorization", "acceptance-environments"]
+glossaryTerms:
+  - term: "Friendly Fraud"
+    definition: "When a legitimate cardholder disputes a charge they actually made — either due to confusion or intentional abuse of the chargeback system."
+  - term: "Account Takeover"
+    definition: "When a fraudster gains access to a legitimate user's account through stolen credentials, phishing, or social engineering."
+  - term: "False Decline"
+    definition: "A legitimate transaction incorrectly blocked by fraud detection systems — often more costly than actual fraud."
+  - term: "Velocity Check"
+    definition: "A fraud rule that flags or blocks transactions when too many occur in a short time period from the same card or account."
+  - term: "AVS"
+    definition: "Address Verification Service — checks if the billing address provided matches the address on file with the card issuer."
+  - term: "CVV"
+    definition: "Card Verification Value — the 3-digit security code on the back of a card, proving the cardholder has the physical card."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## The Three Flavors of Fraud
+
+Not all payment fraud is created equal. When people hear "fraud," they picture a shadowy figure in a hoodie buying electronics with a stolen credit card. That's one type. But the fraud landscape is broader — and stranger — than most people realize.
+
+There are three distinct categories of payment fraud, and each one requires a fundamentally different approach to detect and prevent.
+
+### Friendly Fraud
+
+<GlossaryTerm term="Friendly Fraud" definition="When a legitimate cardholder disputes a charge they actually made — either due to confusion or intentional abuse of the chargeback system.">Friendly fraud</GlossaryTerm> is the most ironic name in payments. There's nothing friendly about it — at least not for the merchant.
+
+This is when a legitimate cardholder disputes a charge they actually made. Sometimes it's genuine confusion: the billing descriptor on their statement says "STRIPE* ACME LLC" and they have no idea what that is, so they call their bank and say "I don't recognize this charge." Sometimes a family member made the purchase — a teenager buying in-app currency on a parent's card.
+
+And sometimes it's intentional abuse. The customer ordered a product, received it, and then filed a chargeback claiming it never arrived — getting both the product and the refund. This is sometimes called "cyber-shoplifting," and it's estimated to account for 60-80% of all chargebacks.
+
+Friendly fraud is maddeningly difficult to fight. The cardholder is real. The card isn't stolen. The authentication checks pass. The fraud only manifests after the transaction is complete, when the dispute is filed.
+
+### Account Takeover
+
+<GlossaryTerm term="Account Takeover" definition="When a fraudster gains access to a legitimate user's account through stolen credentials, phishing, or social engineering.">Account takeover</GlossaryTerm> (ATO) is when a bad actor gains access to a legitimate user's account and makes transactions as if they were that person. The attack vectors are diverse:
+
+- **Credential stuffing:** Trying username/password combinations leaked from other data breaches. (This is why security experts beg people not to reuse passwords.)
+- **Phishing:** Tricking the user into entering their credentials on a fake login page.
+- **SIM swapping:** Convincing a mobile carrier to transfer the victim's phone number to a new SIM card, then intercepting SMS-based two-factor authentication codes.
+- **Social engineering:** Calling customer support and talking a rep into resetting the account password.
+
+ATO is particularly dangerous because the fraudster inherits all of the legitimate user's trust signals. Their account age, transaction history, and behavioral patterns all look normal — because they *are* normal. The fraudster is piggybacking on someone else's reputation.
+
+### True Fraud ("Fraudy Fraud")
+
+This is the classic scenario: a bad actor obtains stolen card data — from a data breach, a skimmer, a dark web marketplace — and uses it to make purchases. They don't have an account with the merchant. They don't know the cardholder. They're just running stolen numbers.
+
+Stolen card data is shockingly cheap. A valid credit card number with CVV and expiration date sells for $5-20 on dark web markets. A "fullz" — a complete identity package including SSN, date of birth, and address — might cost $30-50.
+
+True fraud is the most straightforward to detect because the fraudster's behavior doesn't match the cardholder's patterns. Different device, different location, different purchase behavior. But with millions of transactions per day, catching every instance without blocking legitimate customers is an enormous challenge.
+
+## Three Detection Points
+
+Fraud detection doesn't happen at a single moment. There are three distinct checkpoints where fraud can be caught, each with different tools and trade-offs:
+
+<MermaidDiagram
+  chart={`flowchart LR
+    subgraph PRE["Pre-Submission (Merchant Side)"]
+        P1[Device Fingerprinting]
+        P2[Behavioral Analytics]
+        P3[Velocity Checks]
+        P4[Address / Email / Phone Checks]
+    end
+    subgraph AUTH["Post-Authorization (Network / Acquirer)"]
+        A1[AVS Check]
+        A2[CVV Verification]
+        A3[3D Secure]
+        A4[Network Fraud Score]
+    end
+    subgraph ISS["Issuer-Side Decision"]
+        I1[Cardholder Spending Patterns]
+        I2[ML Fraud Models]
+        I3[Geographic / Device Signals]
+        I4[Approve or Decline]
+    end
+    PRE --> AUTH --> ISS`}
+  caption="The three fraud detection checkpoints: merchant-side, network/acquirer, and issuer"
+/>
+
+### Detection Point 1: Pre-Submission (Merchant Side)
+
+Before a transaction even reaches the card network, the merchant can evaluate it using their own fraud tools. This is the first line of defense.
+
+**Device fingerprinting** collects dozens of signals from the user's browser or phone — screen resolution, installed fonts, browser plugins, timezone, operating system version. This creates a unique identifier for the device. If a "new customer" is using a device that's already been associated with 15 chargebacks, that's a strong signal.
+
+**Behavioral analytics** go deeper. How fast is the user typing? Are they copy-pasting the card number (suggesting they're reading it from a stolen data file) or typing it manually (suggesting they have the physical card)? How long did they spend on the product page before checking out? Fraudsters tend to move fast and skip the browsing.
+
+**<GlossaryTerm term="Velocity Check" definition="A fraud rule that flags or blocks transactions when too many occur in a short time period from the same card or account.">Velocity checks</GlossaryTerm>** flag unusual patterns: five transactions in two minutes from the same IP address, or ten different cards used from the same device in an hour. Legitimate customers don't behave this way.
+
+Third-party fraud prevention platforms — Kount, Sift, Forter, Riskified — offer these capabilities as a service. They maintain massive databases of known fraudulent devices, emails, and addresses, and they use machine learning models trained on billions of transactions to score risk in real time.
+
+### Detection Point 2: Post-Authorization Signals
+
+When the transaction reaches the payment network, additional verification checks come into play.
+
+**<GlossaryTerm term="AVS" definition="Address Verification Service — checks if the billing address provided matches the address on file with the card issuer.">AVS</GlossaryTerm> (Address Verification Service)** compares the billing address submitted by the customer against the address on file with the card issuer. It returns a code indicating whether the street address and/or ZIP code match. A full match is a positive signal. A complete mismatch is a red flag — though not definitive, since people move, use work addresses, or mistype entries.
+
+**<GlossaryTerm term="CVV" definition="Card Verification Value — the 3-digit security code on the back of a card, proving the cardholder has the physical card.">CVV</GlossaryTerm> verification** checks the 3-digit code on the back of the card. If the fraudster obtained the card number from a database breach, they might not have the CVV. A CVV mismatch is a strong fraud signal. (This is also why merchants are prohibited from storing CVV data — it must be verified in real time and then discarded.)
+
+**3D Secure** (especially version 2.0) adds cardholder authentication. The issuing bank sends a challenge — typically an OTP to the cardholder's phone — and the cardholder must verify the transaction. If they can't, it's blocked. 3DS also shifts fraud liability from the merchant to the issuer, creating a powerful incentive for merchants to implement it.
+
+### Detection Point 3: Issuer-Side Decision
+
+The issuing bank is the final gatekeeper. When an authorization request arrives, the issuer's fraud models evaluate it against the cardholder's known patterns.
+
+Does the transaction fit the cardholder's typical spending? (A $3,000 purchase at an electronics store when the cardholder usually buys groceries.) Is the transaction originating from a geography where the cardholder has never been? Is the card being used at a merchant category that the cardholder never visits?
+
+Modern issuer fraud models are sophisticated ML systems trained on billions of historical transactions. They evaluate hundreds of signals in milliseconds and produce a risk score. High-risk transactions are declined automatically. Borderline cases might trigger a real-time notification to the cardholder: "Did you just make a $500 purchase at Best Buy? Reply YES to confirm."
+
+## The False Decline Problem
+
+Here's the uncomfortable math that makes fraud prevention so difficult: blocking more fraud also means blocking more legitimate transactions.
+
+A <GlossaryTerm term="False Decline" definition="A legitimate transaction incorrectly blocked by fraud detection systems — often more costly than actual fraud.">false decline</GlossaryTerm> occurs when a legitimate transaction is incorrectly rejected by fraud detection systems. The customer is real, the card is theirs, the purchase is genuine — but something in the data tripped a fraud rule or ML model, and the transaction was killed.
+
+False declines are far more common than most people realize. Industry estimates suggest that for every dollar of actual fraud, merchants lose $13-30 in false declines. A traveler buying a souvenir in a foreign country gets declined because their card has never been used there. A customer buying a gift for someone at a shipping address that doesn't match their billing address gets flagged. A person making a large purchase that's unusual for their spending pattern gets blocked.
+
+The customer experience is terrible. The customer is embarrassed at checkout, frustrated when their online order is rejected, and likely to take their business elsewhere. Studies show that 33% of consumers who experience a false decline will never shop with that merchant again.
+
+This creates the **fraud paradox**: a system with zero fraud is not a good system. It means you're blocking so many legitimate transactions that the cost of prevention far exceeds the cost of the fraud itself. The optimal fraud rate is *not* zero — it's the rate at which the marginal cost of preventing one more dollar of fraud equals the marginal cost of the false declines you create in the process.
+
+## The EMV Shift
+
+The introduction of EMV chip cards in the US (with the liability shift in October 2015) dramatically reduced card-present fraud. Chip cards generate a unique cryptogram for each transaction, making counterfeit card creation virtually impossible.
+
+But fraud doesn't disappear — it migrates. When chip cards made in-person fraud harder, fraudsters pivoted to card-not-present (CNP) channels: online shopping, phone orders, and mail orders. CNP fraud has roughly doubled since the EMV liability shift was implemented, now accounting for the vast majority of card fraud in developed markets.
+
+This is the "whack-a-mole" dynamic in fraud prevention. Every security improvement in one channel pushes fraud to less-protected channels. EMV chips solved in-person fraud but supercharged online fraud. 3D Secure is addressing online fraud but creates friction that can push customers to alternative payment methods with their own fraud vectors.
+
+## The Scale of the Problem
+
+Global card fraud exceeds $32 billion annually, and it's growing. E-commerce fraud specifically is growing faster than e-commerce itself — meaning fraud is capturing an increasing share of digital transactions.
+
+The fraud ecosystem is sophisticated and industrialized. It's not individual bad actors — it's organized operations with specialized roles. One group steals card data. Another group packages and sells it. A third group uses it for purchases. A fourth group reshapes, launders, or resells the goods. Some operations even have "customer support" for their buyers of stolen data.
+
+For merchants, the calculus is clear: invest in fraud prevention, but not so much that you destroy the customer experience. For issuers, it's about building better models without declining the legitimate international traveler. For the industry, it's an arms race — and the fraudsters are relentless innovators.
+
+## Finding the Balance
+
+The best fraud prevention systems share a common philosophy: make it easy for good customers and hard for bad actors. That means using invisible signals (device fingerprinting, behavioral analytics) rather than visible friction (CAPTCHAs, multi-step verification) wherever possible.
+
+It means accepting that some fraud will get through — and that's okay, as long as the total cost (fraud losses plus false declines plus customer friction) is minimized. And it means continuously learning, because the moment you close one attack vector, fraudsters are already probing the next one.
+
+In payments, fraud is never solved. It's managed.

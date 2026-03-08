@@ -1,0 +1,158 @@
+---
+title: "Chargebacks & Disputes"
+description: "What happens when a cardholder says 'I didn't authorize that' — the dispute process, liability rules, and why chargebacks cost merchants billions."
+theme: "Transaction Lifecycle"
+readingTime: "9 min read"
+order: 3
+relatedTopics: ["authorization", "liability", "fraud-and-risk"]
+glossaryTerms:
+  - term: "Chargeback"
+    definition: "A forced reversal of a card transaction initiated by the cardholder's bank — pulling funds back from the merchant through the card network."
+  - term: "Provisional Credit"
+    definition: "A temporary credit issued to the cardholder by their bank while a dispute is being investigated — the cardholder gets their money back immediately, before anyone determines who's at fault."
+  - term: "Representment"
+    definition: "The process where a merchant challenges a chargeback by submitting evidence that the transaction was legitimate — literally 're-presenting' the charge."
+  - term: "Regulation E"
+    definition: "The federal regulation governing electronic fund transfers, including debit card transactions. It defines consumer liability limits and dispute resolution timelines for debit cards."
+  - term: "Regulation Z"
+    definition: "The federal regulation implementing the Truth in Lending Act, covering credit card transactions. It caps consumer liability for unauthorized charges at $50 (and most issuers waive even that)."
+  - term: "Friendly Fraud"
+    definition: "A chargeback filed by a cardholder who actually made or authorized the purchase — whether intentionally (to get something for free) or due to confusion about the charge."
+  - term: "3D Secure"
+    definition: "An authentication protocol for online card payments that adds a verification step (like a one-time code) to shift fraud liability from the merchant to the issuer."
+  - term: "Reason Code"
+    definition: "A standardized code assigned to a chargeback by the card network that categorizes the dispute — such as fraud, merchandise not received, or duplicate processing."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## The Nuclear Option
+
+In most industries, if a customer is unhappy with a purchase, they go back to the seller and ask for a refund. In card payments, customers have a second option: they can skip the merchant entirely and go straight to their bank.
+
+That's a <GlossaryTerm term="Chargeback" definition="A forced reversal of a card transaction initiated by the cardholder's bank — pulling funds back from the merchant through the card network.">chargeback</GlossaryTerm>. It's a forced reversal of a transaction, initiated by the cardholder's issuing bank, that pulls money back from the merchant through the card network. The merchant doesn't get a choice — the money is taken first, and they can argue later.
+
+Chargebacks were designed as a consumer protection mechanism, and they work remarkably well for that purpose. But they've also become one of the most expensive and contentious aspects of card payments. U.S. merchants lose an estimated $40+ billion per year to chargebacks — and that number keeps growing.
+
+Let's break down how the system works, why it's set up this way, and why merchants find it so painful.
+
+## The Legal Foundation
+
+Chargebacks don't exist because Visa and Mastercard are generous. They exist because of federal law.
+
+<GlossaryTerm term="Regulation Z" definition="The federal regulation implementing the Truth in Lending Act, covering credit card transactions. It caps consumer liability for unauthorized charges at $50 (and most issuers waive even that).">Regulation Z</GlossaryTerm> (implementing the Truth in Lending Act) governs credit card transactions. It caps consumer liability for unauthorized charges at $50 — and in practice, virtually every major issuer waives even that, offering zero-liability policies. If someone steals your credit card number and racks up $10,000 in charges, you owe nothing.
+
+<GlossaryTerm term="Regulation E" definition="The federal regulation governing electronic fund transfers, including debit card transactions. It defines consumer liability limits and dispute resolution timelines for debit cards.">Regulation E</GlossaryTerm> (implementing the Electronic Fund Transfer Act) covers debit cards. The rules are slightly less favorable for consumers: if you report unauthorized use within two business days, your liability is capped at $50. Wait between 2 and 60 days, and it jumps to $500. After 60 days, you could be liable for the full amount.
+
+These regulations give cardholders enormous power. And the card networks (Visa, Mastercard) have layered their own rules on top — extending the window for disputes, standardizing the process, and creating frameworks for arbitration.
+
+## The Chargeback Flow
+
+Here's how a dispute unfolds, step by step:
+
+<MermaidDiagram
+  chart={`sequenceDiagram
+    participant CH as Cardholder
+    participant I as Issuing Bank
+    participant N as Card Network
+    participant A as Acquiring Bank
+    participant M as Merchant
+    CH->>I: "I didn't make this charge"
+    I->>CH: Issue provisional credit
+    I->>N: File chargeback with reason code
+    N->>A: Forward chargeback
+    A->>M: Debit merchant, notify of dispute
+    Note over M: Merchant has 30-45 days to respond
+    alt Merchant accepts
+        M->>A: No response (accepts loss)
+    else Merchant fights back
+        M->>A: Submit representment evidence
+        A->>N: Forward representment
+        N->>I: Forward to issuer for review
+        alt Issuer accepts evidence
+            I->>CH: Reverse provisional credit
+            I-->>N: Chargeback reversed
+        else Issuer rejects evidence
+            I->>N: Escalate to arbitration
+            Note over N: Network makes final decision
+        end
+    end`}
+  caption="The chargeback lifecycle: from initial dispute through representment and potential arbitration"
+/>
+
+**Step 1: The cardholder contacts their bank.** The cardholder sees a charge they don't recognize (or didn't authorize, or for a product they never received) and calls their issuing bank. Increasingly, this happens through mobile apps — most banking apps now have a "dispute this charge" button next to every transaction.
+
+**Step 2: Provisional credit.** The issuing bank issues a <GlossaryTerm term="Provisional Credit" definition="A temporary credit issued to the cardholder by their bank while a dispute is being investigated — the cardholder gets their money back immediately, before anyone determines who's at fault.">provisional credit</GlossaryTerm> to the cardholder. This is key — the consumer gets their money back *immediately*, before anyone investigates whether the dispute is valid. For the cardholder, the problem is essentially solved at this point.
+
+**Step 3: The chargeback is filed.** The issuing bank assigns a <GlossaryTerm term="Reason Code" definition="A standardized code assigned to a chargeback by the card network that categorizes the dispute — such as fraud, merchandise not received, or duplicate processing.">reason code</GlossaryTerm> and sends the chargeback through the card network to the acquiring bank. Reason codes categorize the dispute:
+
+- **Fraud (10.4 on Visa, 4837 on Mastercard):** "I didn't make this transaction."
+- **Merchandise not received (13.1 on Visa):** "I paid but never got the product."
+- **Not as described (13.3 on Visa):** "What I received was different from what was advertised."
+- **Duplicate processing (12.4 on Visa):** "I was charged twice for the same purchase."
+- **Credit not processed (13.6 on Visa):** "The merchant promised a refund but never issued it."
+
+**Step 4: The merchant gets hit.** The acquiring bank debits the chargeback amount from the merchant's account and notifies them of the dispute. Along with the chargeback amount, the merchant is also charged a **chargeback fee** — typically $25 to $35 per incident, regardless of whether the dispute is legitimate. This fee covers the acquirer's cost of processing the dispute.
+
+**Step 5: The merchant responds — or doesn't.** The merchant now has 30–45 days (depending on the network) to respond. They have two options: accept the chargeback and absorb the loss, or fight back through <GlossaryTerm term="Representment" definition="The process where a merchant challenges a chargeback by submitting evidence that the transaction was legitimate — literally 're-presenting' the charge.">representment</GlossaryTerm>.
+
+## Representment: Fighting Back
+
+To win a representment, the merchant must provide **compelling evidence** that the transaction was legitimate. What counts as compelling evidence depends on the reason code:
+
+- **Fraud claim?** Show a signed receipt, delivery confirmation with the cardholder's address, IP address matching the billing address, or proof that the cardholder authenticated with 3D Secure.
+- **Merchandise not received?** Show shipping tracking with delivery confirmation, ideally with a signature.
+- **Not as described?** Show product descriptions, photos, terms of service, and communications with the customer.
+
+The issuing bank reviews the evidence and decides whether to reverse the chargeback. If they reject the merchant's evidence, the merchant can escalate to arbitration — where the card network makes the final decision. But arbitration carries a steep fee (several hundred dollars on Visa, up to $500 on Mastercard), so most merchants only escalate high-value disputes.
+
+Merchants win representment about 20–30% of the time, depending on the industry and the quality of their evidence. That win rate is frustratingly low, which is why chargeback prevention is typically more cost-effective than chargeback fighting.
+
+## The 1% Threshold
+
+Card networks monitor every merchant's chargeback rate — the number of chargebacks divided by the number of transactions. If a merchant's rate exceeds approximately **1%** of transactions (Visa's threshold) or **1.5%** (Mastercard's), they enter a monitoring program.
+
+Monitoring programs start with warnings and escalate to mandatory action plans, increased processing fees, and ultimately the threat of being terminated by their acquirer. A merchant that can't get their chargeback rate under control can lose the ability to accept cards entirely — which for most businesses is effectively a death sentence.
+
+This is why merchants with high-risk profiles (online gambling, subscription services, adult content, travel agencies) struggle to find acquirers willing to work with them. Their chargeback rates are inherently higher, and acquirers don't want to risk network fines.
+
+## The EMV Liability Shift
+
+In October 2015, the U.S. card networks implemented the **EMV liability shift**: if a merchant doesn't support chip card reading and a counterfeit card is used, the fraud liability shifts to the merchant. Before the shift, issuers absorbed most counterfeit fraud losses. After it, the party with the weakest security bears the cost.
+
+This drove chip terminal adoption across the U.S. and dramatically reduced in-person counterfeit fraud. But it also pushed fraudsters online, where there's no chip to verify.
+
+## CNP Fraud and 3D Secure
+
+Card-not-present (CNP) fraud — fraud committed online, over the phone, or via mail order — now dwarfs in-person fraud. When there's no physical card to read, verifying the cardholder's identity is much harder. Anyone who has your card number, expiration date, and CVV can attempt a purchase.
+
+<GlossaryTerm term="3D Secure" definition="An authentication protocol for online card payments that adds a verification step (like a one-time code) to shift fraud liability from the merchant to the issuer.">3D Secure</GlossaryTerm> is the industry's answer to this problem. It adds a cardholder authentication step during online checkout.
+
+**3D Secure 1.0** (launched in the early 2000s as "Verified by Visa" and "Mastercard SecureCode") was widely disliked. It redirected shoppers to a clunky pop-up that asked for a password, causing high cart abandonment. Many merchants refused to implement it.
+
+**3D Secure 2.0** (rolled out starting in 2019) is a major improvement. It passes over 100 data elements to the issuer behind the scenes — device fingerprint, transaction history, shipping address — allowing silent risk assessment. Low-risk transactions flow through without any customer challenge. Only high-risk ones trigger a step-up, typically a one-time code sent to the cardholder's phone.
+
+The key incentive: when a merchant uses 3D Secure and the transaction is authenticated, **liability for fraud shifts to the issuer**. This mirrors the EMV chip logic — invest in better security, and you're shielded from fraud losses.
+
+## Friendly Fraud: The Growing Problem
+
+Not all chargebacks are legitimate. <GlossaryTerm term="Friendly Fraud" definition="A chargeback filed by a cardholder who actually made or authorized the purchase — whether intentionally (to get something for free) or due to confusion about the charge.">Friendly fraud</GlossaryTerm> — also called first-party fraud — is when the actual cardholder files a dispute for a transaction they genuinely made.
+
+Sometimes it's intentional — a consumer buys an item, receives it, then files a chargeback claiming it never arrived. Sometimes it's unintentional — the cardholder doesn't recognize the merchant name on their statement, a family member made the purchase, or they forgot about a subscription.
+
+Friendly fraud is estimated to account for 60–80% of all chargebacks. It's the hardest to fight because "I didn't authorize this" is difficult to disprove. Merchants combat it through clearer billing descriptors, explicit cancellation policies, proactive customer communication, and detailed record-keeping.
+
+## The True Cost of Chargebacks
+
+A chargeback doesn't just cost the merchant the transaction amount. The full cost stacks up: the purchase price, the lost merchandise (the customer still has it), a $25–$35 chargeback fee, non-refunded processing fees, and the staff time spent on representment. High chargeback rates also trigger higher processing fees or account termination.
+
+Industry estimates put the true cost at roughly **2 to 3 times the original transaction amount**. A $100 chargeback might cost the merchant $200–$300. This is why chargeback prevention — fraud detection, 3D Secure, better customer service, clear billing descriptors — is almost always cheaper than chargeback resolution.
+
+## The Asymmetry of Power
+
+The chargeback system is deliberately tilted in favor of the consumer — by design. Reg E and Reg Z exist to protect individuals from fraud and unscrupulous merchants.
+
+But this creates real pain for legitimate businesses. Provisional credit means the cardholder gets money back before anyone investigates. Representment is time-consuming with a low win rate. The chargeback fee applies regardless of outcome. And the 1% threshold penalizes merchants even for chargebacks that aren't their fault.
+
+Merchants accept this because the alternative — not accepting cards — is far worse. Chargebacks are the cost of participating in the card economy, and understanding their rules, economics, and asymmetries is one of the most valuable skills in payments.

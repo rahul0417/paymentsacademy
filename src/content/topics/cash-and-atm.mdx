@@ -1,0 +1,126 @@
+---
+title: "Cash & ATM Transactions"
+description: "Cash isn't dead — how cash payments, ATM networks, and cash-based digital payment methods still serve billions of people worldwide."
+theme: "Non-Card Payments"
+readingTime: "5 min read"
+order: 4
+relatedTopics: ["digital-wallets", "bank-based-payments", "acceptance-environments"]
+glossaryTerms:
+  - term: "Cash-on-Delivery"
+    definition: "A payment method where consumers pay in cash when goods are delivered — still common in emerging markets for e-commerce."
+  - term: "Boleto Bancário"
+    definition: "A Brazilian payment method where consumers print a voucher and pay at banks, convenience stores, or via online banking."
+  - term: "ATM Network"
+    definition: "Networks like Plus (Visa), Cirrus (Mastercard), MoneyPass, and Allpoint that enable cross-bank ATM access."
+  - term: "Reverse Interchange"
+    definition: "In ATM transactions, the issuing bank pays the ATM owner — the opposite of card purchase interchange."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## Reports of Cash's Death Are Greatly Exaggerated
+
+In developed markets, the narrative is that cash is dying. Sweden and Norway are approaching cashless societies. The US and UK see cash usage declining year after year. But zoom out to a global view and the picture changes dramatically.
+
+Over 1.4 billion adults worldwide remain unbanked — no bank account, no card, no digital wallet. In India, cash still accounts for over 60% of consumer transactions by volume. In many parts of Africa, Southeast Asia, and Latin America, cash is the only payment method that works reliably everywhere.
+
+Even in the United States, cash remains the most commonly used payment method for transactions under $10. The Federal Reserve's own data shows that cash accounts for roughly 20% of all transactions — and that share has been remarkably stable despite the growth of digital payments.
+
+Cash persists for good reasons: it requires no infrastructure, no internet, no bank account, no electricity. It's private. It's immediate. It's universally accepted. And for billions of people, it's the only option.
+
+## ATM Networks: The Cash Distribution System
+
+When you withdraw cash from an ATM that doesn't belong to your bank, a network of relationships makes that possible.
+
+<GlossaryTerm term="ATM Network" definition="Networks like Plus (Visa), Cirrus (Mastercard), MoneyPass, and Allpoint that enable cross-bank ATM access.">ATM networks</GlossaryTerm> connect banks and ATM operators so your card works at machines you've never seen before. The major global networks are **Plus** (owned by Visa) and **Cirrus** (owned by Mastercard). If your debit card has a Plus or Cirrus logo, you can withdraw cash from any ATM on that network, anywhere in the world.
+
+The economics of ATM transactions are the opposite of card purchase transactions — and that's not just a metaphor.
+
+<MermaidDiagram
+  chart={`sequenceDiagram
+    participant CH as Cardholder
+    participant ATM as ATM (owned by ATM operator)
+    participant NET as ATM Network (Plus/Cirrus)
+    participant ISS as Issuing Bank
+    CH->>ATM: Inserts card, requests $200
+    ATM->>NET: Routes withdrawal request
+    NET->>ISS: Forwards to cardholder's bank
+    ISS->>ISS: Checks balance, approves
+    ISS-->>NET: Approval + settlement
+    Note over ISS,ATM: Reverse interchange: issuer pays ATM owner
+    NET-->>ATM: Dispenses $200
+    ATM->>CH: Cash dispensed
+    Note over CH: Cardholder may also pay a surcharge fee`}
+  caption="ATM withdrawal flow: unlike card purchases, the issuing bank pays the ATM owner (reverse interchange)"
+/>
+
+In card purchase transactions, the merchant's bank (acquirer) pays the cardholder's bank (issuer) an interchange fee. At ATMs, it's reversed: the cardholder's bank (issuer) pays the ATM owner. This is <GlossaryTerm term="Reverse Interchange" definition="In ATM transactions, the issuing bank pays the ATM owner — the opposite of card purchase interchange.">reverse interchange</GlossaryTerm>. The logic makes sense — the ATM owner is providing a service (cash dispensing) to another bank's customer, and deserves compensation.
+
+On top of reverse interchange, the ATM operator may charge the consumer a surcharge — that $2.50 or $3.00 fee you see on the screen before confirming the withdrawal. This surcharge goes directly to the ATM owner. Your issuing bank may add its own out-of-network fee on top.
+
+### Surcharge-Free Networks
+
+Here's where it gets interesting for fintech. Two major surcharge-free ATM networks have become critical infrastructure for neobanks and challenger banks.
+
+**Allpoint** operates roughly 45,000 surcharge-free ATMs, primarily inside convenience stores, pharmacies, and grocery stores (CVS, Target, Kroger, Walgreens). **MoneyPass** operates about 32,000 surcharge-free ATMs.
+
+Neobanks like Chime, Varo, and Current — which have no physical branches and no ATMs of their own — partner with these surcharge-free networks to give their customers free cash access. When Chime advertises "fee-free ATM access at 60,000+ locations," they're referring to Allpoint and MoneyPass network ATMs.
+
+The bank pays the surcharge-free network a small per-transaction fee (much less than the $2–3 consumer surcharge at out-of-network ATMs). For neobanks whose customers skew younger and expect free everything, this is a necessary cost of doing business.
+
+## Cash-on-Delivery: E-Commerce Without Electronic Payment
+
+<GlossaryTerm term="Cash-on-Delivery" definition="A payment method where consumers pay in cash when goods are delivered — still common in emerging markets for e-commerce.">Cash-on-delivery</GlossaryTerm> (COD) seems like an anachronism, but it remains one of the most important payment methods in e-commerce across emerging markets.
+
+In India, COD accounted for roughly 50% of e-commerce orders as recently as a few years ago (though UPI is rapidly reducing that share). In parts of Southeast Asia and the Middle East, COD remains the dominant e-commerce payment method. In Saudi Arabia and Egypt, a significant majority of online orders are paid for in cash upon delivery.
+
+Why does COD persist in e-commerce? Trust. Consumers in markets with weaker consumer protection laws don't trust prepaying for goods they haven't seen. Will the product actually arrive? Will it match the description? With COD, the consumer inspects the goods before handing over cash. The delivery person acts as a mobile point-of-sale terminal.
+
+COD creates enormous operational challenges for e-commerce companies. Delivery drivers carry cash, creating security risks. Return rates are higher (it's easier to refuse delivery than to request a refund). Cash collection and reconciliation add costs. Failed deliveries (customer not home) waste logistics resources.
+
+This is why companies like Flipkart and Amazon India have aggressively pushed digital payment adoption — not just for the consumer experience, but to reduce the operational burden of cash handling.
+
+## Boleto Bancario: Brazil's Paper-Based Digital Payment
+
+<GlossaryTerm term="Boleto Bancário" definition="A Brazilian payment method where consumers print a voucher and pay at banks, convenience stores, or via online banking.">Boleto Bancário</GlossaryTerm> is one of the most unique payment methods in the world. It bridges the gap between digital commerce and cash payment.
+
+Here's how it works: a Brazilian consumer shopping online selects Boleto as their payment method. The e-commerce site generates a voucher — a document with a barcode and a reference number. The consumer can then pay this voucher in several ways: by printing it and paying at a bank branch, by taking it (or the barcode) to a convenience store (lotérica) and paying in cash, or by scanning the barcode in their online banking app.
+
+Boleto allows Brazilians without credit cards to participate in e-commerce. It also appeals to consumers who don't want to share card details online. Boleto processes billions of transactions annually and remains a critical payment method despite the growth of Pix (Brazil's real-time payment system).
+
+The downside for merchants: Boleto payments aren't guaranteed. A consumer can generate a Boleto and never pay it — the goods sit in limbo until the voucher expires. This creates inventory management headaches and abandoned-order rates that far exceed card payment abandonment.
+
+## Cash Top-Ups for Digital Wallets
+
+An important bridge between cash and digital payments is the cash top-up — depositing physical cash to load a digital wallet or prepaid account.
+
+**M-PESA agents** are the canonical example. In Kenya and across East Africa, a network of over 600,000 agent locations (shops, kiosks, gas stations) allows consumers to hand over cash and have their M-PESA mobile wallet credited. These agents effectively serve as human ATMs in reverse.
+
+**Convenience store kiosks** serve a similar function in other markets. In Japan, consumers can pay for online purchases at convenience stores (konbini). In Mexico, OXXO stores (the country's dominant convenience chain with over 20,000 locations) let consumers pay bills, top up digital wallets, and settle e-commerce orders with cash.
+
+These cash-in points are the on-ramp that connects the cash economy to the digital economy. Without them, the billions of people who earn and transact in cash would be locked out of digital services entirely.
+
+## Why Cash Persists
+
+The resilience of cash comes down to several fundamental advantages that digital payments can't fully replicate.
+
+**No infrastructure required.** Cash works without electricity, internet, terminals, or software. During natural disasters, power outages, and system failures, cash is the last payment method standing.
+
+**Privacy.** Cash transactions leave no digital trail. For consumers concerned about data collection, surveillance, or simply their purchasing habits being tracked, cash offers anonymity that no digital payment can match.
+
+**Universal acceptance.** Every merchant, street vendor, farmer's market stall, and lemonade stand accepts cash. Digital payment acceptance requires hardware, software, internet connectivity, and a merchant account — barriers that exclude the smallest and most informal businesses.
+
+**Financial inclusion.** The 1.4 billion unbanked adults globally can use cash. They can't use cards, bank transfers, or most digital wallets. Until financial inclusion reaches everyone — and it hasn't — cash remains essential.
+
+**Budgeting simplicity.** Research consistently shows that consumers spend less when using cash than when using cards or digital payments. The physical act of handing over bills makes spending feel more real. For consumers managing tight budgets, this psychological friction is a feature, not a bug.
+
+## The Decline in Developed Markets
+
+Despite its advantages, cash usage is declining steadily in developed economies. Sweden leads: cash now represents less than 10% of retail transactions. The UK, Australia, Canada, and the US all show declining cash usage year over year.
+
+COVID-19 accelerated this decline. Hygiene concerns, temporary business closures, and the growth of e-commerce pushed consumers toward contactless and digital payments. Many businesses went cashless — refusing physical currency entirely.
+
+But even in developed markets, complete cashlessness faces resistance. The US has seen legislation in several states and cities (Philadelphia, New York City, San Francisco, New Jersey) banning cashless stores, arguing they discriminate against low-income and unbanked populations. The European Central Bank has affirmed cash as legal tender that must be accepted.
+
+The future isn't cashless. It's cash-optional. Cash will shrink as a share of transactions but persist as a payment method for decades — supported by regulation, necessity, and the simple reality that for billions of people, it still works better than the alternatives.

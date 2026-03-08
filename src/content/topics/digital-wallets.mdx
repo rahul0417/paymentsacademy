@@ -1,0 +1,133 @@
+---
+title: "Digital Wallets"
+description: "From Apple Pay to Alipay — how digital wallets work, the difference between pass-through and staged wallets, and why they're reshaping payments globally."
+theme: "Non-Card Payments"
+readingTime: "8 min read"
+order: 2
+relatedTopics: ["card-networks", "acceptance-environments", "real-time-payments"]
+glossaryTerms:
+  - term: "Pass-Through Wallet"
+    definition: "A wallet like Apple Pay that stores card credentials and processes transactions over the underlying card network rails."
+  - term: "Staged Wallet"
+    definition: "A wallet like PayPal that holds its own balance of funds, with users loading money in via bank transfer or card."
+  - term: "DPAN"
+    definition: "Device PAN — a token issued by the card network that replaces the actual card number on a specific device."
+  - term: "Network Tokenization"
+    definition: "Card networks issuing device-specific tokens (DPANs) so the real card number is never stored on a device or shared with merchants."
+  - term: "QR Code Payment"
+    definition: "A payment method where users scan a QR code to initiate a payment — dominant in China and India via Alipay, WeChat Pay, and UPI."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## Two Wallets, Two Worlds
+
+The term "digital wallet" gets thrown around loosely, but it covers two fundamentally different things. Apple Pay and Alipay are both called digital wallets. They both live on your phone. They both let you pay at stores. But underneath, they work in completely different ways — and that difference shapes the economics of payments across the globe.
+
+Understanding the distinction between <GlossaryTerm term="Pass-Through Wallet" definition="A wallet like Apple Pay that stores card credentials and processes transactions over the underlying card network rails.">pass-through wallets</GlossaryTerm> and <GlossaryTerm term="Staged Wallet" definition="A wallet like PayPal that holds its own balance of funds, with users loading money in via bank transfer or card.">staged wallets</GlossaryTerm> is essential. It explains why Apple doesn't take credit risk, why Alipay became a financial empire, and why the Western and Eastern halves of the world evolved radically different payment ecosystems.
+
+<MermaidDiagram
+  chart={`flowchart LR
+    subgraph PT["Pass-Through Wallet (Apple Pay)"]
+      direction TB
+      U1[User adds card to wallet] --> T1[Wallet stores DPAN token]
+      T1 --> P1[Tap to pay at terminal]
+      P1 --> N1[Transaction routes over Visa/MC rails]
+      N1 --> S1[Issuing bank settles normally]
+    end
+    subgraph ST["Staged Wallet (Alipay)"]
+      direction TB
+      U2[User loads balance via bank/card] --> T2[Wallet holds funds]
+      T2 --> P2[Scan QR code to pay]
+      P2 --> N2[Alipay settles with merchant directly]
+      N2 --> S2[No card network involved]
+    end`}
+  caption="Pass-through wallets ride on existing card network rails. Staged wallets hold their own funds and settle directly with merchants."
+/>
+
+## Pass-Through Wallets: Apple Pay, Google Pay, Samsung Pay
+
+When you add a Visa card to Apple Pay, your actual card number never touches the phone. Instead, Visa issues a <GlossaryTerm term="DPAN" definition="Device PAN — a token issued by the card network that replaces the actual card number on a specific device.">DPAN</GlossaryTerm> (Device PAN) — a unique token tied to that specific device. This is <GlossaryTerm term="Network Tokenization" definition="Card networks issuing device-specific tokens (DPANs) so the real card number is never stored on a device or shared with merchants.">network tokenization</GlossaryTerm> in action.
+
+Here's what happens when you tap your iPhone at a terminal:
+
+1. You authenticate with Face ID, Touch ID, or your passcode.
+2. The phone transmits the DPAN and a one-time cryptogram via NFC to the merchant's terminal.
+3. The terminal sends this to the acquirer, which routes it to Visa.
+4. Visa maps the DPAN back to your real card number and forwards the authorization to your issuing bank.
+5. Your issuing bank approves or declines, just like any card transaction.
+
+The critical insight: **the entire transaction flows over the existing card network.** Visa/Mastercard earn their assessment fees. The issuing bank earns interchange. The acquirer earns its markup. Apple doesn't see the transaction amount, doesn't take credit risk, and doesn't settle with the merchant.
+
+So how does Apple make money? Apple charges the issuing bank a small fee — roughly 0.15% per transaction — for the privilege of being in Apple's wallet. The issuer pays willingly because Apple Pay transactions have dramatically lower fraud rates (thanks to biometric authentication and device-bound tokens) and because issuers want their cards to be the default card in Apple Pay.
+
+Google Pay and Samsung Pay work on the same principle. They're pass-through wallets that tokenize existing cards and route transactions over card network rails. The wallet itself is a convenience layer, not a financial intermediary.
+
+## Staged Wallets: PayPal, Alipay, WeChat Pay, M-PESA
+
+Staged wallets are a different animal entirely. They hold actual money — a stored balance that the user has loaded in via bank transfer, card, cash, or incoming payments from other users.
+
+### PayPal: The Original Digital Wallet
+
+PayPal's origin story is legendary. Founded in 1998 (as Confinity, merging with Elon Musk's X.com), PayPal became the default payment method on eBay by solving a real problem: buyers didn't trust sending money to strangers, and sellers didn't trust checks from strangers. PayPal sat in the middle, holding both sides' money in escrow until the transaction was complete.
+
+To drive adoption, PayPal famously spent $60–70 million on referral bonuses — literally paying people $10 to sign up and $10 more for each friend they referred. It worked. By the time eBay acquired PayPal in 2002, it had millions of users.
+
+Today, PayPal operates as a staged wallet. Users can hold a PayPal balance, and merchants receive PayPal payments into their PayPal account. But PayPal also functions as a pass-through in many cases — when you pay via PayPal using a linked credit card, the transaction ultimately rides over card network rails, and PayPal pays interchange to the card issuer.
+
+This hybrid model is common among Western wallets. The pure staged model — where users maintain a meaningful wallet balance — is far more dominant in Asia.
+
+### Alipay: Escrow to Everything
+
+Alipay launched in 2004 as the payment system for Alibaba's e-commerce platform Taobao. Like PayPal, it started as an escrow service: the buyer pays Alipay, the seller ships the goods, and Alipay releases the funds only after the buyer confirms receipt. This solved the trust problem in Chinese e-commerce at a time when consumer protection laws were weak and online fraud was rampant.
+
+But Alipay went far beyond payments. It introduced Yu'e Bao in 2013, a money market fund that let users earn interest on their Alipay balance — at one point becoming the world's largest money market fund with over $250 billion in assets. It added credit scoring (Zhima Credit), insurance, lending, and investment products. Alipay became a full financial platform, not just a payment method.
+
+The <GlossaryTerm term="QR Code Payment" definition="A payment method where users scan a QR code to initiate a payment — dominant in China and India via Alipay, WeChat Pay, and UPI.">QR code payment</GlossaryTerm> model Alipay popularized transformed Chinese commerce. A street food vendor doesn't need a card terminal — just a printed QR code. Customers scan it with the Alipay app and the payment is instant. Alipay now has over 1 billion users and processes trillions of dollars in transactions annually.
+
+### WeChat Pay: Payments From Messaging
+
+WeChat Pay took a different path to dominance. WeChat started as a messaging app — China's equivalent of WhatsApp — with over a billion users. Tencent added a payment feature in 2013, and adoption exploded in January 2014 when WeChat launched digital "red envelopes" — a digital version of the traditional Chinese custom of giving cash in red envelopes during Lunar New Year.
+
+In a matter of days, millions of Chinese users linked their bank accounts to WeChat Pay to send red envelopes to friends and family. Once the bank accounts were linked, WeChat Pay became a daily payment method. The red envelope campaign was one of the most brilliant growth hacks in fintech history.
+
+Today, WeChat Pay and Alipay together dominate Chinese mobile payments, handling an estimated 90%+ of mobile transactions. They coexist in a duopoly, with most merchants accepting both and most consumers using both.
+
+### M-PESA: Banking the Unbanked
+
+M-PESA launched in Kenya in 2007, and its story is unlike any other payment system. In a country where the majority of the population was unbanked — no bank accounts, no credit cards — Safaricom (a mobile network operator) created a mobile money system that required nothing more than a basic feature phone.
+
+Users deposit cash at M-PESA agent locations (typically small shops), which credits their M-PESA mobile wallet. They can then send money to other users via SMS, pay bills, and buy goods. To withdraw, they visit another agent and convert their mobile balance back to cash.
+
+M-PESA now serves over 50 million active users across several African countries and has expanded into lending, savings, and international remittances. It's the proof that a payment system doesn't need smartphones, internet connectivity, or banking infrastructure — just a mobile network and a network of cash-in/cash-out agents.
+
+## The Global Divergence
+
+There's a striking geographic pattern in how digital wallets evolved.
+
+**The West** (US, Europe) tends toward pass-through wallets. Apple Pay, Google Pay, and Samsung Pay dominate. These wallets sit on top of existing card infrastructure, which is mature, widespread, and well-regulated. Consumers already have bank accounts and credit cards. The wallet adds convenience (tap instead of insert card) and security (tokenization, biometrics) but doesn't fundamentally change the payment flow.
+
+**Asia** (China, India, Southeast Asia) tends toward staged wallets and QR codes. Alipay, WeChat Pay, GCash (Philippines), GrabPay (Southeast Asia), and Paytm (India) hold balances and settle directly with merchants. Card infrastructure was less developed when these wallets launched, so they built their own payment ecosystems from scratch.
+
+**Africa** developed mobile money systems like M-PESA that leapfrogged both cards and smartphones, serving populations with no existing financial infrastructure.
+
+The result is that payment experiences differ dramatically by geography. An American tourist tapping their iPhone at a London café is using the same card rails as if they'd swiped a physical card. A Chinese tourist scanning a QR code at a Shanghai noodle shop is using a completely separate financial system that never touches Visa or Mastercard.
+
+## The Economics
+
+The economic implications of wallet type are significant.
+
+Pass-through wallets preserve the existing card economics. Interchange still flows to issuers. Network assessments still flow to Visa/Mastercard. The wallet provider earns a small fee from the issuer. Merchants pay the same card acceptance costs whether the customer taps Apple Pay or inserts a plastic card.
+
+Staged wallets disrupt those economics entirely. When a customer pays via Alipay using their Alipay balance, no card network is involved. No interchange is generated. Alipay charges the merchant a fee (typically 0.6% in China — far less than card interchange), but that fee goes to Alipay, not to a bank or card network. The wallet has effectively replaced the card network as the payment rail.
+
+This explains why Visa and Mastercard have been aggressive about partnering with pass-through wallets (ensuring their rails remain relevant) while viewing staged wallets with more concern. It also explains why card networks have invested heavily in tokenization — making their cards work seamlessly inside wallets is an existential priority.
+
+## What's Next
+
+The lines between wallet types are blurring. PayPal offers tap-to-pay via NFC in addition to its staged wallet. Apple launched Apple Pay Later (BNPL), moving into lending. Alipay has partnered with international card networks for cross-border acceptance.
+
+Meanwhile, real-time payment systems like UPI in India are enabling a third model: bank-based wallets where the payment moves directly between bank accounts via QR codes, without a card network *or* a staged wallet balance. Google Pay in India, for instance, works as a UPI front-end — not a pass-through card wallet like Google Pay in the US.
+
+The digital wallet is becoming the primary interface between consumers and financial services. Whoever controls the wallet controls the customer relationship — which is why Apple, Google, Alibaba, Tencent, and every major bank on the planet are fighting for position.

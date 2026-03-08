@@ -1,0 +1,155 @@
+---
+title: "Bank-Based Payments"
+description: "ACH, SEPA, BACS, and the world of bank-to-bank transfers — how money moves without card networks, and why it's still the backbone of payments."
+theme: "Non-Card Payments"
+readingTime: "9 min read"
+order: 1
+relatedTopics: ["real-time-payments", "cross-border-payments", "b2b-payments"]
+glossaryTerms:
+  - term: "ACH"
+    definition: "Automated Clearing House — the US system for batch bank-to-bank transfers, handling 82% of US electronic payments."
+  - term: "SEPA"
+    definition: "Single Euro Payments Area — the EU system for cross-border euro bank transfers across 36 countries."
+  - term: "BACS"
+    definition: "Bankers' Automated Clearing Services — the UK system for direct debits and bank credits."
+  - term: "Direct Debit"
+    definition: "A pull-based payment where the payee initiates the withdrawal from the payer's bank account."
+  - term: "NACHA"
+    definition: "The organization governing ACH rules and file formats in the US."
+  - term: "Open Banking"
+    definition: "Regulatory mandates (like PSD2) requiring banks to provide APIs for third-party access to account data and payment initiation."
+  - term: "ODFI"
+    definition: "Originating Depository Financial Institution — the bank that initiates an ACH transaction on behalf of the sender."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## The Quiet Backbone of Payments
+
+Card networks get the headlines, but bank-to-bank transfers move far more money. In the United States alone, <GlossaryTerm term="ACH" definition="Automated Clearing House — the US system for batch bank-to-bank transfers, handling 82% of US electronic payments.">ACH</GlossaryTerm> processed over 31 billion transactions in 2023 — about 82% of all electronic payments in the country. Your paycheck, your rent, your utility bills, your tax refund — all of these almost certainly travel over bank-based payment rails, not card networks.
+
+Bank transfers are older, cheaper, and less glamorous than cards. They don't earn rewards points or generate interchange fees. But they're the infrastructure that makes payroll possible, keeps insurance claims flowing, and enables government benefit disbursement at scale.
+
+If you work in fintech and you only understand card payments, you're missing the rails that actually move the most money.
+
+## Pull vs. Push: Two Fundamental Models
+
+Before diving into specific systems, you need to understand the two basic directions money can move in bank-based payments.
+
+**Push payments** are initiated by the sender. You tell your bank to send money to someone else's account. A wire transfer is a push payment. So is a direct deposit from your employer.
+
+**Pull payments** are initiated by the receiver. You authorize a company to withdraw money from your account, and they pull it out. A <GlossaryTerm term="Direct Debit" definition="A pull-based payment where the payee initiates the withdrawal from the payer's bank account.">direct debit</GlossaryTerm> for your gym membership is a pull payment. So is the recurring charge from your utility company.
+
+This distinction matters enormously for fraud risk, consumer protection, and how disputes work. Push payments are harder to reverse — the sender authorized the transfer explicitly. Pull payments come with stronger consumer protections because you're trusting someone else to take the right amount at the right time. In most systems, consumers can dispute and reverse unauthorized pull payments.
+
+## ACH: How America Moves Money
+
+The <GlossaryTerm term="ACH" definition="Automated Clearing House — the US system for batch bank-to-bank transfers, handling 82% of US electronic payments.">ACH network</GlossaryTerm> is the dominant bank-to-bank payment system in the United States. It handles direct deposits, bill payments, B2B transfers, tax refunds, Social Security payments, and the underlying transfers behind apps like Venmo, PayPal, and Cash App.
+
+ACH is governed by <GlossaryTerm term="NACHA" definition="The organization governing ACH rules and file formats in the US.">NACHA</GlossaryTerm> (the National Automated Clearing House Association), which sets the rules, file formats, and operating procedures. The actual clearing is operated by two operators: the Federal Reserve (FedACH) and The Clearing House (EPN).
+
+Here's how an ACH transaction actually works:
+
+<MermaidDiagram
+  chart={`sequenceDiagram
+    participant S as Sender (Originator)
+    participant ODFI as ODFI (Sender's Bank)
+    participant OP as ACH Operator (Fed/EPN)
+    participant RDFI as RDFI (Receiver's Bank)
+    participant R as Receiver
+    Note over S,R: Example: Employer pays employee via direct deposit
+    S->>ODFI: Submits NACHA file with payment instructions
+    ODFI->>OP: Forwards batch to ACH Operator
+    Note over OP: Sorts and routes transactions
+    OP->>RDFI: Delivers entries to receiving bank
+    RDFI->>R: Credits receiver's account
+    Note over S,R: Settlement: 1-3 business days (standard) or same day`}
+  caption="ACH transaction flow: the originator submits a NACHA file through their bank (ODFI), which is routed by the ACH operator to the receiving bank (RDFI)"
+/>
+
+The <GlossaryTerm term="ODFI" definition="Originating Depository Financial Institution — the bank that initiates an ACH transaction on behalf of the sender.">ODFI</GlossaryTerm> (Originating Depository Financial Institution) is the sender's bank. The RDFI (Receiving Depository Financial Institution) is the receiver's bank. The sender — called the "originator" — submits payment instructions in a standardized NACHA file format. That file contains routing numbers, account numbers, amounts, and transaction codes that tell the receiving bank whether to credit or debit the account.
+
+ACH transactions are processed in batches, not in real time. Historically, this meant 1–3 business day settlement. In 2015, NACHA introduced **Same-Day ACH**, which enables settlement within the same business day for transactions submitted before specific cutoff times. Same-Day ACH has grown rapidly but still represents a minority of total ACH volume.
+
+The batch processing model is both ACH's strength and its limitation. It's incredibly efficient for processing millions of transactions — payroll runs, subscription billing, insurance premiums — at extremely low cost (often $0.20–$0.50 per transaction, compared to 2–3% for card transactions). But it's slow compared to card authorization, which takes seconds.
+
+### Direct Deposit Is ACH
+
+When your employer pays you, that's an ACH credit. Your company's payroll provider generates a NACHA file containing every employee's bank routing number, account number, and pay amount. That file is submitted to the company's bank (the ODFI), batched through the ACH operator, and distributed to each employee's bank (the RDFI). The entire process runs like clockwork every two weeks for millions of American workers.
+
+### Venmo and PayPal Use ACH Underneath
+
+When you link a bank account to Venmo and send money to a friend, the actual money movement between banks happens over ACH. Venmo provides the real-time experience — your friend sees the payment instantly — but the underlying bank-to-bank settlement occurs over ACH rails, typically taking 1–3 business days. Venmo manages the timing gap by fronting the money based on risk models.
+
+PayPal works the same way. When you pay a merchant via PayPal using your linked bank account, PayPal initiates an ACH debit from your bank account. The merchant sees the payment confirmed immediately, but the actual bank settlement takes days.
+
+## SEPA: Europe's Unified Bank Transfer System
+
+<GlossaryTerm term="SEPA" definition="Single Euro Payments Area — the EU system for cross-border euro bank transfers across 36 countries.">SEPA</GlossaryTerm> (Single Euro Payments Area) is the European equivalent of ACH — but with a twist. It works across 36 countries, not just one. A bank transfer from a German account to a French account uses the same rails and rules as a transfer between two German accounts. Before SEPA, each European country had its own incompatible bank transfer system.
+
+SEPA handles two main payment types: SEPA Credit Transfer (push payments, settled within one business day) and SEPA Direct Debit (pull payments, used for recurring billing like subscriptions and utilities).
+
+The economics are remarkable. SEPA transfers within Europe are essentially free or near-free for consumers, by regulation. Banks cannot charge more for a cross-border euro transfer than for a domestic one. This regulatory mandate has made bank transfers the default payment method for many European use cases where Americans would reach for a credit card.
+
+SEPA Instant Credit Transfer, launched in 2017, enables transfers in under 10 seconds, 24/7/365 — but adoption has been gradual and fees vary by bank.
+
+## BACS: The UK's Workhorse
+
+<GlossaryTerm term="BACS" definition="Bankers' Automated Clearing Services — the UK system for direct debits and bank credits.">BACS</GlossaryTerm> (Bankers' Automated Clearing Services) is the UK's batch bank transfer system, handling direct debits and direct credits. It processes over 4 billion transactions per year.
+
+BACS has a notably long settlement cycle: three business days. Day 1 is input (the file is submitted), Day 2 is processing, and Day 3 is settlement (funds arrive). This glacial pace is one reason the UK introduced Faster Payments in 2008 — a real-time alternative that now handles time-sensitive transfers while BACS continues to dominate for scheduled recurring payments.
+
+The UK's direct debit system via BACS is particularly strong. The Direct Debit Guarantee gives consumers the right to an immediate refund for any direct debit taken in error — a level of consumer protection that makes businesses and consumers comfortable with pull-based payments.
+
+## Open Banking: Banks as Platforms
+
+<GlossaryTerm term="Open Banking" definition="Regulatory mandates (like PSD2) requiring banks to provide APIs for third-party access to account data and payment initiation.">Open Banking</GlossaryTerm> is fundamentally changing bank-based payments. The concept is simple but radical: regulators require banks to open APIs that allow third-party providers to access account data and initiate payments — with the account holder's consent.
+
+The EU's PSD2 (Payment Services Directive 2) was the landmark regulation. It created two new categories of regulated entities: Account Information Service Providers (AISPs), which can read your bank data, and Payment Initiation Service Providers (PISPs), which can trigger payments from your bank account.
+
+The UK went further with its Open Banking Implementation Entity, mandating standardized APIs across the nine largest UK banks.
+
+Why does this matter for payments? Because Open Banking enables a new type of bank-to-bank payment that bypasses cards entirely. Instead of entering card details at checkout, a consumer can authorize a direct bank transfer through their banking app. The merchant avoids card interchange fees. The payment settles quickly (often instantly with Faster Payments or SEPA Instant). And the consumer authenticates with their bank's security — no card number to steal.
+
+Companies like TrueLayer, Plaid, and Tink are building the infrastructure layer that makes Open Banking payments seamless for merchants and consumers.
+
+## Bank Redirect Methods: Country-Specific Champions
+
+Several countries have developed bank-based payment methods that dominate their domestic markets:
+
+**iDEAL (Netherlands).** The most popular online payment method in the Netherlands, used for over 70% of e-commerce transactions. When a Dutch consumer checks out online, they select iDEAL, choose their bank, authenticate in their banking app, and the payment is initiated as a bank transfer. The merchant receives guaranteed funds. No card needed.
+
+**Interac (Canada).** Canada's domestic debit network, but also a bank transfer system. Interac e-Transfer lets Canadians send money between bank accounts using just an email address or phone number. It processes over a billion transactions per year.
+
+**Giropay (Germany).** A bank-based online payment method used by German consumers, redirecting them to their bank's online banking to authorize a transfer.
+
+**Bancontact (Belgium).** Belgium's dominant payment method, handling both card and bank-transfer payments through a unified system.
+
+These systems share a common pattern: they leverage existing bank infrastructure to create consumer-friendly payment experiences that bypass card networks entirely.
+
+## Why Bank Transfers Are Cheaper Than Cards
+
+The cost difference is dramatic. A typical ACH transaction costs $0.20–$0.50. A SEPA transfer might be free. A card transaction costs 2–3% of the transaction value.
+
+Why the difference? Card transactions involve interchange fees flowing to the issuing bank, assessment fees flowing to the card network, and processor markups. All of these layers of intermediaries take their cut. Bank-based transfers involve fewer intermediaries — it's bank to bank, with the clearing system in between.
+
+For merchants processing high volumes, the savings from accepting bank payments instead of cards can be enormous. A company processing $100 million in payments saves roughly $2 million annually by shifting from cards to ACH.
+
+This economic reality is driving the growth of bank-based payment acceptance. Companies like GoCardless (which offers global direct debit) and Plaid (which enables ACH payments through bank authentication) are building businesses specifically around helping merchants accept bank payments.
+
+## The Trade-offs
+
+Bank-based payments aren't superior to cards in every way. They come with real limitations.
+
+**Speed.** Standard ACH takes 1–3 days. Even Same-Day ACH doesn't match the instant authorization that cards provide. Real-time payment systems are closing this gap, but they're not yet universal.
+
+**Consumer protection.** Credit cards offer chargeback rights, extended warranties, and purchase protection. Bank transfers generally offer fewer consumer protections, especially for push payments.
+
+**No rewards.** Consumers earn points, cash back, and miles from credit cards. Bank transfers offer none of these incentives, which limits consumer enthusiasm for switching.
+
+**International complexity.** ACH only works in the US. SEPA only works in Europe. BACS only works in the UK. Cross-border bank transfers between different systems remain expensive and slow — a problem that card networks solved decades ago with their global interoperability.
+
+Despite these limitations, the direction is clear. Bank-based payments are growing faster than card payments in most markets. As real-time payment systems mature and Open Banking expands, bank-to-bank transfers will capture an increasing share of payment volume — especially for use cases where card economics don't make sense.
+
+The card networks know this. It's one reason both Visa and Mastercard have been acquiring bank-transfer and real-time payment companies, positioning themselves to participate in the bank-based payments future rather than be disrupted by it.

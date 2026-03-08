@@ -1,0 +1,166 @@
+---
+title: "Interchange Fees"
+description: "The hidden fee behind every card transaction — who pays it, who earns it, how it's calculated, and why it's the most debated topic in payments."
+theme: "Card Ecosystem"
+readingTime: "9 min read"
+order: 4
+relatedTopics: ["card-networks", "credit-cards-vs-debit-cards", "clearing-and-settlement"]
+glossaryTerms:
+  - term: "Interchange"
+    definition: "A fee paid by the merchant's bank (acquirer) to the cardholder's bank (issuer) on each card transaction."
+  - term: "MCC"
+    definition: "Merchant Category Code — a four-digit code classifying the type of business, which affects interchange rates."
+  - term: "Interchange Plus"
+    definition: "A transparent pricing model where merchants pay the actual interchange fee plus a fixed processor markup."
+  - term: "Blended Pricing"
+    definition: "A simplified pricing model where merchants pay one flat rate regardless of card type — usually more expensive overall."
+  - term: "Durbin Amendment"
+    definition: "US regulation capping debit interchange for banks with over $10 billion in assets at roughly 21 cents + 0.05%."
+  - term: "Private Label Card"
+    definition: "A store-branded card (like a Macy's card) that only works at that retailer — no network interchange applies."
+  - term: "Co-Brand Card"
+    definition: "A card branded by both a retailer and a network (like Amazon Visa) — uses network rails but negotiates custom economics."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## The Fee That Funds the Entire Card Industry
+
+Every time you use a card — credit, debit, prepaid — a fee gets charged. Not to you. To the merchant. And the largest component of that fee doesn't go to the company that sold the merchant the terminal, or the network that routed the message. It goes to the bank that issued your card.
+
+This fee is called <GlossaryTerm term="Interchange" definition="A fee paid by the merchant's bank (acquirer) to the cardholder's bank (issuer) on each card transaction.">interchange</GlossaryTerm>, and it's the economic engine of the entire card payments ecosystem. It funds your rewards points, pays for fraud protection, covers customer service, and underwrites the risk the issuing bank takes when it extends you credit. It's also the most controversial and heavily regulated fee in payments.
+
+Understanding interchange is non-negotiable if you work in fintech. It directly shapes the business models of issuers, acquirers, merchants, and every company built on top of card rails.
+
+## Who Pays Whom
+
+The money flow is specific and directional.
+
+<MermaidDiagram
+  chart={`sequenceDiagram
+    participant M as Merchant
+    participant ACQ as Acquirer
+    participant NET as Card Network
+    participant ISS as Issuing Bank
+    participant CH as Cardholder
+    Note over M,CH: Customer buys $100 of goods
+    M->>ACQ: Submits $100 transaction
+    ACQ->>NET: Routes via Visa/MC
+    NET->>ISS: Authorization + clearing
+    Note over NET: Settlement calculates fees
+    ISS-->>ACQ: Interchange: ~$1.80 retained by issuer
+    NET-->>NET: Assessment: ~$0.14 retained by network
+    ACQ-->>ACQ: Markup: ~$0.40 retained by acquirer
+    ACQ->>M: Deposits $97.66 to merchant`}
+  caption="The fee waterfall on a $100 credit card transaction: interchange goes to the issuer, assessments to the network, markup to the acquirer"
+/>
+
+The **acquirer** (the merchant's bank) collects the full transaction amount and deducts fees before depositing the remainder into the merchant's account. Of the total fees deducted, the largest portion — interchange — gets paid to the **issuing bank** (the cardholder's bank). The **card network** (Visa, Mastercard) takes a small assessment fee. And the acquirer keeps its markup.
+
+On a $100 purchase with a standard consumer credit card, the typical breakdown looks like this:
+
+| Component | Amount | Recipient |
+|---|---|---|
+| Interchange | ~$1.80 | Issuing bank |
+| Network assessment | ~$0.14 | Card network |
+| Acquirer markup | ~$0.40 | Acquirer/processor |
+| **Total merchant fees** | **~$2.34** | |
+| **Merchant receives** | **~$97.66** | |
+
+The merchant never sees this breakdown unless they're on interchange-plus pricing (more on that shortly). Many merchants just see a single blended rate — "2.9% + $0.30" — and don't realize how the money is split behind the scenes.
+
+## How Interchange Rates Are Set
+
+Interchange is not a single rate. Visa and Mastercard each publish interchange tables with *hundreds* of different rates, varying by a matrix of factors. The main variables:
+
+**Card type.** This is the biggest driver. A basic consumer credit card might carry interchange of 1.51% + $0.10. A premium rewards card (Visa Signature, World Elite Mastercard) might be 2.10% + $0.10 — nearly 40% more. Commercial cards, corporate cards, and purchasing cards have their own rate tiers, often higher than consumer cards.
+
+**<GlossaryTerm term="MCC" definition="Merchant Category Code — a four-digit code classifying the type of business, which affects interchange rates.">Merchant category code (MCC)</GlossaryTerm>.** Every merchant is assigned a four-digit code classifying their business type. A grocery store (MCC 5411) gets lower interchange than a general retailer (MCC 5999), which gets lower interchange than a restaurant (MCC 5812). Supermarkets and gas stations have historically negotiated favorable rates because of their volume and thin margins. Charities (MCC 8398) get discounted rates too.
+
+**Transaction type.** A card-present transaction (chip dip at a terminal) has lower interchange than a card-not-present transaction (online purchase). Why? Card-present transactions have lower fraud rates, so the issuer's risk is lower. The difference can be 20–30 basis points.
+
+**Transaction amount.** Some interchange categories have a percentage component only, some have a percentage plus a fixed cents component, and some have caps. The fixed-cent component means interchange takes a proportionally larger bite out of small transactions.
+
+**Data quality.** Certain B2B and government transactions qualify for lower interchange rates if the merchant submits enhanced transaction data (Level 2 or Level 3 data) — line-item details, tax amounts, customer codes. This incentivizes better data, which helps the issuer's corporate clients with expense management.
+
+## Real-World Interchange Rates
+
+Let's put concrete numbers on this. Here are representative Visa U.S. interchange rates (these change periodically, but the structure is stable):
+
+| Card / Transaction Type | Rate |
+|---|---|
+| Consumer credit — card-present retail | 1.51% + $0.10 |
+| Consumer credit — e-commerce | 1.80% + $0.10 |
+| Visa Signature Preferred — card-present | 2.10% + $0.10 |
+| Visa Infinite — card-present | 2.30% + $0.10 |
+| Consumer debit — regulated (Durbin) | 0.05% + $0.21 |
+| Consumer debit — exempt | 0.80% + $0.15 |
+| Commercial card — card-present | 2.50% + $0.10 |
+| Supermarket — consumer credit | 1.22% + $0.05 |
+
+Notice the range. A regulated debit transaction at a supermarket might cost the merchant $0.24. A Visa Infinite credit card used online at a general retailer might cost $2.40 on the same $100 purchase. That's a 10x difference.
+
+## The Durbin Amendment: Reshaping Debit Economics
+
+The <GlossaryTerm term="Durbin Amendment" definition="US regulation capping debit interchange for banks with over $10 billion in assets at roughly 21 cents + 0.05%.">Durbin Amendment</GlossaryTerm>, passed in 2010 as part of the Dodd-Frank Act, fundamentally changed debit card economics.
+
+For banks with over $10 billion in assets — JPMorgan Chase, Bank of America, Wells Fargo, and about 100 others — debit interchange was capped at approximately 21 cents plus 0.05% per transaction, with an additional 1 cent allowed for banks that meet certain fraud prevention standards. Before Durbin, the average debit interchange fee was about 44 cents per transaction.
+
+Banks below the $10 billion threshold are **exempt** from the cap. Their debit cards can still command interchange rates of 0.70%–1.00% or more.
+
+This exemption created a fascinating structural incentive in fintech. Neobanks like Chime, Cash App, and Current deliberately partner with small community banks and credit unions — not primarily because they like small banks, but because Durbin-exempt debit cards generate 3–4x the interchange revenue of regulated cards. When your business model depends on interchange (as it does for most free consumer fintech apps), partnering with a bank under the $10 billion threshold is an economic necessity.
+
+The exemption also creates a cliff effect. A bank approaching the $10 billion asset threshold faces a sharp drop in debit interchange revenue upon crossing it. Some smaller banks have reportedly managed their growth to stay below the threshold — a regulatory distortion that policymakers didn't fully anticipate.
+
+## Private Label Cards: Avoiding Interchange Entirely
+
+Some large retailers have found a way to sidestep network interchange altogether: <GlossaryTerm term="Private Label Card" definition="A store-branded card (like a Macy's card) that only works at that retailer — no network interchange applies.">private label cards</GlossaryTerm>.
+
+A private label card — like a Macy's card or a Target RedCard — carries no Visa or Mastercard logo. It only works at that specific retailer. Because the transaction doesn't travel over card network rails, there's no network interchange. The retailer issues the card (typically through a partner bank like Synchrony or Citi Retail Services), processes the transaction on its own systems, and keeps the economics in-house.
+
+Target's RedCard offers customers a 5% discount on all purchases. How can Target afford to give away 5%? Because by moving customers off network cards and onto the RedCard, Target eliminates the 2%+ interchange fee. The 5% discount costs Target only about 3% net — a worthwhile investment to build loyalty and capture customer data.
+
+The limitation is obvious: the card only works at one merchant. Consumers carry private label cards for their favorite retailers but still need a general-purpose card for everything else.
+
+## Co-Brand Cards: Custom Economics on Network Rails
+
+<GlossaryTerm term="Co-Brand Card" definition="A card branded by both a retailer and a network (like Amazon Visa) — uses network rails but negotiates custom economics.">Co-brand cards</GlossaryTerm> split the difference. The Amazon Prime Visa Signature card is branded by Amazon, issued by Chase, and runs on Visa's network. It works anywhere Visa is accepted, not just at Amazon.
+
+The economics are negotiated between the parties. Amazon receives a rebate on interchange for transactions made at Amazon.com — effectively reducing its payment acceptance cost. In return, Amazon promotes the card, driving transaction volume that benefits Chase (interchange revenue, interest income) and Visa (assessment fees).
+
+Major co-brand partnerships — Delta/Amex, United/Chase, Costco/Citi — are some of the most valuable and fiercely contested relationships in the card industry. Airlines and large retailers command significant interchange rebates and sign-up bonus funding from their issuing bank partners, creating multi-billion-dollar economics.
+
+## How Merchants Pay: Interchange Plus vs. Blended
+
+Merchants encounter interchange through one of two pricing models.
+
+<GlossaryTerm term="Interchange Plus" definition="A transparent pricing model where merchants pay the actual interchange fee plus a fixed processor markup.">Interchange-plus pricing</GlossaryTerm> is the transparent model. The merchant pays the actual interchange rate (whatever Visa or Mastercard dictates for that specific transaction) plus a fixed markup from the acquirer — say, interchange + 0.20% + $0.10. The merchant's cost varies by card type, but they can see exactly what they're paying and why. Large merchants and sophisticated businesses generally prefer this model.
+
+<GlossaryTerm term="Blended Pricing" definition="A simplified pricing model where merchants pay one flat rate regardless of card type — usually more expensive overall.">Blended pricing</GlossaryTerm> bundles everything into a single rate — for example, 2.9% + $0.30 per transaction regardless of card type. This is the model Stripe, Square, and most modern PSPs use for small businesses. It's simple and predictable, but merchants overpay on cheap cards (regulated debit at 21 cents getting charged 2.9%) while potentially underpaying on expensive cards (Visa Infinite at 2.3%).
+
+The acquirer/processor profits from blended pricing by setting the flat rate high enough to cover the most expensive card types while pocketing the spread on cheaper ones. For small businesses processing modest volume, the simplicity is worth the cost. For large businesses processing millions, the overpayment is significant — which is why large merchants aggressively negotiate interchange-plus deals.
+
+## Why Interchange Is the Most Debated Topic in Payments
+
+Interchange has been the subject of lawsuits, legislation, and regulatory action across the globe. The tension is straightforward: merchants think interchange is too high, and banks think it's justified.
+
+**The merchant argument:** Interchange is a hidden tax on commerce. Merchants can't negotiate it — rates are set by Visa and Mastercard unilaterally. The fee has increased over time as card networks introduce ever-more-premium card tiers with higher interchange. And merchants can't refuse expensive cards without refusing all cards on that network (the "honor all cards" rule). Small businesses, operating on thin margins, absorb costs they have no power to influence.
+
+**The issuer argument:** Interchange pays for fraud protection, customer service, transaction guarantees, and the extension of credit. Without interchange revenue, banks couldn't offer free checking accounts, zero-liability fraud protection, or the rewards programs that drive consumer card adoption. And card payments reduce merchants' costs in other ways — less cash handling, faster checkout, higher average ticket sizes.
+
+The debate has produced regulation in many countries. The EU capped interchange at 0.3% for credit and 0.2% for debit. Australia's Reserve Bank imposed caps. In the U.S., the Durbin Amendment capped debit but left credit interchange unregulated — an ongoing source of legislative debate.
+
+A massive antitrust settlement between merchants and Visa/Mastercard (originally filed in 2005, with a revised settlement proposed in 2024) has been one of the largest class-action cases in U.S. history. The outcome will continue to shape interchange economics for years.
+
+## Why Interchange Matters for Fintech
+
+If you're building a fintech company, interchange is likely either your primary revenue source or your primary cost — and sometimes both.
+
+**If you're an issuer or BaaS platform**, interchange on every card swipe is how you make money. Your partner bank earns it; you negotiate a revenue share. The difference between a Durbin-exempt and Durbin-regulated partner bank can make or break your unit economics.
+
+**If you're a merchant platform or PSP**, interchange is the largest cost in your payment acceptance stack. Your pricing model (blended vs. interchange-plus), your network routing strategy (PIN debit vs. signature), and your merchant mix (low-MCC grocery vs. high-MCC luxury retail) all drive profitability.
+
+**If you're building anything on card rails**, interchange sets the floor for transaction costs and defines the economic relationships between every participant in the ecosystem.
+
+Interchange isn't glamorous. But it's the single most important number in payments.

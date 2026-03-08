@@ -1,0 +1,129 @@
+---
+title: "Card Networks"
+description: "Visa, Mastercard, Amex, Discover — the rails that connect every card payment. How they work, how they differ, and why they matter."
+theme: "Card Ecosystem"
+readingTime: "8 min read"
+order: 1
+relatedTopics: ["payments-ecosystem-overview", "interchange-fees", "issuer-processors"]
+glossaryTerms:
+  - term: "Card Network"
+    definition: "The payment rail (like Visa or Mastercard) that connects issuers and acquirers and routes transactions between them."
+  - term: "Open-Loop Network"
+    definition: "A network like Visa or Mastercard that works with many issuers and acquirers — cards can be used almost anywhere."
+  - term: "Closed-Loop Network"
+    definition: "A network like American Express that acts as both issuer and acquirer — controlling both sides of the transaction."
+  - term: "PIN Debit Network"
+    definition: "Secondary networks (like Interlink, Maestro, STAR) used for PIN-authenticated debit transactions with lower interchange."
+  - term: "Durbin Amendment"
+    definition: "US regulation capping interchange fees for large banks and requiring debit cards support at least two unaffiliated networks."
+  - term: "Network Assessment Fee"
+    definition: "A small fee charged by the card network (Visa/Mastercard) on every transaction for using their rails."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## The Invisible Rails Under Every Swipe
+
+Every time you tap your card at a coffee shop or type your card number into an online checkout, a message travels across a vast electronic network — routed, authenticated, and guaranteed in under two seconds. The companies that operate these networks are some of the most profitable in the world, yet most people couldn't tell you what they actually do.
+
+<GlossaryTerm term="Card Network" definition="The payment rail (like Visa or Mastercard) that connects issuers and acquirers and routes transactions between them.">Card networks</GlossaryTerm> are the payment rails connecting the bank that issued your card to the bank that works with the merchant. They don't hold your money. They don't issue your card. They don't sign up merchants. What they do is equally important: they set the rules, route the messages, and guarantee that money moves from one bank to another.
+
+Think of them as the air traffic control system for payments. Airlines (banks) fly the planes (hold the money), airports (merchants) handle the passengers — but without air traffic control, nothing gets off the ground safely.
+
+## What Card Networks Actually Do
+
+Card networks perform three essential functions that hold the entire payment system together.
+
+**They set the rules.** Every card network publishes thick rulebooks — Visa's Core Rules document alone runs hundreds of pages — that govern how transactions must be processed, what security standards apply, how disputes are handled, and what happens when something goes wrong. When you file a chargeback, you're invoking rules the card network wrote.
+
+**They route transactions.** When a merchant's terminal sends an authorization request, the card network figures out which issuing bank to send it to, delivers the message, and returns the response. Visa's VisaNet processes over 65,000 transaction messages per second at peak. That routing happens in milliseconds.
+
+**They guarantee settlement.** After transactions clear, the card network calculates what each bank owes and is owed, then orchestrates the actual movement of funds. If an issuing bank fails to settle, the network steps in. This guarantee is what gives merchants confidence that they'll get paid.
+
+## Open Loop vs. Closed Loop
+
+There are two fundamentally different models for how card networks operate, and understanding the distinction explains most of the competitive dynamics in the industry.
+
+<MermaidDiagram
+  chart={`graph TD
+    subgraph Open-Loop ["Open-Loop (Visa, Mastercard)"]
+      CH1[Cardholder] --> ISS[Issuing Bank<br/>e.g., Chase]
+      ISS <--> CN[Card Network<br/>Visa / Mastercard]
+      CN <--> ACQ[Acquiring Bank<br/>e.g., Worldpay]
+      ACQ --> M1[Merchant]
+    end
+    subgraph Closed-Loop ["Closed-Loop (Amex, Discover)"]
+      CH2[Cardholder] --> AMEX[American Express<br/>Issuer + Network + Acquirer]
+      AMEX --> M2[Merchant]
+    end`}
+  caption="Open-loop networks connect separate issuers and acquirers; closed-loop networks control both sides"
+/>
+
+An <GlossaryTerm term="Open-Loop Network" definition="A network like Visa or Mastercard that works with many issuers and acquirers — cards can be used almost anywhere.">open-loop network</GlossaryTerm> like Visa or Mastercard works with thousands of banks. Any bank can join the network as an issuer (giving out cards) or an acquirer (signing up merchants). Visa doesn't care which bank issued your card — it routes the transaction regardless. This is why Visa and Mastercard cards are accepted at over 100 million merchant locations worldwide. The open model scales brilliantly because the network doesn't have to do the hard work of customer acquisition on either side.
+
+A <GlossaryTerm term="Closed-Loop Network" definition="A network like American Express that acts as both issuer and acquirer — controlling both sides of the transaction.">closed-loop network</GlossaryTerm> like American Express traditionally plays all the roles itself. Amex issues the card, signs up the merchant, routes the transaction, and settles the funds. It's a vertically integrated model.
+
+The closed-loop advantage is data and control. Amex sees both sides of every transaction, which enables superior fraud detection, richer analytics, and tighter customer experiences. It also keeps all the economics — no interchange negotiation, because Amex is paying itself.
+
+The closed-loop disadvantage is reach. When you have to sign up every merchant yourself, you end up with a smaller acceptance footprint. This is why some small businesses still don't accept Amex — and why Amex's merchant discount rate (what it charges merchants) has historically been higher than Visa or Mastercard's blended rate.
+
+In practice, the lines have blurred. Amex now lets other banks issue Amex-branded cards through its Global Network Services (GNS) program. Discover partners with networks worldwide (like JCB in Japan and UnionPay in China) for international acceptance. Pure closed-loop is increasingly rare.
+
+## The Big Four Networks
+
+**Visa** is the dominant network by nearly every measure. It handles roughly 60% of U.S. card purchase volume and operates in over 200 countries. Visa went public in 2008 in what was then the largest IPO in U.S. history. It doesn't issue a single card or make a single loan — it's purely an infrastructure and rules company, which gives it extraordinary margins.
+
+**Mastercard** is the second-largest global network, with roughly 25–30% of U.S. volume. Its technology and business model are nearly identical to Visa's — open-loop, rule-setting, transaction routing. Mastercard has been slightly more aggressive in expanding into data analytics and services beyond core payments.
+
+**American Express** operates primarily as a closed-loop network and is famous for its premium positioning. Amex cardholders tend to spend significantly more per transaction than Visa or Mastercard holders. The trade-off is a smaller merchant acceptance footprint and higher merchant fees, though both have improved substantially in recent years. Amex also makes money from annual card fees and interest — revenue streams Visa and Mastercard don't have.
+
+**Discover** is the smallest of the four U.S. networks. Like Amex, it started as a closed-loop network (launched by Sears in 1985). Discover has differentiated by charging no annual fees and offering cash-back rewards. Its merchant acceptance has grown significantly, though it still trails the others. Capital One's acquisition of Discover, announced in 2024, will reshape this competitive dynamic.
+
+## Three Types of Network Rails
+
+Not all card transactions travel the same rails, even within the same network. There are three distinct types of network infrastructure.
+
+**Credit rails (dual-message).** When you use a credit card — or when a debit card is run as "credit" — the transaction follows a dual-message process. The first message is authorization (approve or decline). The second message comes later during clearing (here's the final amount, please settle). This is called "signature debit" when a debit card is routed this way, because historically you signed a receipt instead of entering a PIN.
+
+**PIN debit rails (single-message).** When you swipe your debit card and enter a PIN, the transaction travels over <GlossaryTerm term="PIN Debit Network" definition="Secondary networks (like Interlink, Maestro, STAR) used for PIN-authenticated debit transactions with lower interchange.">PIN debit networks</GlossaryTerm>. These are single-message systems — authorization and clearing happen simultaneously. The money moves immediately. PIN debit interchange rates are significantly lower than credit interchange rates, which is why merchants often prefer this routing.
+
+**ATM networks.** When you withdraw cash at an ATM, the transaction routes over ATM networks — Plus (owned by Visa), Cirrus (owned by Mastercard), and surcharge-free networks like MoneyPass and Allpoint. These networks handle balance inquiries and cash dispensing, with their own fee structures.
+
+## Sub-Networks: The Hidden Debit Infrastructure
+
+Here's something that surprises many people: Visa and Mastercard each own PIN debit sub-networks that compete for debit card transaction routing.
+
+Visa owns **Interlink**, a PIN debit network. Mastercard owned **Maestro** (now being phased into the Mastercard Debit brand). Discover owns **PULSE**. And there are independent PIN debit networks too — **STAR** (owned by Fiserv), **NYCE**, and **Shazam** among them.
+
+Why does this matter? Because of the <GlossaryTerm term="Durbin Amendment" definition="US regulation capping interchange fees for large banks and requiring debit cards support at least two unaffiliated networks.">Durbin Amendment</GlossaryTerm>.
+
+## The Durbin Amendment and Dual-Network Mandate
+
+The Durbin Amendment, passed as part of the 2010 Dodd-Frank Act, did two consequential things to debit card networks.
+
+First, it capped debit card interchange fees for banks with more than $10 billion in assets at roughly 21 cents plus 0.05% per transaction. Before Durbin, regulated debit interchange averaged around 44 cents per transaction. The cap roughly cut it in half.
+
+Second — and this is the part that reshaped network competition — it required that every debit card support at least two unaffiliated networks. A Chase debit card with the Visa logo must also support a second, non-Visa network (like STAR or PULSE) for PIN debit routing. This gives merchants a choice: route this debit transaction over Visa's rails or over the competing PIN debit network, whichever is cheaper.
+
+This dual-network mandate created fierce competition among PIN debit networks for routing priority. Merchants like Walmart aggressively route debit transactions to the lowest-cost network, saving millions annually. The networks, in turn, compete on interchange rates, incentive payments, and transaction speed to win routing preference.
+
+## How Networks Make Money
+
+Here's a common misconception: card networks do *not* earn interchange. Interchange flows from the acquirer to the issuer — the network just sets the rate and facilitates the transfer. The network's revenue comes from <GlossaryTerm term="Network Assessment Fee" definition="A small fee charged by the card network (Visa/Mastercard) on every transaction for using their rails.">network assessment fees</GlossaryTerm>.
+
+These are small fees — typically 0.13%–0.15% of the transaction — charged on every transaction that crosses the network's rails. They're charged to both the issuer and the acquirer. On a $100 transaction, Visa might collect about $0.14 total in assessments.
+
+It sounds tiny. But multiply $0.14 by hundreds of billions of transactions per year, and you get Visa's $35+ billion in annual revenue. This volume-based model, with minimal credit risk and almost no physical infrastructure, is why Visa and Mastercard consistently rank among the most profitable companies on Earth.
+
+Networks also earn revenue from cross-border fees (additional assessments on international transactions), data analytics products, consulting services, and licensing fees. But transaction-based assessments remain the core business.
+
+## Why Card Networks Matter for Fintech
+
+If you're building anything in payments, card networks are the gravitational force shaping your economics and your architecture.
+
+They determine your interchange costs (and therefore your business model). They set the security standards you must comply with (EMV, tokenization, 3D Secure). They define how disputes work (and who bears the liability). They control which transactions get routed where (and give merchants tools to optimize routing).
+
+Understanding the difference between open-loop and closed-loop, between credit rails and PIN debit rails, between Visa's assessment fee and a bank's interchange revenue — these distinctions are the foundation for understanding how money actually moves in the modern economy.
+
+The four card networks may be invisible to consumers, but they're the most important infrastructure companies in financial services.

@@ -1,0 +1,118 @@
+---
+title: "B2B Payments"
+description: "How businesses pay each other — the $200 trillion market of invoices, wire transfers, virtual cards, and ERP integrations that keeps the economy running."
+theme: "Products & Use Cases"
+readingTime: "7 min read"
+order: 5
+relatedTopics: ["bank-based-payments", "virtual-cards", "cross-border-payments"]
+glossaryTerms:
+  - term: "B2B Payments"
+    definition: "Business-to-business payments — transactions between companies, typically larger amounts with more complex approval workflows."
+  - term: "ERP"
+    definition: "Enterprise Resource Planning — systems like SAP, Oracle, and NetSuite that manage business operations including accounts payable/receivable."
+  - term: "Accounts Payable"
+    definition: "The department or process responsible for paying a company's bills and invoices to suppliers."
+  - term: "Reconciliation"
+    definition: "Matching payment records to invoices and accounting entries — a major operational challenge in B2B payments."
+  - term: "Idempotency"
+    definition: "Ensuring a payment instruction can only be executed once, even if submitted multiple times — critical for preventing duplicate payments."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## The Biggest Market Nobody Talks About
+
+Consumer payments get all the attention. Apple Pay at the coffee shop. Venmo-ing your friend. Tapping your card at the grocery store. These are the payment experiences people write about, tweet about, and build apps around.
+
+Meanwhile, <GlossaryTerm term="B2B Payments" definition="Business-to-business payments — transactions between companies, typically larger amounts with more complex approval workflows.">B2B payments</GlossaryTerm> — businesses paying other businesses — quietly move roughly $127 trillion per year globally, projected to reach $200 trillion by 2028. That's not a typo. Trillion with a T. Consumer payments are a rounding error by comparison.
+
+Every time a company pays a supplier, a manufacturer pays for raw materials, a retailer restocks inventory, or a business pays its law firm — that's a B2B payment. The global economy runs on these transactions. And yet, B2B payments remain stubbornly manual, fragmented, and inefficient. In a world where you can send $50 to a friend instantly with your thumbprint, paying a $50,000 invoice to a supplier still involves emailing PDFs, manual data entry, multi-step approvals, and waiting days for settlement.
+
+## How B2B Differs From Consumer Payments
+
+B2B payments look nothing like consumer payments, and understanding the differences explains why modernization has been so slow.
+
+**Larger amounts.** A consumer transaction averages $30-50. A B2B payment can be $500, $50,000, or $5 million. The stakes of getting a payment wrong — sending the wrong amount, paying the wrong vendor, paying twice — are dramatically higher.
+
+**Approval workflows.** A consumer taps their card and the payment is done. A B2B payment might require a purchase order, a three-way match (PO, invoice, receiving report), approval from the department head for amounts over $5,000, approval from the CFO for amounts over $50,000, and final release by the treasury team. These workflows exist for good reason — they prevent fraud and enforce budget controls — but they add days or weeks to the payment cycle.
+
+**Net terms.** Consumers pay at the point of purchase. Businesses pay on terms — Net 30 (pay within 30 days), Net 60, or Net 90. This means the buyer receives goods today but doesn't pay for a month or more. Managing payment timing across hundreds of suppliers, each with different terms, is an operational challenge.
+
+**Remittance data.** When a consumer pays $4.50 for coffee, no additional data is needed. When a business pays $47,832.16 to a supplier, the supplier needs to know which invoices that payment covers. Was it invoice #4521? Or invoices #4521, #4523, and #4527 combined? This remittance data — the information that accompanies a payment explaining what it's for — is critical for <GlossaryTerm term="Reconciliation" definition="Matching payment records to invoices and accounting entries — a major operational challenge in B2B payments.">reconciliation</GlossaryTerm> on the receiving end. And it's frequently lost, garbled, or separated from the payment itself.
+
+## The Payment Methods
+
+<MermaidDiagram
+  chart={`flowchart TB
+    subgraph METHODS["B2B Payment Methods"]
+      direction TB
+      A["Checks<br/>Still ~40% of US B2B payments<br/>Declining but stubborn"] --> E[Slow, manual,<br/>fraud-prone]
+      B["ACH<br/>Most common electronic method<br/>$0.20-1.50 per transaction"] --> F[1-3 day settlement<br/>batch processing]
+      C["Wire Transfer<br/>Large/urgent payments<br/>$15-30 per transaction"] --> G[Same-day settlement<br/>irrevocable]
+      D["Virtual Cards<br/>Fastest-growing method<br/>30%+ annual growth"] --> H[Instant issuance<br/>buyer earns interchange]
+    end`}
+  caption="The four major B2B payment methods, from legacy (checks) to modern (virtual cards), each with distinct cost and speed characteristics"
+/>
+
+**Checks.** Yes, checks. In 2024. An astonishing 40% of US B2B payments are still made by check. A company prints a check, puts it in an envelope, mails it, and waits for the supplier to receive it, deposit it, and wait for it to clear. The entire process takes 5-10 days, costs $4-20 per check when you factor in printing, postage, and processing time, and is vulnerable to mail fraud. So why do checks persist? Inertia, mostly. Small businesses are comfortable with checks. Some suppliers prefer checks because they avoid card processing fees. And checks provide a natural payment delay (the "float") that some buyers exploit as a form of free short-term financing.
+
+**ACH.** The most common electronic B2B payment method in the US. ACH batch processing handles billions of transactions per year at extremely low cost ($0.20-1.50 per transaction). Standard ACH settles in 1-3 business days. Same-day ACH (available since 2016, with a current limit of $1 million per transaction) settles within the same business day. ACH is reliable and cheap, but it's a batch system — payments are processed in windows, not in real time. And ACH carries a risk of returns: a payment can be reversed up to 60 days after settlement for unauthorized transactions.
+
+**Wire transfers.** For large or urgent payments, companies use wire transfers (Fedwire in the US). Wires settle same-day and are irrevocable once sent — the money is final. But they're expensive ($15-30 per domestic wire, $35-50 international) and require manual initiation. Wire transfers are appropriate for a $2 million real estate closing or an urgent vendor payment, but impractical for routine invoice payments.
+
+**Virtual cards.** The fastest-growing B2B payment method, with Visa estimating 30%+ annual growth. The buyer generates a single-use virtual card for the exact invoice amount, and the supplier charges the card. The buyer earns interchange (typically 1.0-1.5% of the payment amount) — effectively getting paid to pay their bills. The supplier receives funds faster than ACH and gets the certainty of card network settlement. Virtual cards work best for mid-size payments ($500-$50,000) where the interchange revenue is meaningful and the payment amount is below typical card limits.
+
+**International methods.** For cross-border B2B payments, the dominant method is SWIFT — the messaging network that connects 11,000+ financial institutions globally. A US company paying a German supplier sends a wire through SWIFT, which may pass through one or more correspondent banks before reaching the supplier's bank. The process takes 1-5 business days, costs $25-50+ in fees (sometimes more with intermediary bank charges), and involves currency conversion at rates that include a bank markup. SEPA (Europe), BACS (UK), and local payment schemes handle domestic B2B payments within their respective regions.
+
+## The <GlossaryTerm term="Accounts Payable" definition="The department or process responsible for paying a company's bills and invoices to suppliers.">Accounts Payable</GlossaryTerm> Problem
+
+AP (Accounts Payable) is where invoices go to die. The traditional AP process looks like this:
+
+1. Supplier sends an invoice (email, PDF, paper mail, or EDI).
+2. AP clerk receives the invoice and manually enters data into the <GlossaryTerm term="ERP" definition="Enterprise Resource Planning — systems like SAP, Oracle, and NetSuite that manage business operations including accounts payable/receivable.">ERP</GlossaryTerm> system.
+3. AP matches the invoice to the original purchase order and receiving report (three-way match).
+4. Invoice routes through approval workflow (department head, budget owner, etc.).
+5. Approved invoice queues for payment on the next payment run.
+6. Treasury team executes the payment (check, ACH, wire, or virtual card).
+7. Payment details are recorded in the ERP for reconciliation.
+
+Each step involves manual work, and each handoff introduces delay. The average invoice takes 10-15 days to process from receipt to payment. For companies handling thousands of invoices per month, AP departments are large, expensive, and perpetually backlogged.
+
+Modern AP automation platforms — Bill.com, Tipalti, Coupa, and the AP features within Ramp and Brex — attack this workflow at every step. OCR and machine learning extract invoice data automatically (no manual entry). Rules engines perform three-way matching programmatically. Digital approval workflows replace email chains. Payment execution is automated based on payment terms and preferred method. And reconciliation happens automatically as payments are synced back to the ERP.
+
+The results are dramatic. AP automation can reduce invoice processing costs from $15-40 per invoice (manual) to $2-5 per invoice (automated). Processing time drops from 10-15 days to 1-3 days. And error rates — duplicate payments, incorrect amounts, payments to wrong vendors — drop by 80%+.
+
+## The Reconciliation Challenge
+
+<GlossaryTerm term="Reconciliation" definition="Matching payment records to invoices and accounting entries — a major operational challenge in B2B payments.">Reconciliation</GlossaryTerm> — matching payments to invoices and accounting entries — is the unglamorous but critical last mile of B2B payments.
+
+When a supplier receives a $47,832.16 ACH deposit, they need to know which invoices it covers. If the remittance data (the list of invoices being paid) arrives separately from the payment — which it often does, via email or a separate portal — someone has to manually match them. If a payment covers multiple invoices and includes adjustments or credits, the matching becomes even more complex.
+
+Now multiply this by hundreds of payments per day, across dozens of customers, and you begin to understand why reconciliation is a full-time job at many companies. AR (Accounts Receivable) teams at large suppliers spend days each month manually matching payments to invoices.
+
+The problem is partly technical (payment systems and ERP systems don't natively share data) and partly structural (remittance data standards vary across payment methods and trading partners). Virtual cards actually help here — because each card is generated for a specific invoice, the payment itself carries the invoice reference. ACH payments can include remittance data in addenda records, but many banks and ERP systems don't process these fields correctly.
+
+## <GlossaryTerm term="Idempotency" definition="Ensuring a payment instruction can only be executed once, even if submitted multiple times — critical for preventing duplicate payments.">Idempotency</GlossaryTerm>: Preventing the Double Pay
+
+One of the most expensive errors in B2B payments is the duplicate payment — paying the same invoice twice. Industry estimates suggest 0.1-0.5% of payments are duplicates, which sounds small until you apply it to a company paying $100 million per year. That's $100,000-$500,000 in erroneous payments that must be identified and recovered.
+
+Duplicate payments happen for mundane reasons. A supplier sends an invoice twice (once by email, once by mail). An invoice is entered into the ERP under two slightly different vendor names. A payment fails, is retried, and both the original and retry succeed.
+
+Idempotency — ensuring a payment instruction produces the same result regardless of how many times it's submitted — is a critical safeguard. Modern AP systems assign unique idempotency keys to each payment instruction. If the same key is submitted twice, the system recognizes the duplicate and blocks the second payment. This is a concept borrowed from API design (Stripe, for example, uses idempotency keys extensively) and applied to payment operations.
+
+Beyond idempotency keys, AP teams use duplicate detection rules: same vendor + same amount + same date = potential duplicate, flagged for review. Some systems use machine learning to catch subtler patterns — a vendor with two slightly different names in the system, or an invoice number that differs by one digit.
+
+## Why B2B Is Still "Stuck"
+
+Given the enormous market size and obvious inefficiencies, why hasn't B2B payments been fully modernized?
+
+**ERP integration complexity.** Every company's ERP is configured differently. SAP alone has thousands of configuration parameters for AP processes. Integrating a modern payment tool with a company's specific ERP setup — including their chart of accounts, approval hierarchies, tax rules, and reporting requirements — is a significant implementation project. This is why B2B payment companies invest heavily in pre-built ERP connectors.
+
+**Buyer-supplier dynamics.** B2B payments involve two parties with competing interests. Buyers want to pay as late as possible (preserving cash). Suppliers want to be paid as early as possible (improving cash flow). Payment terms are negotiated, and switching payment methods requires agreement from both sides. A buyer can't unilaterally switch to virtual cards if their suppliers won't accept them.
+
+**Change management.** AP teams at large companies have been doing things the same way for decades. Introducing new tools requires training, process redesign, and organizational buy-in. The ROI of AP automation is clear on paper, but the human resistance to change is real.
+
+**Fragmentation.** Unlike consumer payments, where a handful of card networks and payment methods dominate, B2B payments span checks, ACH, wires, virtual cards, SWIFT, local payment schemes, and manual processes. No single platform handles all of them seamlessly across all geographies.
+
+Despite these challenges, B2B payment modernization is accelerating. The combination of AP automation software, virtual card adoption, real-time payment networks (RTP, FedNow), and API-first banking infrastructure is gradually replacing the manual, paper-based processes that have defined B2B payments for decades. The $200 trillion market is finally moving — slowly, but unmistakably — toward digital, automated, and real-time.

@@ -1,0 +1,150 @@
+---
+title: "Subscriptions & Recurring Payments"
+description: "The infrastructure behind recurring billing — automated retries, account updaters, involuntary churn, and why your Netflix subscription rarely fails."
+theme: "Products & Use Cases"
+readingTime: "8 min read"
+order: 3
+relatedTopics: ["authorization", "card-networks", "clearing-and-settlement"]
+glossaryTerms:
+  - term: "Involuntary Churn"
+    definition: "Subscribers lost due to payment failures (expired card, insufficient funds) rather than deliberate cancellation."
+  - term: "Voluntary Churn"
+    definition: "Subscribers who deliberately cancel their subscription."
+  - term: "Account Updater"
+    definition: "Card network services (Visa VAU, Mastercard ABU) that automatically update expired or replaced card credentials with merchants."
+  - term: "CIT/MIT Framework"
+    definition: "Cardholder-Initiated Transaction vs Merchant-Initiated Transaction — a Visa framework determining how recurring charges are classified."
+  - term: "Retry Strategy"
+    definition: "The logic for re-attempting declined recurring payments — timing, frequency, and decay patterns matter significantly."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## The Quiet Crisis Behind Every Subscription
+
+You probably subscribe to a dozen services right now. Netflix, Spotify, iCloud, your gym, a news site, maybe a meal kit. Each one charges your card monthly without you lifting a finger. It feels seamless. Automatic. Invisible.
+
+But underneath that seamless experience is a constant battle against payment failure. Cards expire every three years. Banks reissue cards after fraud. Customers change banks. Accounts run low on payday-minus-one. Each of these events threatens to break the billing relationship — and silently cancel a subscription the customer never intended to leave.
+
+This is <GlossaryTerm term="Involuntary Churn" definition="Subscribers lost due to payment failures (expired card, insufficient funds) rather than deliberate cancellation.">involuntary churn</GlossaryTerm>, and it's the subscription economy's biggest hidden problem. Industry data suggests 20-40% of all subscription churn is involuntary — customers lost to payment failures, not to dissatisfaction. For a subscription business doing $100 million in annual recurring revenue, involuntary churn might silently drain $3-5 million per year. That's not a rounding error. That's a crisis.
+
+<GlossaryTerm term="Voluntary Churn" definition="Subscribers who deliberately cancel their subscription.">Voluntary churn</GlossaryTerm> — when customers deliberately cancel — gets all the attention. Product teams obsess over it. But involuntary churn is often the larger, more solvable problem. And solving it requires understanding the payment infrastructure.
+
+## The Billing Engine
+
+At the core of every subscription business sits a billing engine — the system that knows who owes what, when they owe it, and how to charge them. This sounds simple until you consider the edge cases.
+
+A customer signs up on January 31st. When's the next charge? February 28th? March 3rd? What if they upgrade mid-cycle — do you prorate? What about downgrades? Refunds? Tax calculations across jurisdictions? Free trials that convert to paid? Annual vs monthly plans with different pricing?
+
+Billing engines handle all of this. Companies either build their own or use platforms like Stripe Billing, Zuora, Chargebee, or Recurly. The build-vs-buy decision is a classic tradeoff. Building in-house gives you full control but requires years of engineering investment. Buying gives you proven infrastructure but introduces vendor dependency and platform constraints.
+
+Most companies start by building a simple billing loop — a cron job that charges cards on a schedule. Then they discover the edge cases. Proration logic alone can take months to build correctly. Tax compliance (Avalara, TaxJar) adds another layer. Multi-currency support adds another. Before long, the "simple" billing system has become one of the most complex pieces of the codebase.
+
+## The Card Lifecycle Problem
+
+Here's the fundamental challenge of recurring billing: the payment credential you stored today might not work tomorrow.
+
+The average credit card expires every 3 years. In a portfolio of 1 million subscribers, roughly 28,000 cards expire every month. If you do nothing, those 28,000 subscribers will see their next payment decline. Most won't proactively update their card. Many won't even notice the subscription lapsed until weeks later, at which point they've moved on.
+
+But expiration is only one failure mode. Banks regularly reissue cards after data breaches — sometimes millions of cards at once. Customers switch banks. Cards are reported lost or stolen. Each event creates a new card number that the merchant doesn't have.
+
+This is where <GlossaryTerm term="Account Updater" definition="Card network services (Visa VAU, Mastercard ABU) that automatically update expired or replaced card credentials with merchants.">Account Updater</GlossaryTerm> services become essential.
+
+## Account Updaters: The Silent Savior
+
+Visa Account Updater (VAU), Mastercard Automatic Billing Updater (ABU), and American Express Card Refresher are network-level services that automatically update stored card credentials when cards are replaced.
+
+Here's how it works. The merchant (or their payment processor) submits a batch of stored card numbers to the card network. The network checks each card against its records. If a card has been replaced — new number, new expiry — the network returns the updated credentials. The merchant updates their records and charges the new card on the next billing cycle. The subscriber never knows it happened.
+
+Account Updater comes in two flavors:
+
+**Batch mode.** The merchant submits their entire card portfolio periodically (weekly or monthly). The network processes the file and returns updates. This is the original model and works well for catching expired or reissued cards before the next billing attempt.
+
+**Real-time mode.** When a recurring charge is declined, the processor can query the Account Updater service in real time to check if updated credentials are available. If they are, the processor can retry the charge with the new credentials immediately — turning a decline into a successful payment without any delay.
+
+The impact is significant. Account Updater services recover 10-20% of otherwise-failed payments. For a large subscription business, that translates directly to millions in recovered revenue. Stripe reports that its automatic card updater recovers billions of dollars in payments annually across its platform.
+
+## Retry Strategies: The Art of the Second Attempt
+
+When a recurring payment is declined, the next question is: should you try again, and when?
+
+Not all declines are equal. A "hard decline" means the card is permanently invalid — closed account, reported stolen, or invalid card number. Retrying a hard decline is pointless and can trigger penalties from the card networks. A "soft decline" means the charge failed for a temporary reason — insufficient funds, issuer temporarily unavailable, or processing error. Soft declines are worth retrying.
+
+The <GlossaryTerm term="Retry Strategy" definition="The logic for re-attempting declined recurring payments — timing, frequency, and decay patterns matter significantly.">retry strategy</GlossaryTerm> — when and how often to retry soft declines — is both art and science.
+
+<MermaidDiagram
+  chart={`flowchart TB
+    A[Recurring charge attempt] --> B{Approved?}
+    B -->|Yes| C[Payment successful<br/>Reset retry counter]
+    B -->|No| D{Decline type?}
+    D -->|Hard decline| E[Do not retry<br/>Flag for dunning]
+    D -->|Soft decline| F{Check Account Updater<br/>for new credentials}
+    F -->|Updated card found| G[Retry with new credentials]
+    G --> B
+    F -->|No update| H[Schedule retry]
+    H --> I{Retry #1<br/>Wait 2-3 days}
+    I -->|Declined| J{Retry #2<br/>Wait 5-7 days}
+    J -->|Declined| K{Retry #3<br/>Wait 7-10 days}
+    K -->|Declined| L{Retry #4<br/>Align with payday cycle}
+    L -->|Declined| M[Final attempt<br/>then cancel or dunning]
+    I -->|Approved| C
+    J -->|Approved| C
+    K -->|Approved| C
+    L -->|Approved| C`}
+  caption="Retry decision tree: different decline types receive different handling, with soft declines retried on an escalating schedule"
+/>
+
+**Timing matters enormously.** A decline for insufficient funds on the 28th of the month might succeed on the 1st, after payday. Sophisticated retry systems incorporate payday awareness — they know that many consumers are paid on the 1st and 15th, and schedule retries accordingly. A retry timed to land on payday can have a 20-30% higher success rate than a retry timed randomly.
+
+**Frequency and limits.** Visa's rules (the Transaction Acceptance Procedure Guide) limit merchants to a maximum of 15 retry attempts within 30 days for soft declines. After that window, retries must stop. Excessive retries trigger network monitoring programs and can result in fines. The card networks impose these limits because retries cost them processing capacity, and merchants who retry declined cards hundreds of times create system load without generating revenue.
+
+**Partial authorizations.** Some issuers will approve a charge for less than the requested amount if the cardholder's available balance is insufficient. A $14.99 Netflix charge might be approved for $10.00 if that's all the cardholder has available. Netflix can accept the partial authorization or decline it. Most subscription services decline partial authorizations because managing partial payments on a recurring basis is operationally complex.
+
+## The CIT/MIT Framework
+
+In 2018, Visa introduced the <GlossaryTerm term="CIT/MIT Framework" definition="Cardholder-Initiated Transaction vs Merchant-Initiated Transaction — a Visa framework determining how recurring charges are classified.">CIT/MIT framework</GlossaryTerm>, which classifies every card transaction as either a Cardholder-Initiated Transaction (CIT) or a Merchant-Initiated Transaction (MIT). This seemingly bureaucratic distinction has major implications for recurring billing.
+
+A CIT is a transaction where the cardholder is actively present and initiating the payment — signing up for a subscription, making a one-time purchase, or entering their card details. A MIT is a transaction initiated by the merchant without the cardholder's active participation — recurring subscription charges, installment payments, or delayed charges.
+
+The distinction matters for two reasons.
+
+**Authentication.** CITs may require Strong Customer Authentication (SCA) under regulations like PSD2 in Europe. The first payment — when the customer signs up — is a CIT and must be authenticated (3D Secure, biometrics, etc.). Subsequent recurring charges are MITs and are exempt from SCA, because demanding the customer authenticate every monthly charge would destroy the subscription experience.
+
+**Liability.** When a CIT is properly authenticated, fraud liability shifts to the issuer. When a MIT is processed based on a stored credential from a previously authenticated CIT, the merchant generally bears fraud liability. This means merchants must maintain a clear chain from the original authenticated CIT to each subsequent MIT, including a transaction ID that links them.
+
+For subscription businesses, the practical impact is that the first payment must be properly authenticated and flagged as a CIT, and every subsequent recurring charge must reference the original CIT and be flagged as a MIT. Getting this wrong can result in higher decline rates, lost chargeback disputes, and network fines.
+
+## Dunning: The Last Resort
+
+When retries fail and Account Updater has no updated credentials, there's one option left: ask the customer directly. This is dunning — contacting customers about failed payments and asking them to update their payment method.
+
+Effective dunning is a multi-channel, multi-step process:
+
+1. **Email.** "Your payment for Netflix failed. Update your payment method to continue your subscription." This is the default, and it works for a surprising percentage of customers — people who genuinely want to keep the service but had a card expire.
+
+2. **In-app notification.** When the customer opens the app, a banner or modal prompts them to update their payment method. This has higher conversion than email because the customer is already engaged with the product.
+
+3. **SMS.** For high-value subscriptions, an SMS with a direct link to update payment details can be effective. SMS open rates (98%) dramatically outperform email (20%).
+
+4. **Escalation.** If the customer doesn't respond, subsequent messages can increase urgency: "Your subscription will be cancelled in 3 days." Loss aversion is a powerful motivator.
+
+The timing and tone of dunning messages matter. Aggressive dunning ("YOUR ACCOUNT IS PAST DUE") alienates customers. Helpful dunning ("It looks like your card expired — update it in 10 seconds to keep watching") retains them. A/B testing subject lines, message timing, and CTA language can improve recovery rates by 5-15%.
+
+## Why Netflix Rarely Fails
+
+Netflix is often cited as the gold standard for recurring payment reliability. Their subscription rarely fails, and when it does, the recovery process is nearly invisible. Here's why.
+
+Netflix uses multiple payment processors (redundancy — if one processor is down, transactions route to another). They run Account Updater queries proactively before billing, not just after declines. Their retry strategy is finely tuned based on billions of transactions — they know exactly when to retry for maximum success rates. They support multiple payment methods per account (if the primary card fails, charge the backup). And their dunning flow is optimized across email, push notifications, and in-app prompts.
+
+The result: Netflix's involuntary churn rate is estimated at under 1% annually — far below the industry average of 3-5%. That seemingly small difference, applied to 230+ million subscribers, represents millions of retained subscribers and billions in retained revenue.
+
+## Key Metrics
+
+Two metrics define success in recurring payments:
+
+**Time to collect.** How long it takes to successfully collect payment after the billing date. A billing run that collects 95% of payments on day one, 3% through retries by day seven, and 1.5% through dunning by day fourteen has a 99.5% collection rate but a multi-week time-to-collect tail. Shortening this tail improves cash flow predictability.
+
+**Amount collected (recovery rate).** What percentage of attempted charges ultimately succeed — including initial attempts, retries, account updater recoveries, and dunning conversions. Best-in-class subscription businesses achieve 98-99% recovery rates. Average businesses see 93-96%. The gap between average and best-in-class is pure revenue — and closing it requires investing in every layer of the retry and recovery stack.
+
+The subscription economy now exceeds $300 billion globally and is growing at 15-20% annually. Behind every successful subscription business is a payment infrastructure stack that relentlessly fights to keep customers paying — not through dark patterns or lock-in, but through the quiet engineering of reliable, resilient recurring billing.

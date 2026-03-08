@@ -1,0 +1,131 @@
+---
+title: "Liability"
+description: "When fraud happens, who pays? The liability framework that determines whether the merchant, the issuer, or the consumer bears the cost."
+theme: "Trust & Compliance"
+readingTime: "6 min read"
+order: 4
+relatedTopics: ["chargebacks-and-disputes", "fraud-and-risk", "acceptance-environments"]
+glossaryTerms:
+  - term: "Liability Shift"
+    definition: "The transfer of fraud liability from one party to another — EMV chip shifted card-present liability from merchants to issuers."
+  - term: "EMV Liability Shift"
+    definition: "Since October 2015, if a merchant doesn't accept chip cards and fraud occurs, the merchant bears the liability instead of the issuer."
+  - term: "Zero Liability"
+    definition: "Card network policies protecting consumers from unauthorized transactions — the consumer isn't responsible for fraud on their card."
+  - term: "CNP Liability"
+    definition: "In card-not-present transactions, the merchant typically bears liability for fraud — unless additional authentication (like 3DS) shifts it to the issuer."
+  - term: "Merchant of Record"
+    definition: "The entity listed as the seller in a transaction — the Merchant of Record bears primary liability for disputes and refunds."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## The Question That Matters Most
+
+When a fraudulent transaction happens — when someone uses a stolen card number to buy a laptop, or when a customer falsely claims they never received their order — one question dominates everything: *who pays?*
+
+The answer isn't always intuitive. It depends on the type of transaction, the security measures in place, the specific card network rules, and the regulations that apply. But the liability framework is one of the most consequential aspects of the payment system, because it determines who bears the financial risk — and that, in turn, drives every security investment decision in the industry.
+
+## The Default Framework
+
+The core principle is simple: **liability falls on the party with the weakest security.** The card networks designed it this way deliberately — to create financial incentives for every participant to invest in fraud prevention.
+
+<MermaidDiagram
+  chart={`flowchart TD
+    subgraph CP["Card-Present Transactions"]
+        CP1["EMV Chip Used"] -->|Liability on| CP1R["Issuer"]
+        CP2["Chip Available, Not Used"] -->|Liability on| CP2R["Merchant"]
+        CP3["Swipe Only / No Chip"] -->|Liability on| CP3R["Merchant"]
+    end
+    subgraph CNP["Card-Not-Present Transactions"]
+        CNP1["No Authentication"] -->|Liability on| CNP1R["Merchant"]
+        CNP2["3D Secure Authenticated"] -->|Liability on| CNP2R["Issuer"]
+    end
+    subgraph CON["Consumer"]
+        CON1["Reg Z Credit: $50 max"]
+        CON2["Reg E Debit: $50 if reported in 2 days"]
+        CON3["Zero Liability Policies: $0"]
+    end`}
+  caption="The liability spectrum: who pays for fraud depends on the acceptance environment and security measures in place"
+/>
+
+Let's walk through each scenario.
+
+## Card-Present with EMV Chip
+
+When a customer inserts or taps a chip card at a terminal, and the terminal reads the chip, the **issuing bank bears liability** for any resulting fraud.
+
+This is the <GlossaryTerm term="EMV Liability Shift" definition="Since October 2015, if a merchant doesn't accept chip cards and fraud occurs, the merchant bears the liability instead of the issuer.">EMV liability shift</GlossaryTerm>, which took effect in the US in October 2015. The logic: EMV chips generate a unique cryptogram for each transaction, making counterfeit cards nearly impossible. If a chip-authenticated transaction still turns out to be fraudulent, the merchant did everything right — they used the most secure available method. The issuer should have caught it on their end.
+
+Before the liability shift, issuers absorbed most counterfeit card fraud. They had little incentive to push chip adoption, because the system was "working" for them — merchants bore the counterfeit risk through chargebacks. The liability shift changed the economics overnight, giving merchants a powerful reason to upgrade their terminals.
+
+## Card-Present Without Chip
+
+Here's where the <GlossaryTerm term="Liability Shift" definition="The transfer of fraud liability from one party to another — EMV chip shifted card-present liability from merchants to issuers.">liability shift</GlossaryTerm> bites. If a chip-enabled card is presented at a terminal that only supports magnetic stripe (swipe), and the transaction turns out to be fraudulent, the **merchant bears the liability**.
+
+The merchant had the option to accept the more secure chip transaction but chose not to invest in a chip-capable terminal. They accepted a lower level of security, so they accept the corresponding risk.
+
+This was the economic lever that drove EMV terminal adoption across the US. Within a few years of the October 2015 shift, chip-ready terminals went from a minority to the vast majority of card-present payment environments. Nobody wanted to be the merchant holding the bag for counterfeit fraud.
+
+There were some notable exceptions. Gas stations received extended deadlines for EMV adoption (originally April 2017, ultimately pushed to April 2021) because replacing fuel pump payment terminals is significantly more expensive and complex than swapping a countertop reader. ATMs received similar extensions.
+
+## Card-Not-Present: The Merchant's Burden
+
+<GlossaryTerm term="CNP Liability" definition="In card-not-present transactions, the merchant typically bears liability for fraud — unless additional authentication (like 3DS) shifts it to the issuer.">Card-not-present (CNP) liability</GlossaryTerm> is straightforward and painful for merchants: by default, the **merchant bears liability** for fraud in online, phone, and mail-order transactions.
+
+There's no chip to read online. There's no way to physically verify the cardholder. The merchant accepted the order based on a card number, expiration date, and CVV — all of which could have been stolen. If it turns out the real cardholder didn't make the purchase, the merchant eats the loss through a chargeback.
+
+This is why CNP fraud is such a massive problem for e-commerce businesses. Every fraudulent online transaction comes directly out of the merchant's revenue — plus chargeback fees, lost merchandise, and potential network monitoring penalties.
+
+## 3D Secure: Shifting CNP Liability
+
+3D Secure is the merchant's escape valve in the CNP world. When a merchant implements 3D Secure and a transaction is successfully authenticated by the issuing bank (the cardholder verifies via OTP, biometric, or banking app), **liability shifts to the issuer**.
+
+The logic mirrors EMV: the merchant invested in the more secure authentication method. If an authenticated transaction still turns out to be fraudulent, the issuer — who performed the authentication — bears the cost.
+
+This creates a genuine dilemma for merchants. 3D Secure shifts liability away from them (good), but it adds friction to checkout (bad). If the authentication challenge causes a customer to abandon their cart, the merchant loses a legitimate sale. If they skip 3D Secure to reduce friction, they keep liability for fraud.
+
+The art is in selective application. Many merchants use 3D Secure only on transactions that their fraud models flag as medium-to-high risk, while letting low-risk transactions flow through without authentication. This balances fraud protection against conversion rate impact.
+
+## Consumer Protection: Zero Liability
+
+From the consumer's perspective, the picture is much simpler.
+
+<GlossaryTerm term="Zero Liability" definition="Card network policies protecting consumers from unauthorized transactions — the consumer isn't responsible for fraud on their card.">Zero liability</GlossaryTerm> policies from Visa and Mastercard mean that consumers are not responsible for unauthorized transactions on their cards — period. If someone steals your card number and makes purchases, you owe nothing.
+
+Federal regulation backs this up:
+
+**Regulation Z** (credit cards) caps consumer liability for unauthorized charges at $50. In practice, every major issuer waives even this amount through their zero-liability programs. The cardholder's exposure on credit card fraud is effectively zero.
+
+**Regulation E** (debit cards) is slightly less generous. If you report unauthorized use within 2 business days, your liability is capped at $50. Between 2 and 60 days, it rises to $500. After 60 days, there's theoretically no cap. This is one of the practical reasons financial advisors often recommend using credit cards over debit cards for purchases — the consumer protections are stronger.
+
+The key insight: consumers are largely shielded from fraud liability. The cost gets allocated between merchants and issuers, depending on the acceptance environment and security measures in play.
+
+## The Merchant of Record in Marketplaces
+
+The liability picture gets more complex in marketplace and platform models. When you buy something on Etsy, who's the merchant? Is it the individual seller? Is it Etsy?
+
+The <GlossaryTerm term="Merchant of Record" definition="The entity listed as the seller in a transaction — the Merchant of Record bears primary liability for disputes and refunds.">Merchant of Record</GlossaryTerm> is the entity whose name appears on the cardholder's statement and who bears primary liability for disputes and refunds. In the payment facilitator (PayFac) model, the platform is the Merchant of Record. Stripe's name (or its client's name) appears on the statement, and Stripe bears the initial liability for chargebacks — even though the actual seller is a sub-merchant on their platform.
+
+This creates a cascading liability chain. The consumer disputes with their issuer. The issuer charges back the acquirer. The acquirer charges back the Merchant of Record (the platform). The platform then attempts to recover from the sub-merchant (the seller). If the sub-merchant has disappeared, gone bankrupt, or drained their account, the platform absorbs the loss.
+
+This is why PayFacs and marketplaces are so obsessive about onboarding quality (KYB), transaction monitoring, and reserve requirements for their sellers. Every sub-merchant is a potential liability, and the platform can't pass that risk upstream.
+
+## The Cost Allocation Summary
+
+When you zoom out, the liability framework creates a clear cost allocation:
+
+**Merchants** bear the cost of CNP fraud (unless they use 3DS), card-present fraud when they lack chip terminals, chargebacks from friendly fraud, and chargeback processing fees regardless of outcome. For most merchants, fraud losses are 1-2% of revenue, with some high-risk categories (digital goods, travel, luxury) running significantly higher.
+
+**Issuers** bear the cost of card-present fraud on chip-authenticated transactions, CNP fraud when 3D Secure was used, and the operational cost of running fraud detection systems and issuing provisional credits. Major issuers budget hundreds of millions annually for fraud losses.
+
+**Consumers** are largely protected by regulation and network policies. Their maximum exposure is $50 on credit (waived in practice) and $50-$500 on debit (depending on reporting speed). This consumer protection is a feature, not a bug — it's what gives people the confidence to use cards in the first place.
+
+## Why This Framework Drives Everything
+
+Understanding liability isn't an academic exercise. It's the key to understanding why the payments industry invests billions in security.
+
+Merchants adopt EMV because the alternative is bearing counterfeit fraud losses. Merchants implement 3D Secure because the alternative is bearing all CNP fraud. Issuers build sophisticated ML fraud models because chip-authenticated fraud falls on their books. Card networks design the rules to push the cost of fraud toward whoever is least invested in preventing it.
+
+Every security feature, every authentication protocol, every fraud model in the payment ecosystem exists because someone's balance sheet is on the line. Liability isn't a side topic in payments — it's the economic engine that drives the entire security apparatus.

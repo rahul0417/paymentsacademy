@@ -1,0 +1,122 @@
+---
+title: "Push-to-Card"
+description: "Sending money instantly to any debit card — how Visa Direct and Mastercard Send enable real-time payouts without needing bank account details."
+theme: "Moving Money"
+readingTime: "6 min read"
+order: 2
+relatedTopics: ["card-networks", "real-time-payments", "anatomy-of-a-swipe"]
+glossaryTerms:
+  - term: "Visa Direct"
+    definition: "Visa's platform for pushing funds directly to Visa debit cards and bank accounts in real time."
+  - term: "Mastercard Send"
+    definition: "Mastercard's platform for pushing funds to Mastercard debit cards, originally developed as Omney."
+  - term: "OCT"
+    definition: "Original Credit Transaction — the technical mechanism for push-to-card, essentially an in-store refund without an original purchase."
+  - term: "Push Payment"
+    definition: "A payment initiated by the sender that pushes funds to the recipient — the opposite of a pull payment like a card charge."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## The Reverse Swipe
+
+Every card payment you've ever made works the same way: money gets pulled from your account. You tap at a coffee shop, the merchant pulls $4.50 from your bank through the card network. That's a pull payment — the merchant initiates, your bank responds.
+
+But what if the flow went the other direction? What if someone could push money to your debit card — instantly, without knowing your bank account number or routing number? That's push-to-card, and it's quietly become one of the most important payment innovations of the last decade.
+
+<GlossaryTerm term="Push Payment" definition="A payment initiated by the sender that pushes funds to the recipient — the opposite of a pull payment like a card charge.">Push payments</GlossaryTerm> flip the card payment model on its head. Instead of merchants pulling money from cardholders, senders push money to cardholders. The card number becomes a destination address for funds, not just a source.
+
+## How It Actually Works: The OCT
+
+Under the hood, push-to-card uses a mechanism called an <GlossaryTerm term="OCT" definition="Original Credit Transaction — the technical mechanism for push-to-card, essentially an in-store refund without an original purchase.">Original Credit Transaction (OCT)</GlossaryTerm>. The name reveals its origin — it's essentially a refund. When a store processes a return, it sends a credit transaction back to your card. An OCT is the same thing, except there was no original purchase. It's a credit without a preceding debit.
+
+The technical elegance is that OCTs ride on the existing card network infrastructure. No new rails needed. No new connections between banks. The same Visa and Mastercard networks that process billions of card purchases can also push money to any card on their network. The plumbing was already there — push-to-card just reversed the flow.
+
+Here's what happens when a company pushes funds to your debit card:
+
+<MermaidDiagram
+  chart={`sequenceDiagram
+    participant S as Sender<br/>(e.g., Lyft)
+    participant PSP as Payment Processor<br/>(e.g., Tabapay)
+    participant NET as Card Network<br/>(Visa Direct / MC Send)
+    participant ISS as Issuing Bank<br/>(Cardholder's Bank)
+    participant R as Recipient<br/>(Driver)
+    S->>PSP: Push $150 to card ending 4821
+    PSP->>NET: OCT request with card number,<br/>amount, sender details
+    NET->>ISS: Route OCT to issuing bank
+    Note over ISS: Validate card, credit account
+    ISS->>NET: Approval response
+    NET->>PSP: Confirmation
+    PSP->>S: Funds delivered
+    Note over R: Funds available in minutes<br/>(typically under 30 minutes)`}
+  caption="Push-to-card flow: the sender initiates an Original Credit Transaction that travels through the card network in reverse, crediting the recipient's debit card"
+/>
+
+The sender submits the recipient's debit card number, the amount, and basic transaction details to their payment processor. The processor formats an OCT and sends it through the card network. The network routes it to the issuing bank, which credits the cardholder's account. The entire process typically takes under 30 minutes, and often completes in seconds.
+
+## Visa Direct and Mastercard Send
+
+The two major card networks each have their own platform for push-to-card.
+
+<GlossaryTerm term="Visa Direct" definition="Visa's platform for pushing funds directly to Visa debit cards and bank accounts in real time.">Visa Direct</GlossaryTerm> is Visa's push payment platform. It can reach over 3 billion Visa credentials worldwide and processes transactions in real time. Visa Direct supports push to debit cards, prepaid cards, and in some markets, directly to bank accounts. The platform handles person-to-person transfers, business disbursements, and government payments. Visa reports that Visa Direct transactions have been growing at 30%+ annually.
+
+<GlossaryTerm term="Mastercard Send" definition="Mastercard's platform for pushing funds to Mastercard debit cards, originally developed as Omney.">Mastercard Send</GlossaryTerm> is the equivalent platform on the Mastercard side. Originally developed under the name Omney and later rebranded, Mastercard Send enables push payments to Mastercard debit and prepaid cards. It reaches over 2 billion Mastercard credentials globally.
+
+Between the two networks, push-to-card can reach virtually any debit cardholder in the developed world. And that reach is the whole point.
+
+## Why Push-to-Card Is Powerful
+
+The killer feature of push-to-card isn't speed — although near-instant delivery is compelling. The killer feature is reach and simplicity.
+
+**Roughly 80% of American adults have a debit card.** That's a pre-existing, universally understood credential that people already carry in their wallets. Collecting a debit card number is dramatically simpler than collecting bank account details. A gig worker signing up for instant payouts can photograph the front of their debit card — no need to hunt for routing numbers, no risk of transposing account digits, no need to verify bank ownership through micro-deposits that take days.
+
+Compare that to ACH, which requires a routing number and account number, takes 1-3 business days for standard settlement, and has a meaningful rate of returns due to incorrect account information. Push-to-card is faster to set up, faster to deliver, and has lower failure rates.
+
+**The cost is fixed and predictable.** A push-to-card transaction typically costs $0.25-0.50, regardless of the payment amount. Pushing $50 costs the same as pushing $5,000. That's dramatically cheaper than wire transfers ($25-30) and competitive with ACH on a per-transaction basis, with the added benefit of instant delivery.
+
+**No bank account required.** Recipients need a debit card, not a bank account. While most debit cards are linked to bank accounts, prepaid debit cards — which don't require a traditional bank relationship — also work. This opens push-to-card to underbanked populations who might have a Green Dot or Chime prepaid card but no traditional checking account.
+
+## Use Cases: Where Push-to-Card Shines
+
+Push-to-card has found its strongest product-market fit in disbursements — any situation where a company needs to send money to many individuals quickly.
+
+**Gig economy payouts.** This is the use case that put push-to-card on the map. Lyft, Uber, DoorDash, and other gig platforms offer drivers the option to cash out their earnings instantly to a debit card, rather than waiting for a weekly ACH deposit. Drivers overwhelmingly prefer instant access to their money. Some platforms charge a small fee ($0.50-1.99) for instant cashout; others absorb it as a driver retention benefit. The impact on driver satisfaction and retention is measurable and significant.
+
+**Insurance claim disbursements.** When a customer files an auto insurance claim, they want their money fast. Traditionally, insurers mailed checks — a process that took 7-14 days including mail delivery. Push-to-card reduces that to minutes. Several major insurers now offer instant claim payouts to debit cards, and customers who receive instant payouts report dramatically higher satisfaction scores.
+
+**Marketplace seller payments.** Platforms like eBay, Etsy, and Amazon Marketplace need to pay millions of individual sellers. Push-to-card lets sellers receive their proceeds instantly rather than waiting for ACH settlement. For small sellers who depend on that cash flow to purchase inventory, the speed difference is material.
+
+**P2P transfers.** When you send money to a friend on Venmo or Cash App and they choose "instant deposit," the underlying mechanism is often push-to-card. The app pushes the funds to your friend's linked debit card via Visa Direct or Mastercard Send. That's why instant deposits are available for a small fee — the app is passing through the push-to-card cost.
+
+**Lending disbursements.** When a consumer takes out a personal loan or receives approval for a buy-now-pay-later advance, the lender can push funds to their debit card instantly rather than initiating an ACH that takes days. For emergency lending use cases, same-day delivery can be the difference between winning and losing a customer.
+
+## Limitations and Constraints
+
+Push-to-card isn't a silver bullet. It comes with real constraints that shape where and how it's used.
+
+**Debit cards only.** Push-to-card generally works only with debit and prepaid cards, not credit cards. The card networks restrict OCTs to debit credentials because credit cards don't have a linked deposit account to credit — they have a credit line. You can't "deposit" money into a credit card in a way that makes sense for disbursements. (You can send a credit to a credit card, but it just reduces the balance owed, which isn't what a gig worker needs.)
+
+**Transaction limits.** Both Visa Direct and Mastercard Send impose per-transaction and daily limits. These vary by issuer and market, but typical limits are $5,000-$25,000 per transaction. For large B2B payments, push-to-card isn't practical. It's built for consumer-scale disbursements.
+
+**Issuer participation.** While most major banks support inbound push-to-card, not every issuer has enabled it. Some smaller banks and credit unions may not accept OCTs, or may take longer to post them to customer accounts. The result: a push-to-card transaction might arrive in 30 seconds at Chase but take 24 hours at a smaller institution. The sender can't always guarantee the recipient experience.
+
+**Not ideal for recurring payments.** Push-to-card is transaction-by-transaction. There's no equivalent of ACH's recurring payment setup. For ongoing payroll or subscription-style disbursements, ACH is still more practical and cheaper at scale.
+
+## The Tabapay Story
+
+One company worth understanding in the push-to-card ecosystem is Tabapay, because it illustrates a clever infrastructure play.
+
+Traditional payment processors handle either card acquiring (pulling money from cards) or push-to-card (sending money to cards), but rarely both. Tabapay built a platform that does both — pull and push — from the same card credential in a single integration. This matters for platforms that need to both collect payments from some users and disburse to others.
+
+Consider a marketplace like Airbnb. A guest pays with a card (pull). The host receives a payout (push). With a traditional setup, Airbnb would need one processor for the pull side and another for the push side. Tabapay provides both through a single API, simplifying the integration and reducing the number of vendor relationships.
+
+This dual-capability model has made Tabapay a preferred processor for fintech companies, gig platforms, and lending companies that need bidirectional money movement. The company processes billions in annual volume, largely invisible to end users.
+
+## Push-to-Card in the Broader Payments Landscape
+
+Push-to-card occupies a specific niche in the disbursement landscape — fast, cheap, and simple for consumer-scale payouts. It's not replacing ACH for payroll. It's not replacing wire transfers for B2B. It's not replacing real-time payment networks like RTP or FedNow for bank-to-bank transfers.
+
+But for the specific problem of "I need to send $50-$5,000 to an individual who has a debit card, and I need them to have it today" — push-to-card is unmatched. The combination of near-universal reach, instant speed, low cost, and dead-simple enrollment (just a card number) has made it the default rails for gig economy payouts, insurance disbursements, and instant P2P transfers.
+
+As real-time payment networks like FedNow mature, they'll compete with push-to-card for some of these use cases. FedNow offers instant bank-to-bank transfers at even lower cost ($0.045 per transaction). But FedNow requires bank account details, and adoption is still limited. Push-to-card's advantage — reaching any debit card without needing bank account information — will keep it relevant for years to come.

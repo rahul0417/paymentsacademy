@@ -1,0 +1,151 @@
+---
+title: "Clearing & Settlement"
+description: "After authorization comes the real work — how transactions are confirmed, fees extracted, and actual money moves between banks."
+theme: "Transaction Lifecycle"
+readingTime: "7 min read"
+order: 2
+relatedTopics: ["authorization", "interchange-fees", "anatomy-of-a-swipe"]
+glossaryTerms:
+  - term: "Clearing"
+    definition: "The process where merchants confirm final transaction details and submit them to the card network — locking in amounts, tips, and adjustments before money moves."
+  - term: "Settlement"
+    definition: "The actual transfer of funds between financial institutions, calculated as net positions by the card network and executed through banking rails like Fedwire."
+  - term: "Fedwire"
+    definition: "The Federal Reserve's real-time gross settlement system used by U.S. banks to transfer funds with immediate finality."
+  - term: "Network Assessment Fee"
+    definition: "A fee charged by the card network (Visa, Mastercard) on every transaction for operating the routing and settlement infrastructure."
+  - term: "Batch Processing"
+    definition: "The practice of bundling a day's worth of approved transactions into a single file for submission to the acquirer — typically done at end of business day."
+  - term: "T+1 Settlement"
+    definition: "Settlement that occurs one business day after the transaction. T+2 means two business days. 'T' stands for the transaction date."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## The Work That Happens After "Approved"
+
+When your card gets approved at a checkout terminal, most people assume the transaction is done. The merchant got paid, your account got charged, end of story.
+
+Not quite. Authorization is just a promise — a hold on funds, a handshake between banks. The real financial plumbing kicks in *after* you've left the store, in two distinct phases that most cardholders never see: **clearing** and **settlement**.
+
+These processes determine when the merchant actually gets their money, how much they keep after fees, and why your bank statement sometimes shows a different amount than what you originally authorized. Let's walk through both.
+
+## Clearing: Confirming the Final Bill
+
+<GlossaryTerm term="Clearing" definition="The process where merchants confirm final transaction details and submit them to the card network — locking in amounts, tips, and adjustments before money moves.">Clearing</GlossaryTerm> is the merchant saying, "Here's what actually happened today — please process these transactions for real."
+
+At the end of each business day, the merchant's point-of-sale system gathers every approved transaction from that day and bundles them into what's called a <GlossaryTerm term="Batch Processing" definition="The practice of bundling a day's worth of approved transactions into a single file for submission to the acquirer — typically done at end of business day.">batch</GlossaryTerm>. This batch gets submitted to the acquirer processor, which forwards it to the card network, which then sends the transaction details to the issuer.
+
+Why not just use the authorization? Because the final amount isn't always the same as the authorized amount.
+
+### When Authorization and Clearing Amounts Differ
+
+This happens more often than you'd think:
+
+**Restaurants.** You authorize $50 for dinner. Then you add a $10 tip on the receipt. The clearing amount is $60. The restaurant's terminal captures the tip amount and includes it in the clearing file.
+
+**Hotels.** You check in and the hotel pre-authorizes $500 for a two-night stay plus incidentals. Your final bill at checkout is $423 — you had room service but didn't use the minibar. The clearing file reflects $423, and the original $500 hold gets released.
+
+**Gas stations.** The pump pre-authorizes $100 but you only pump $37.50 of gas. Clearing comes through at $37.50.
+
+**Partial shipments.** You order three items from an online retailer for $150. They ship two items today ($100) and one next week ($50). The merchant clears $100 now and $50 later — two separate clearing transactions against the original $150 authorization.
+
+In all these cases, the clearing file is where the truth gets established. It replaces the "pending" charge on your statement with a "posted" charge at the correct amount.
+
+### What Happens If Clearing Never Comes?
+
+If a merchant authorizes a transaction but never sends the clearing file — maybe they voided the sale or their system glitched — the authorization hold simply expires. For Visa, this is typically 7–8 days. The pending charge vanishes from your statement, and the held funds become available again.
+
+This is why you sometimes see a "pending" charge disappear from your account without any corresponding refund. It was never a real charge — just a hold that expired.
+
+## Settlement: Moving the Money
+
+Once clearing files are exchanged, it's time for actual money to move. This is <GlossaryTerm term="Settlement" definition="The actual transfer of funds between financial institutions, calculated as net positions by the card network and executed through banking rails like Fedwire.">settlement</GlossaryTerm>.
+
+Here's a crucial detail that surprises most people: the card network doesn't move money transaction by transaction. That would be impossibly expensive and slow at scale. Instead, the network calculates **net positions**.
+
+Think of it like a poker game. At the end of the night, you don't settle every individual hand. You look at who's up, who's down, and move the net difference. Visa does the same thing, just with thousands of banks and billions of dollars.
+
+<MermaidDiagram
+  chart={`sequenceDiagram
+    participant M as Merchant
+    participant AP as Acquirer Processor
+    participant N as Card Network
+    participant IP as Issuer Processor
+    participant I as Issuing Bank
+    participant FW as Fedwire
+    M->>AP: End-of-day batch (clearing file)
+    AP->>N: Submit clearing data
+    N->>IP: Forward transaction details
+    IP->>I: Post transactions to cardholder accounts
+    Note over N: Network calculates net positions
+    N->>FW: Settlement instructions
+    FW->>I: Debit issuing bank
+    FW->>AP: Credit acquiring bank
+    AP->>M: Deposit funds to merchant account`}
+  caption="Clearing and settlement: the merchant confirms transactions, the network calculates net positions, and Fedwire moves the money"
+/>
+
+Visa's settlement system, VisaNet, calculates what each member bank owes or is owed across all transactions for that settlement period. A large issuing bank might owe $50 million to the Visa settlement pool and be owed $30 million from the same pool. The net result: they wire $20 million. These transfers happen through <GlossaryTerm term="Fedwire" definition="The Federal Reserve's real-time gross settlement system used by U.S. banks to transfer funds with immediate finality.">Fedwire</GlossaryTerm>, the Federal Reserve's real-time gross settlement system that provides immediate finality.
+
+## The Fee Stack: Who Gets Paid What
+
+Settlement is also where the economics of card payments materialize. Before the merchant receives their funds, three layers of fees get extracted.
+
+Let's walk through a concrete example: a **$100 purchase** on a Visa credit card at a retail store.
+
+**Interchange fee — ~$1.80 (goes to the issuing bank).** This is the largest fee and the most contentious one in the industry. It flows from the acquirer to the issuer. Interchange rates vary by card type (credit vs. debit), merchant category, and how the card was read (chip vs. e-commerce). For a standard consumer credit card at a retail merchant, it's typically around 1.5%–2.0% plus a small fixed fee. Interchange is what funds your cash-back rewards and airline miles.
+
+**<GlossaryTerm term="Network Assessment Fee" definition="A fee charged by the card network (Visa, Mastercard) on every transaction for operating the routing and settlement infrastructure.">Network assessment fee</GlossaryTerm> — ~$0.14 (goes to Visa/Mastercard).** The card network charges a small fee — usually around 0.13%–0.15% — on every transaction for maintaining the routing infrastructure, setting the rules, and operating the settlement system. This is Visa's and Mastercard's primary revenue source.
+
+**Acquirer markup — ~$0.30–$0.50 (goes to the acquirer/processor).** The acquirer charges the merchant a fee on top of interchange and assessment for providing the payment acceptance infrastructure — the terminal, the gateway, the reporting, the customer support. This varies widely depending on the merchant's size and negotiating power.
+
+Here's the breakdown:
+
+| Fee Component | Amount | Recipient |
+|---|---|---|
+| Interchange | ~$1.80 | Issuing bank |
+| Network assessment | ~$0.14 | Card network (Visa/MC) |
+| Acquirer markup | ~$0.40 | Acquirer/processor |
+| **Total fees** | **~$2.34** | |
+| **Merchant receives** | **~$97.66** | |
+
+On a $5 coffee, the math scales down — roughly $0.12–$0.15 in total fees. On a $1,000 purchase, it can be $20–$25. The percentage stays roughly constant, which is why high-ticket merchants feel the pain more acutely in absolute terms, and low-ticket merchants feel it more in relative terms (that $0.12 on a $2 pack of gum is 6% of the sale).
+
+## Settlement Timelines
+
+How fast does the merchant actually get their money? The industry uses "T+N" notation, where T is the transaction date and N is the number of business days until settlement.
+
+<GlossaryTerm term="T+1 Settlement" definition="Settlement that occurs one business day after the transaction. T+2 means two business days. 'T' stands for the transaction date.">T+1</GlossaryTerm> means the merchant receives funds one business day after the transaction. This is the standard for most card networks in the U.S. You buy coffee on Monday, the merchant's batch closes Monday night, and the funds hit their account Tuesday.
+
+**T+2** is common for smaller merchants, those using certain payment processors, or cross-border transactions that involve currency conversion and additional settlement steps.
+
+Some modern payment processors (like Stripe and Square) offer **instant settlement** or **next-morning settlement** for an additional fee. They're essentially advancing the funds to the merchant before the actual inter-bank settlement completes, taking on the settlement risk themselves.
+
+For the *cardholder*, the timeline looks different. Your pending charge typically posts (moves from "pending" to "posted") within 1–3 business days. But your available balance dropped immediately at authorization. This creates a common confusion:
+
+- **Available balance:** Reflects authorization holds. Drops immediately.
+- **Current/posted balance:** Reflects cleared transactions. Updates at T+1 or T+2.
+
+If you check your bank account right after a purchase, the available balance is lower than the current balance. The difference is your outstanding authorization holds.
+
+## Edge Cases and Complications
+
+Settlement sounds clean in theory. In practice, there are complications.
+
+**Weekends and holidays.** Fedwire doesn't operate on weekends or federal holidays. A Friday transaction clears over the weekend but doesn't settle until Monday. This means merchants have longer funding gaps around holidays, and cardholders see pending charges linger.
+
+**Chargebacks.** If a cardholder disputes a transaction after settlement, the settlement gets reversed. Money flows backward — from the acquirer (and ultimately the merchant) back to the issuer. This is a whole separate process with its own rules and timelines.
+
+**Currency conversion.** Cross-border transactions involve an additional step where the network converts currencies at the settlement exchange rate. This rate is set by the network (not the merchant or the banks), and it's one of the ways Visa and Mastercard earn additional revenue on international transactions.
+
+**Multi-currency settlement.** Large global merchants may settle in multiple currencies. A U.S. merchant selling to European customers might settle EUR transactions in euros to avoid conversion costs, but this requires separate settlement accounts and adds operational complexity.
+
+## Why This Matters
+
+Clearing and settlement are the unglamorous machinery of payments. Nobody builds a startup pitch around batch processing. But understanding these mechanics is essential for anyone working in fintech.
+
+If you're building a merchant platform, settlement timing determines your cash flow and funding model. If you're an issuer, the gap between authorization and clearing is where disputes and adjustments live. If you're designing a fintech product, the fee stack — interchange, assessment, acquirer markup — is the economic foundation on which your business model either works or doesn't.
+
+Authorization gets the glory. Clearing and settlement do the work.

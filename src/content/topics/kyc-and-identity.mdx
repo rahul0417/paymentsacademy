@@ -1,0 +1,147 @@
+---
+title: "KYC & Identity Verification"
+description: "Know Your Customer — why payments companies must verify identity, how the process works, and the challenge of serving people without traditional documentation."
+theme: "Trust & Compliance"
+readingTime: "7 min read"
+order: 1
+relatedTopics: ["compliance-and-regulation", "marketplaces", "issuer-processors"]
+glossaryTerms:
+  - term: "KYC"
+    definition: "Know Your Customer — the process of verifying a customer's identity before allowing them to open accounts or transact."
+  - term: "KYB"
+    definition: "Know Your Business — similar to KYC but for business entities, verifying company registration, ownership, and beneficial owners."
+  - term: "AML"
+    definition: "Anti-Money Laundering — regulations requiring financial institutions to monitor transactions and report suspicious activity."
+  - term: "FATF"
+    definition: "Financial Action Task Force — the international body that sets global AML/KYC standards adopted by 200+ countries."
+  - term: "Thin File"
+    definition: "A person with minimal credit history or identity documentation — common among immigrants, young adults, and the unbanked."
+  - term: "Progressive KYC"
+    definition: "Gradually requesting more identity verification as a user's transaction volume or risk level increases, rather than demanding everything upfront."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## Why KYC Exists
+
+Every financial institution in the world — from the largest banks to the smallest neobank — has to answer a fundamental question before letting someone transact: *who are you, really?*
+
+That question isn't optional. It's the law.
+
+<GlossaryTerm term="KYC" definition="Know Your Customer — the process of verifying a customer's identity before allowing them to open accounts or transact.">KYC</GlossaryTerm> exists to prevent three things: fraud, money laundering, and terrorist financing. After 9/11, the USA PATRIOT Act dramatically expanded identity verification requirements for financial institutions. But the concept predates that — the Bank Secrecy Act of 1970 already required banks to report suspicious transactions and maintain customer records.
+
+The logic is straightforward. If someone wants to move money through the financial system, governments want to know who they are. Anonymous accounts enable drug trafficking, sanctions evasion, human trafficking, and terror financing. KYC is the first checkpoint that prevents the financial system from becoming a tool for bad actors.
+
+The <GlossaryTerm term="FATF" definition="Financial Action Task Force — the international body that sets global AML/KYC standards adopted by 200+ countries.">FATF</GlossaryTerm> — the Financial Action Task Force — sets global standards that over 200 countries adopt. Their recommendations form the backbone of <GlossaryTerm term="AML" definition="Anti-Money Laundering — regulations requiring financial institutions to monitor transactions and report suspicious activity.">AML</GlossaryTerm> and KYC frameworks worldwide. A country that doesn't comply gets grey-listed or black-listed, which effectively locks its banks out of international finance.
+
+## The Core Data
+
+In the United States, KYC typically requires four pieces of information:
+
+- **Full legal name** — as it appears on government-issued identification.
+- **Date of birth** — to confirm age and cross-reference databases.
+- **Social Security Number (SSN)** — the primary identifier in the US financial system, used to check credit bureaus, watch lists, and government databases.
+- **Physical address** — a residential address (not a P.O. box) to verify the individual's location and cross-check against public records.
+
+That sounds simple. Collect four data points, check them against some databases, and you're done. In practice, it's far more complex.
+
+## The Verification Flow
+
+When a user signs up for a fintech app or opens a bank account, here's what typically happens behind the scenes:
+
+**Step 1: Collect data.** The application form captures the user's name, date of birth, SSN, and address. Many apps also capture a phone number and email for additional verification signals.
+
+**Step 2: Check against databases.** The platform sends that data to a KYC provider — companies like Alloy, Persona, Socure, Experian, or LexisNexis. These providers don't just check one source. They cross-reference the data against credit bureau records, government databases (DMV, Social Security Administration), public records, OFAC sanctions lists, and proprietary data sets.
+
+**Step 3: Risk scoring.** The KYC provider returns a risk score. This isn't a simple pass/fail — it's a nuanced assessment. A perfect match across all databases is a clear pass. A partial match (right name and DOB, but address doesn't match) might flag for review. No match at all is a likely denial.
+
+**Step 4: Decision.** Based on the risk score, the platform does one of three things: approve the user, deny them, or request additional verification (a "step-up").
+
+Step-ups might include uploading a government-issued photo ID, taking a selfie for biometric matching, answering knowledge-based authentication questions ("Which of these addresses have you lived at?"), or submitting utility bills for address verification.
+
+## Progressive KYC: The Smarter Approach
+
+Here's where it gets interesting. Not every transaction carries the same risk.
+
+Consider a prepaid gift card. You buy it at a store with cash, load $50 on it, and use it until the balance runs out. The risk is minimal — the card can't be reloaded, the value is low, and it's not connected to a bank account. Federal regulations don't require full KYC for these products.
+
+Now consider a reloadable prepaid card. This can be refilled repeatedly, holds higher balances, and can receive direct deposits. Suddenly the risk profile changes dramatically — this starts looking like a bank account. Full KYC is required.
+
+<GlossaryTerm term="Progressive KYC" definition="Gradually requesting more identity verification as a user's transaction volume or risk level increases, rather than demanding everything upfront.">Progressive KYC</GlossaryTerm> takes this concept and builds it into the user experience. Instead of demanding a driver's license, SSN, and selfie before a user can do anything, you let them in with minimal friction and escalate verification as their usage increases.
+
+<MermaidDiagram
+  chart={`flowchart TD
+    A[User Signs Up] --> B{Basic Info Only}
+    B --> C[Name + Email + Phone]
+    C --> D[Tier 1: Limited Access]
+    D --> E{User wants higher limits?}
+    E -->|Yes| F[Collect SSN + DOB + Address]
+    F --> G{Database Verification}
+    G -->|Pass| H[Tier 2: Standard Access]
+    G -->|Partial Match| I[Step-Up: Upload Photo ID]
+    I --> J{ID + Biometric Match?}
+    J -->|Pass| H
+    J -->|Fail| K[Manual Review or Deny]
+    H --> L{User wants premium features?}
+    L -->|Yes| M[Additional Docs: Proof of Income, etc.]
+    M --> N[Tier 3: Full Access]
+    E -->|No| D`}
+  caption="Progressive KYC: verification escalates as the user's activity and risk level increase"
+/>
+
+Rick Song, the founder of Persona (one of the leading identity verification platforms), describes the key insight this way: a modern KYC system needs to stitch together 20 or more data providers and progressively step users up rather than demanding everything upfront. No single provider has a complete picture. One might excel at verifying SSNs against credit bureaus, another at matching selfies to ID photos, another at screening sanctions lists.
+
+The art is in the orchestration — routing each user through the right combination of checks based on their risk profile, and only adding friction when the risk warrants it.
+
+## Step-Up Authentication
+
+Step-up is the mechanism that makes progressive KYC work. When the automated checks return an ambiguous result — or when a user's behavior triggers a risk flag — the system escalates to a higher level of verification.
+
+Common step-ups include:
+
+- **Document verification:** Upload a driver's license or passport. OCR extracts the data and compares it to what the user provided. Advanced systems check for document tampering.
+- **Biometric matching:** Take a selfie. AI compares it to the photo on the uploaded ID. Liveness detection ensures the user isn't holding up a printed photo or a screen.
+- **Knowledge-based authentication (KBA):** "Which of these streets have you lived on?" Questions drawn from credit bureau data that only the real person should be able to answer. (Though KBA is increasingly considered weak — data breaches have made this information widely available.)
+- **Phone verification:** Send an OTP to a phone number on record. This confirms device possession, not identity per se, but adds a useful signal.
+
+## The Thin File Problem
+
+Here's the uncomfortable truth about KYC: it works best for people who already have extensive records in the financial system. And it works worst for the people who need financial services the most.
+
+A <GlossaryTerm term="Thin File" definition="A person with minimal credit history or identity documentation — common among immigrants, young adults, and the unbanked.">thin file</GlossaryTerm> is someone with minimal — or no — presence in credit bureaus and identity databases. This includes recent immigrants who have valid documentation from their home country but no US credit history. It includes young adults who've never had a credit card or utility bill in their name. It includes formerly incarcerated individuals re-entering society. And it includes the roughly 1.4 billion adults globally who are completely unbanked.
+
+When a KYC provider queries databases for a thin-file individual, nothing comes back. No credit history, no address history, no phone records. The automated system either denies them outright or flags them for manual review — which is slow, expensive, and discouraging.
+
+This creates a vicious cycle. You need financial services to build a financial identity. But you need a financial identity to access financial services.
+
+Some companies are tackling this with alternative data — verifying identity through utility payments, rent history, mobile phone records, or even social media presence. Others are building international identity bridges, allowing immigrants to port their credit history from their home country. It's an unsolved problem with enormous stakes.
+
+## KYB: Verifying Businesses
+
+Identity verification isn't just for individuals. <GlossaryTerm term="KYB" definition="Know Your Business — similar to KYC but for business entities, verifying company registration, ownership, and beneficial owners.">KYB</GlossaryTerm> — Know Your Business — applies the same principles to companies.
+
+When a business wants to open a merchant account, accept card payments, or use a financial product, the platform must verify:
+
+- **Business registration:** Is the company legally registered? In what state/country? What's the business type (LLC, corporation, sole proprietorship)?
+- **Ownership structure:** Who owns the company? What percentage does each owner hold?
+- **Ultimate Beneficial Owners (UBOs):** Who are the individuals who ultimately control or benefit from the business? Regulations typically require identifying anyone who owns 25% or more.
+- **Business activity:** What does the company actually do? Is it in a high-risk industry (gambling, crypto, adult content)?
+
+Each UBO then goes through individual KYC. So verifying a business with three partners means three separate identity checks plus the business verification itself.
+
+KYB is particularly critical in the marketplace and payment facilitator (PayFac) models. When Stripe onboards a new merchant, or when a marketplace like Etsy lets a seller accept payments, they're responsible for verifying that business — and they're liable if they onboard a fraudulent or sanctioned entity.
+
+## International Variations
+
+KYC requirements vary dramatically across jurisdictions. The US relies heavily on the SSN. The UK uses a combination of electoral roll data, credit bureau checks, and document verification. India's Aadhaar system — a biometric national ID covering over a billion people — has enabled near-instant digital identity verification. Many African countries are leapfrogging traditional models with mobile-phone-based identity systems.
+
+For companies operating globally, this means building different verification flows for each market. The four data points that work in the US are meaningless in a country without Social Security numbers. The document types, database sources, and regulatory requirements shift with every border.
+
+This is why KYC orchestration platforms — the Personas, Alloys, and Socures of the world — are so valuable. They abstract the complexity of dozens of data providers and regulatory frameworks into a single API. The fintech company defines its risk policies; the orchestration layer figures out which checks to run, in which order, for which country.
+
+## The Bottom Line
+
+KYC is the front door of the financial system. Get it right, and you onboard legitimate customers quickly while blocking bad actors. Get it wrong, and you either let fraud through the door or lock out the people you're trying to serve.
+
+The best companies treat KYC not as a compliance checkbox but as a product experience. They minimize friction for low-risk users, escalate intelligently when risk increases, and continuously iterate on their verification flows based on data. Because ultimately, the goal isn't to collect documents — it's to build trust.

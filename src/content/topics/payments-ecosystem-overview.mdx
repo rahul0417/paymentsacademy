@@ -1,0 +1,131 @@
+---
+title: "Payments Ecosystem Overview"
+description: "A map of the payments landscape — the key players, how they connect, and why the system works the way it does."
+theme: "Foundations"
+readingTime: "7 min read"
+order: 2
+relatedTopics: ["anatomy-of-a-swipe", "card-networks", "issuer-processors"]
+glossaryTerms:
+  - term: "Four-Party Model"
+    definition: "The standard card payment structure involving cardholder, merchant, issuing bank, and acquiring bank — with a card network connecting them in the middle."
+  - term: "Open-Loop Network"
+    definition: "A card network like Visa or Mastercard where the issuer and acquirer are separate banks, and any bank can participate."
+  - term: "Closed-Loop Network"
+    definition: "A card network like American Express where a single company acts as issuer, acquirer, and network — controlling the entire transaction."
+  - term: "PayFac"
+    definition: "Payment Facilitator — a company that aggregates merchants under its own master merchant account, simplifying onboarding. Stripe and Square are prominent examples."
+  - term: "PSP"
+    definition: "Payment Service Provider — a company that offers merchants the technology and services to accept payments, often bundling gateway, processing, and risk management."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## Why Are There So Many Companies in Payments?
+
+If you've ever looked at a diagram of the payments industry and thought, "Why does it take this many companies to move $5 from my bank to a coffee shop?" — you're asking exactly the right question.
+
+The short answer: risk, regulation, and scale. Moving money is easy. Moving money *safely*, *instantly*, across *millions* of merchants and *billions* of cards, while catching fraud, complying with banking laws in dozens of countries, and making sure everyone gets paid — that's what created this ecosystem.
+
+Let's map the whole thing out.
+
+## The Four-Party Model
+
+The backbone of modern card payments is the <GlossaryTerm term="Four-Party Model" definition="The standard card payment structure involving cardholder, merchant, issuing bank, and acquiring bank — with a card network connecting them in the middle.">four-party model</GlossaryTerm>. Despite the name, there are actually five entities involved if you count the card network in the middle, and even more once you add processors.
+
+Here are the core players:
+
+- **The Cardholder.** You. The person with the card.
+- **The Merchant.** The business accepting payment — from a street-corner taco stand to Amazon.
+- **The Issuing Bank (Issuer).** The bank that gave you the card. Chase, Capital One, Barclays. They hold your funds (debit) or extend you credit (credit card), and they're the ones who approve or decline every transaction.
+- **The Acquiring Bank (Acquirer).** The bank that has a relationship with the merchant. They enable the merchant to accept card payments, and they're on the hook if the merchant goes bust and can't cover refunds or chargebacks.
+- **The Card Network.** Visa, Mastercard, Discover, UnionPay. They don't hold anyone's money. They're the *routing layer* — the rules engine and messaging backbone that connects issuers and acquirers.
+
+This model is what the industry calls an <GlossaryTerm term="Open-Loop Network" definition="A card network like Visa or Mastercard where the issuer and acquirer are separate banks, and any bank can participate.">open-loop network</GlossaryTerm>. "Open" because *any* bank can join as an issuer or acquirer. Visa doesn't care which bank issued your card — it'll route the message to the right place regardless.
+
+## Open Loop vs. Closed Loop
+
+Not every card network works this way. American Express and (historically) Discover operate as <GlossaryTerm term="Closed-Loop Network" definition="A card network like American Express where a single company acts as issuer, acquirer, and network — controlling the entire transaction.">closed-loop networks</GlossaryTerm>. In a closed-loop system, a single company plays multiple roles — issuer, acquirer, *and* network.
+
+When you use an Amex card at a merchant that accepts Amex, American Express is the one who issued your card, the one who signed up the merchant, and the one routing the transaction. There's no separate issuing bank or acquiring bank. It's all Amex.
+
+This gives closed-loop networks some advantages. They have complete visibility into both sides of the transaction, which can mean better fraud detection and richer data. They also keep all the fees — there's no interchange negotiation because they're paying themselves.
+
+The downside? Scale. Building a network where you have to sign up every merchant *and* every cardholder yourself is brutally hard. This is why Visa and Mastercard dominate global volume — their open-loop model lets them leverage thousands of banks doing the distribution work for them. Amex has a fraction of the merchant acceptance footprint that Visa does, which is why some small businesses still don't take it.
+
+In practice, even "closed-loop" networks have opened up somewhat. Amex now allows other banks to issue Amex-branded cards (called GNS, or Global Network Services), blurring the line.
+
+## The Processors: The Invisible Infrastructure
+
+Banks set the rules. But most banks don't actually run the technology. That job falls to **processors** — the companies that build and operate the platforms handling authorization, clearing, and settlement.
+
+There are two flavors:
+
+**Issuer processors** sit behind the issuing bank. When a transaction comes in from Visa, it's the issuer processor that actually receives the message, checks the cardholder's balance, runs the fraud rules, and sends back the approve/decline decision. Companies like TSYS (now part of Global Payments), Marqeta, Galileo, and i2c play this role. Your bank might make the business decisions, but the issuer processor executes them in real time.
+
+**Acquirer processors** sit behind the acquiring bank. They're the ones who capture the transaction from the merchant's terminal, format it into an ISO 8583 message, and route it to the card network. Fiserv (via First Data), Worldpay, and Global Payments are major acquirer processors. They also handle the clearing and settlement files that move money at the end of the day.
+
+## The Full Ecosystem
+
+Here's how all these players fit together:
+
+<MermaidDiagram
+  chart={`graph LR
+    CH[Cardholder] -->|Pays| M[Merchant]
+    M -->|Sends txn| PSP[PSP / PayFac]
+    PSP -->|Routes to| AP[Acquirer Processor]
+    AP -->|Connects to| ACQ[Acquiring Bank]
+    ACQ <-->|Messages via| CN[Card Network]
+    CN <-->|Messages via| ISS[Issuing Bank]
+    ISS <-->|Tech by| IP[Issuer Processor]
+    IP -->|Decision to| ISS`}
+  caption="The full payments ecosystem: from cardholder to issuer, with processors and intermediaries at every step"
+/>
+
+Notice how many layers sit between the cardholder and the issuer. Each one exists because of a specific need — technology, risk absorption, merchant onboarding, regulatory compliance, or network routing.
+
+## PSPs and PayFacs: The Merchant-Facing Layer
+
+If you're a small business trying to accept cards, you're not going to call up JPMorgan and ask them to set you up as a merchant. You're going to sign up with Stripe, Square, or a similar service.
+
+These companies occupy the merchant-facing layer of the ecosystem, and they come in two main flavors:
+
+A <GlossaryTerm term="PSP" definition="Payment Service Provider — a company that offers merchants the technology and services to accept payments, often bundling gateway, processing, and risk management.">PSP</GlossaryTerm> (Payment Service Provider) gives merchants the tools to accept payments — APIs, checkout pages, reporting dashboards. They typically partner with an acquiring bank and processor behind the scenes.
+
+A <GlossaryTerm term="PayFac" definition="Payment Facilitator — a company that aggregates merchants under its own master merchant account, simplifying onboarding. Stripe and Square are prominent examples.">PayFac</GlossaryTerm> (Payment Facilitator) goes a step further. Instead of each merchant getting their own merchant account with an acquiring bank, the PayFac holds one master merchant account and aggregates many smaller merchants underneath it. This is why you can sign up for Stripe and start accepting payments in minutes — you're operating under Stripe's merchant account, not your own.
+
+The trade-off? The PayFac takes on the risk. If one of their sub-merchants turns out to be fraudulent, the PayFac is liable. This is why PayFacs invest heavily in underwriting and monitoring.
+
+Stripe, Square, Adyen, and PayPal are all examples of companies that blend the PSP and PayFac models. They've abstracted away the complexity of the acquiring side so that a developer can accept card payments with a few lines of code.
+
+## The Flow of Money vs. the Flow of Information
+
+One of the most important concepts in payments is that **information and money travel at different speeds and sometimes in different directions**.
+
+The *information flow* happens in real time during authorization. A message goes from merchant to acquirer to network to issuer and back in under two seconds. This is what makes the terminal beep and display "Approved."
+
+The *money flow* happens later — typically the next business day. After clearing (the merchant confirms the day's transactions), the card network calculates net settlement positions, and actual funds move between banks via systems like Fedwire.
+
+Here's why this matters: between authorization and settlement, the merchant has a *promise* of payment but not actual cash. The acquirer fills this gap by funding the merchant early (often T+1, meaning one business day after the transaction), even though the full settlement process takes longer. The acquirer takes on the risk that the money will arrive.
+
+This gap between information and money is where a lot of the economics live. It's why acquirers charge fees, why merchants care about settlement timing, and why the whole system has more intermediaries than you'd expect.
+
+## Why So Many Intermediaries?
+
+You could imagine a much simpler world: cardholder's bank talks directly to merchant's bank, money moves, done. So why doesn't it work that way?
+
+**Risk distribution.** Every intermediary absorbs a specific type of risk. The issuer takes on credit risk (will the cardholder pay their bill?). The acquirer takes on merchant risk (will the merchant fulfill orders and handle chargebacks?). The network takes on systemic risk (is the whole system stable?). Spreading risk across specialized parties is more efficient than having any single entity bear it all.
+
+**Regulation.** Banks are heavily regulated. Card networks need to comply with rules from the Fed, the CFPB, and their international equivalents. Processors need PCI DSS certification. Each layer has its own regulatory burden, and specialization helps manage compliance.
+
+**Scale.** Visa processes over 200 billion transactions per year. No single bank could handle that volume alone. The layered architecture allows each participant to specialize — networks optimize for routing speed, processors optimize for uptime, banks optimize for risk management.
+
+**Competition and innovation.** The layered model creates space for new entrants. Marqeta didn't have to become a bank to innovate in card issuing — it could plug in as an issuer processor. Stripe didn't need an acquiring bank license to transform merchant onboarding — it could layer on top of existing acquirers. The modular architecture enables fintech innovation without requiring anyone to rebuild the whole stack.
+
+## Putting It All Together
+
+The payments ecosystem is a supply chain. Like any supply chain, it has evolved layers of specialization that look complex from the outside but exist for good reasons.
+
+When you tap your card, your payment passes through a cardholder, a merchant, a PSP or PayFac, an acquirer processor, an acquiring bank, a card network, an issuing bank, and an issuer processor. Each one adds value — routing, risk management, compliance, technology — and each one takes a small fee for doing so.
+
+Understanding this map is the foundation for everything else in payments. When you read about interchange regulation, or why a startup chose to become a PayFac, or how a new issuer processor is disrupting the market — you'll know exactly where in the ecosystem they sit and why it matters.

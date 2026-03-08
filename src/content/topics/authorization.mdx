@@ -1,0 +1,165 @@
+---
+title: "Authorization"
+description: "The first act of every card payment — what happens in the split second between tapping your card and seeing 'Approved' on the screen."
+theme: "Transaction Lifecycle"
+readingTime: "8 min read"
+order: 1
+relatedTopics: ["anatomy-of-a-swipe", "clearing-and-settlement", "issuer-processors"]
+glossaryTerms:
+  - term: "ISO 8583"
+    definition: "The international standard messaging format used for card transaction communications — the language that every player in the payment chain speaks."
+  - term: "Dual-Message"
+    definition: "A transaction flow where authorization and clearing happen as two separate messages — typical of credit cards and signature-debit transactions."
+  - term: "Single-Message"
+    definition: "A transaction flow where authorization and clearing happen in one combined message — typical of PIN-debit transactions."
+  - term: "Authorization Hold"
+    definition: "A temporary freeze on funds in the cardholder's account after an approved authorization. No money moves — the hold simply reserves the amount until clearing."
+  - term: "Pre-Authorization"
+    definition: "An authorization for an estimated amount before the final charge is known — common at hotels, gas stations, and car rentals."
+  - term: "Hard Decline"
+    definition: "A permanent rejection of a transaction that cannot be retried — typically due to a closed account, stolen card, or invalid card number."
+  - term: "Soft Decline"
+    definition: "A temporary rejection that may succeed if retried — often caused by insufficient funds, issuer timeouts, or temporary fraud flags."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## The Two-Second Decision
+
+Every card transaction begins the same way: someone presents a card, and the system has to answer a simple question — *should this be approved?*
+
+That question gets answered in about two seconds. But in those two seconds, a structured message travels across multiple entities, undergoes a battery of checks, and returns with a verdict. Authorization is the fastest and most consequential step in the payment lifecycle. Get it wrong — approve a fraudulent transaction or decline a legitimate one — and the consequences ripple through the entire system.
+
+Let's unpack what actually happens.
+
+## The Language: ISO 8583
+
+Before we trace the flow, we need to understand the format. Every authorization request is a structured message built on a standard called <GlossaryTerm term="ISO 8583" definition="The international standard messaging format used for card transaction communications — the language that every player in the payment chain speaks.">ISO 8583</GlossaryTerm>.
+
+ISO 8583 has been the backbone of card payments since the 1980s. It's not JSON. It's not XML. It's a compact, binary-encoded format designed for speed and efficiency — because when you're processing thousands of transactions per second, every byte matters.
+
+An ISO 8583 authorization request includes dozens of data elements, but the key ones are:
+
+- **Primary Account Number (PAN)** — the card number (or a token representing it)
+- **Transaction amount** — in the currency's smallest unit (cents for USD)
+- **Merchant Category Code (MCC)** — a four-digit code that tells the issuer what kind of business this is (5812 = restaurant, 5411 = grocery store, 4111 = transit)
+- **Terminal ID** — which specific device initiated the transaction
+- **Point-of-service entry mode** — how the card was read (chip, tap, swipe, e-commerce)
+- **Cryptogram** — for chip and tap transactions, a one-time code proving the physical card was present
+
+The MCC might seem like a minor detail, but it's surprisingly important. Issuers use it to apply different fraud rules (a $5,000 charge at an electronics store gets more scrutiny than a $5,000 charge at a hospital). Some card programs restrict spending to specific MCCs. And interchange rates — the fees issuers earn — vary by MCC category.
+
+## Dual-Message vs. Single-Message
+
+Not all authorizations work the same way. There are two fundamentally different models.
+
+In a <GlossaryTerm term="Dual-Message" definition="A transaction flow where authorization and clearing happen as two separate messages — typical of credit cards and signature-debit transactions.">dual-message</GlossaryTerm> flow, authorization is the first message and clearing is a second, separate message that comes later (usually at end of day). This is how credit card transactions work, and it's why you see "pending" charges on your statement. The authorization reserves the funds, and the clearing message later confirms the final amount.
+
+In a <GlossaryTerm term="Single-Message" definition="A transaction flow where authorization and clearing happen in one combined message — typical of PIN-debit transactions.">single-message</GlossaryTerm> flow, the authorization *is* the clearing. One message does both jobs. This is how PIN-debit transactions work. When you enter your PIN at a terminal, the system authorizes and clears in one shot. The money moves faster, and the transaction is considered final immediately.
+
+Why does this distinction matter? Because dual-message transactions have a gap between auth and clearing where things can change — tips can be added, amounts can be adjusted, transactions can be voided. Single-message transactions don't have that flexibility, but they settle faster and cost merchants less in interchange fees.
+
+## The Authorization Flow
+
+Here's what happens when you tap your card for a $50 purchase:
+
+<MermaidDiagram
+  chart={`sequenceDiagram
+    participant C as Cardholder
+    participant T as Terminal
+    participant AP as Acquirer Processor
+    participant N as Card Network
+    participant IP as Issuer Processor
+    participant I as Issuing Bank
+    C->>T: Tap card
+    T->>T: Read card data, build auth request
+    T->>AP: ISO 8583 auth request
+    AP->>AP: Validate, enrich, route
+    AP->>N: Forward to network
+    N->>N: BIN lookup, route to issuer
+    N->>IP: Deliver auth request
+    IP->>IP: Check card status
+    IP->>IP: Check balance / credit limit
+    IP->>IP: Run fraud rules
+    IP->>IP: Apply velocity checks
+    IP->>I: Log decision
+    IP-->>N: Response (Approved / Declined)
+    N-->>AP: Forward response
+    AP-->>T: Forward response
+    T-->>C: Display result`}
+  caption="The authorization flow: from card tap to approval, typically under 2 seconds"
+/>
+
+The entire round trip — terminal to acquirer processor to network to issuer processor and back — must complete within strict time limits. Card networks enforce a response SLA of roughly **2 to 3 seconds**. If the issuer doesn't respond in time, the network generates a timeout, and the acquirer has to decide whether to stand-in approve or decline.
+
+## What the Issuer Checks
+
+The issuer processor runs through a series of checks in milliseconds. Here's what it's evaluating:
+
+**Card status.** Is the card active? Has it been reported lost or stolen? Is the account closed? Has the cardholder requested a freeze? This is the first gate — if the card isn't valid, nothing else matters.
+
+**Available funds.** For debit cards, is there enough money in the linked account? For credit cards, is there sufficient available credit? Note that "available" means the balance minus any existing authorization holds — not the posted balance.
+
+**Fraud rules.** This is where it gets sophisticated. Modern issuer processors run hundreds of rules and machine learning models in real time:
+
+- **Geographic velocity.** Was the last transaction in Chicago twenty minutes ago and this one is in Miami? Physically impossible.
+- **Amount patterns.** Does this cardholder normally spend $50 at this type of merchant? Or is this ten times their usual amount?
+- **Merchant risk scoring.** Some merchants have higher fraud rates than others. A transaction at a high-risk merchant gets extra scrutiny.
+- **Device and channel analysis.** For e-commerce, is this device recognized? Is the IP address suspicious?
+
+**Velocity checks.** How many transactions has this card attempted in the last hour? In the last day? A burst of rapid-fire transactions is a classic fraud pattern.
+
+**Program restrictions.** Some card programs have specific rules. A corporate expense card might only allow purchases at approved MCCs. A teen's card might have daily spending limits set by a parent.
+
+All of this happens in under 100 milliseconds on a well-optimized issuer processor platform.
+
+## Authorization Holds
+
+When a transaction is approved, the issuer creates an <GlossaryTerm term="Authorization Hold" definition="A temporary freeze on funds in the cardholder's account after an approved authorization. No money moves — the hold simply reserves the amount until clearing.">authorization hold</GlossaryTerm> — a reservation of funds against the cardholder's account.
+
+This is why your bank balance shows two numbers: your "available balance" (which subtracts holds) and your "current balance" (which only reflects posted transactions). If you have $500 in your account and authorize a $50 purchase, your available balance drops to $450 immediately, even though the $500 current balance hasn't changed.
+
+Holds don't last forever. If a merchant never sends the clearing message — maybe they voided the transaction but failed to send a reversal — the hold automatically expires. Visa holds typically expire after 7–8 days, though some categories (like hotels and car rentals) get longer windows.
+
+## Pre-Authorization
+
+Some industries can't know the final amount at the time of authorization. This is where <GlossaryTerm term="Pre-Authorization" definition="An authorization for an estimated amount before the final charge is known — common at hotels, gas stations, and car rentals.">pre-authorization</GlossaryTerm> comes in.
+
+**Gas stations** are the classic example. When you insert your card at the pump, the station sends a pre-auth — often for $1 (just to verify the card works) or for $100–$150 (to reserve enough for a full tank). After you finish pumping, the actual amount replaces the pre-auth during clearing.
+
+**Hotels** pre-authorize for the estimated stay plus an incidental buffer. You check in for a two-night stay at $200/night, and the hotel might pre-authorize $500 (the room cost plus $100 for room service or minibar). At checkout, the final clearing amount reflects what you actually spent.
+
+**Car rentals** work similarly — a pre-auth at pickup, final charge at return.
+
+Pre-auths create a common source of cardholder confusion. You rent a car, see a $500 hold, return the car and get charged $300, but both amounts show on your statement for a few days until the original hold drops off. This is one of the most common reasons people call their bank.
+
+## Hard Declines vs. Soft Declines
+
+Not all declines are created equal.
+
+A <GlossaryTerm term="Hard Decline" definition="A permanent rejection of a transaction that cannot be retried — typically due to a closed account, stolen card, or invalid card number.">hard decline</GlossaryTerm> means the transaction should *not* be retried. The card is reported stolen. The account is closed. The card number is invalid. Retrying will produce the same result and may trigger penalties from the card network. Merchants who repeatedly retry hard-declined transactions face fines.
+
+A <GlossaryTerm term="Soft Decline" definition="A temporary rejection that may succeed if retried — often caused by insufficient funds, issuer timeouts, or temporary fraud flags.">soft decline</GlossaryTerm> means the transaction *might* succeed later. The cardholder had insufficient funds right now but might deposit more tomorrow. The issuer's system timed out. The fraud engine flagged a false positive. For subscription merchants, the distinction is critical — they'll retry soft declines on a schedule but stop immediately on hard declines.
+
+The issuer communicates this through **response codes** in the ISO 8583 message. Response code "05" (Do Not Honor) is deliberately vague — the issuer doesn't want to reveal its exact reason. But response code "14" (Invalid Card Number) is clear and permanent. Acquirers and PSPs maintain mappings of these codes to determine retry logic.
+
+## Authorization Rates: The Metric That Matters
+
+For any company issuing cards or processing payments, **authorization rate** — the percentage of attempted transactions that get approved — is one of the most closely watched metrics. A typical card program targets above 85–90% for card-present and 70–80% for card-not-present (e-commerce).
+
+Every declined legitimate transaction is a lost sale. But approving too liberally means more fraud losses. Issuer processors provide dashboards that let banks tune their fraud rules in real time, adjusting the threshold between security and conversion.
+
+## The 3-Second Contract
+
+Authorization is governed by an implicit contract: the card network expects a response within about 3 seconds. Miss that window, and the network may generate a "stand-in" decision on behalf of the issuer — using the network's own fraud models and the cardholder's recent transaction history to approve or decline.
+
+Stand-in processing is a safety net, but issuers hate it. When the network makes the decision, the issuer loses control — and still bears the loss if a fraudulent transaction gets approved. This is why issuer processors invest heavily in redundancy and uptime. In practice, most issuers return decisions in 200–500 milliseconds. The rest of the 3-second window is consumed by network routing and acquirer processing.
+
+## Why Authorization Matters
+
+Authorization is the most visible moment in payments. It's the instant the cardholder sees "Approved" or "Declined." It's where fraud is caught or missed. It's where the economics of interchange and card programs begin.
+
+Everything that follows — clearing, settlement, chargebacks — traces back to what happened during authorization. A sloppy authorization process leads to more fraud, more chargebacks, more disputes. A well-tuned one keeps fraud low, approval rates high, and cardholders happy.
+
+Understanding authorization at this level of detail is what separates people who *use* payments from people who *build* them.

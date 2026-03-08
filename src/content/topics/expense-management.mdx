@@ -1,0 +1,133 @@
+---
+title: "Expense Management"
+description: "How modern corporate cards killed the expense report — real-time spend controls, automatic categorization, and the payments infrastructure behind it."
+theme: "Products & Use Cases"
+readingTime: "7 min read"
+order: 2
+relatedTopics: ["virtual-cards", "issuer-processors", "interchange-fees"]
+glossaryTerms:
+  - term: "Spend Controls"
+    definition: "Real-time rules on corporate cards — limiting spending by amount, merchant category, time, or geography per card."
+  - term: "Track 3 Data"
+    definition: "Receipt-level transaction detail (itemized line items) captured at point of sale — enables automatic receipt matching."
+  - term: "Corporate Card Program"
+    definition: "A card program issued to a company's employees, with centralized billing and administrative controls."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## The Expense Report Is Dead
+
+Here's how corporate spending used to work. An employee flies to Chicago for a client meeting. She pays for the flight on her personal credit card. Checks into the hotel — personal card again. Takes the client to dinner — personal card. Grabs a taxi to the airport — personal card.
+
+She gets back to the office and opens Concur. She manually enters each expense. Photographs each receipt with her phone. Assigns each one to a cost center and project code. Submits the report. Her manager reviews it three days later and approves it. Finance reviews it the following week. Two weeks after the trip, an ACH reimbursement lands in her bank account.
+
+Total time from swipe to reimbursement: 14-21 days. Total manual steps: dozens. Total employee satisfaction: rock bottom. This process was universally hated by every single person involved — the employee fronting their own money, the manager rubber-stamping reports, and the finance team hunting down missing receipts.
+
+The modern expense management stack eliminates nearly all of it.
+
+## The New Model: Controlled Spending at the Point of Swipe
+
+Companies like Brex, Ramp, Divvy (now Bill.com), and Emburse flipped the model. Instead of reimbursing employees after the fact, they issue <GlossaryTerm term="Corporate Card Program" definition="A card program issued to a company's employees, with centralized billing and administrative controls.">corporate cards</GlossaryTerm> — physical and virtual — with real-time controls that enforce policy at the moment of purchase.
+
+<MermaidDiagram
+  chart={`flowchart TB
+    subgraph OLD["Traditional Expense Flow"]
+      direction TB
+      A1[Employee pays with personal card] --> A2[Collects receipts]
+      A2 --> A3[Submits expense report<br/>3-5 days later]
+      A3 --> A4[Manager reviews & approves<br/>2-7 days]
+      A4 --> A5[Finance audits<br/>3-5 days]
+      A5 --> A6[ACH reimbursement<br/>3-5 days]
+      A6 --> A7[Total: 14-21 days]
+    end
+    subgraph NEW["Modern Expense Flow"]
+      direction TB
+      B1[Employee swipes corporate card] --> B2[Real-time policy check<br/>at authorization]
+      B2 --> B3[Push notification:<br/>snap receipt photo]
+      B3 --> B4[Auto-categorized & coded<br/>in seconds]
+      B4 --> B5[Manager notified if needed<br/>same day]
+      B5 --> B6[Synced to accounting<br/>automatically]
+      B6 --> B7[Total: real-time]
+    end`}
+  caption="Old vs new: modern expense management shifts control from post-hoc review to real-time enforcement at the point of purchase"
+/>
+
+The difference is profound. In the old model, policy was enforced after the money was spent. In the new model, policy is enforced before the money leaves the account. That's not an incremental improvement — it's a fundamental architectural change.
+
+## How Real-Time Spend Controls Work
+
+When an employee swipes a modern corporate card, the authorization request doesn't just go to a bank for a balance check. It hits the issuer processor's decision engine, which evaluates a set of <GlossaryTerm term="Spend Controls" definition="Real-time rules on corporate cards — limiting spending by amount, merchant category, time, or geography per card.">spend controls</GlossaryTerm> in real time — typically within 50-100 milliseconds.
+
+These controls can include:
+
+**Amount limits.** Each card can have a per-transaction limit ($500), daily limit ($1,000), or monthly limit ($5,000). An employee trying to charge $2,000 to a card with a $500 per-transaction limit gets an instant decline. No awkward reimbursement clawback. No uncomfortable conversation with a manager. Just a declined transaction.
+
+**Merchant category restrictions.** Every merchant is assigned a Merchant Category Code (MCC) by their acquirer — 5812 for restaurants, 4511 for airlines, 5944 for jewelry stores. A corporate card can be configured to allow only specific MCCs. The engineering team's card works at software vendors (MCC 5734) and cloud hosting providers (MCC 7372), but declines at liquor stores (MCC 5921). This replaces vague expense policies ("use good judgment") with hard technical enforcement.
+
+**Time-based controls.** Cards can be active only during business hours, or only on weekdays, or only during the dates of a specific conference. A card issued for a three-day business trip automatically deactivates when the trip ends.
+
+**Geographic restrictions.** Limit transactions to domestic merchants only, or to specific countries. An employee traveling to Germany gets a card that works in Germany and nowhere else.
+
+**JIT (Just-in-Time) funding.** Some platforms fund corporate cards at the moment of each transaction rather than maintaining a pre-loaded balance. When the employee swipes, the platform's decision engine approves the transaction and simultaneously funds the exact amount from the company's cash account. This gives the company maximum control over cash flow — money only moves when a legitimate, policy-compliant purchase happens.
+
+## The Receipt Problem
+
+Receipts are the bane of expense management. Employees lose them. They forget to submit them. They photograph them poorly. Finance teams spend hours chasing down missing documentation.
+
+Modern platforms attack this from multiple angles.
+
+**Push notifications.** The moment a transaction is authorized, the employee gets a push notification on their phone. The notification prompts them to photograph the receipt right there at the register, while they're still holding it. Capture rates jump dramatically when the prompt arrives in real time versus asking someone to find receipts days later.
+
+**<GlossaryTerm term="Track 3 Data" definition="Receipt-level transaction detail (itemized line items) captured at point of sale — enables automatic receipt matching.">Track 3 data</GlossaryTerm> (Level III data).** For certain merchant types — particularly B2B transactions — the payment networks support enhanced transaction data that includes itemized line items, tax amounts, and invoice numbers. When available, this data can replace or supplement physical receipts. A purchase from Staples might include "24-pack ballpoint pens, $14.99" in the transaction data itself, eliminating the need for a separate receipt.
+
+**OCR and auto-matching.** When employees do photograph receipts, machine learning parses the image — extracting the merchant name, date, amount, and line items. The system automatically matches the receipt to the corresponding card transaction. No manual data entry.
+
+**Auto-categorization.** Transactions are automatically mapped to expense categories based on MCC codes, merchant names, and historical patterns. A charge at Marriott is tagged as "Travel — Lodging." A charge at Delta is tagged as "Travel — Airfare." Finance teams review exceptions rather than categorizing every transaction manually.
+
+## The Infrastructure Stack
+
+Behind every modern expense management platform sits a surprisingly complex infrastructure stack.
+
+The **issuer processor** (Marqeta, Lithic, Highnote, Galileo) provides the core card issuance and transaction processing infrastructure. It generates card numbers, processes authorizations in real time, applies spend controls, and delivers transaction data via webhooks. The issuer processor is the engine room.
+
+The **sponsor bank** (Sutton Bank, Celtic Bank, Cross River Bank, etc.) provides the banking license and sits as the legal issuer of the cards. Visa and Mastercard require a licensed bank as the issuer — fintech companies can't issue cards directly. The sponsor bank holds the BIN range and takes on certain regulatory obligations.
+
+The **card network** (Visa, Mastercard) provides the acceptance network. A Visa-branded corporate card works at any of the 80+ million merchants worldwide that accept Visa. The network routes authorizations, clears transactions, and settles funds between the issuing bank and the acquiring bank.
+
+The **expense platform** (Brex, Ramp, Divvy) provides the software layer — the mobile app, the admin dashboard, the approval workflows, the accounting integrations, the receipt capture, the reporting. This is what the employee and the finance team actually interact with.
+
+**Accounting integrations** connect the expense platform to the company's general ledger — QuickBooks, Xero, NetSuite, Sage. Transactions flow automatically from the card to the accounting system, mapped to the right accounts and cost centers. This eliminates the manual journal entry work that traditionally consumed hours of accounting staff time each month.
+
+## Revenue Models: Interchange vs SaaS
+
+The business models in expense management divide into two camps, and the distinction reveals a lot about how payments economics work.
+
+**Interchange-based (Brex, Ramp, Divvy).** These companies charge no monthly subscription fee — or a very low one. Their primary revenue comes from interchange. Every time an employee swipes the card, the merchant pays a processing fee (say, 2.5%), and a portion of that — the interchange fee (roughly 1.5-2.0%) — flows back to the card issuer. The expense platform keeps a share of this interchange as its revenue.
+
+The math works because corporate spending is high-volume. A 500-person company spending $2 million per month on corporate cards generates roughly $30,000-$40,000 per month in interchange. That's real revenue, and the platform didn't charge the customer a dime. In fact, many platforms offer cashback to the customer — returning a portion of the interchange (1-1.5%) as a rebate. The customer saves money compared to their old expense management tool and earns cashback on their spending. It feels like magic, but it's just interchange economics.
+
+**SaaS-based (Concur, Expensify, Navan).** Traditional expense management tools charge per user per month — typically $8-15 per employee. They make money from software subscriptions, not interchange. Some have added corporate card products, but the card is secondary to the software.
+
+The interchange-based model has been winning, and it's not hard to see why. When one product charges you $12/user/month and another product pays you 1.5% cashback on your spending, the total cost difference is enormous. A 1,000-employee company might save $500,000+ per year by switching from a SaaS expense tool to an interchange-based platform. This dynamic has driven explosive growth at Ramp and Brex, and forced traditional players like Concur (SAP) to rethink their approach.
+
+## Per-Employee Budgets and Approval Workflows
+
+Beyond card-level controls, modern platforms enable hierarchical budget management.
+
+A department gets a monthly budget of $50,000. Within that, each team gets a sub-budget. Within each team, each employee gets individual spending limits. When the engineering team's AWS card is charged, the spend counts against the engineering team's budget, the engineering department's budget, and the company's overall spending. If any level hits its limit, new transactions are declined.
+
+Approval workflows add a human layer. Purchases above $1,000 might require manager approval before the card is activated. Requests for new virtual cards can route through a Slack bot — an employee types "/request-card $500 for conference registration," the manager approves with a click, and a virtual card is generated and delivered instantly. This combines human judgment with automated enforcement.
+
+## What Changed: Why Now?
+
+Three shifts converged to make modern expense management possible.
+
+**API-first issuer processors.** Before Marqeta (founded 2010) and similar companies, issuing cards required deep integrations with bank mainframe systems — a process that took months or years. Modern issuer processors exposed card issuance, spend controls, and transaction data through REST APIs. This let software companies build card programs without becoming banks.
+
+**Real-time webhooks.** When a card is swiped, the issuer processor delivers a webhook to the expense platform within milliseconds. This real-time data flow enables instant notifications, instant receipt prompts, and instant policy enforcement. The old batch-file model — receiving transaction data hours or days after the fact — couldn't support any of this.
+
+**Mobile-first design.** Employees live on their phones. The ability to push a notification the moment a card is swiped, prompt a receipt photo, and show real-time spending against budget — all in a mobile app — transformed the user experience from "painful monthly chore" to "effortless real-time flow."
+
+The result is a category that barely existed before 2017 and now represents billions of dollars in annual revenue, billions of cards issued, and a fundamental rethinking of how companies manage spending. The expense report — that universally despised ritual of corporate life — is finally dying. And nobody misses it.

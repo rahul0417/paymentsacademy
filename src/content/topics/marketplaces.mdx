@@ -1,0 +1,129 @@
+---
+title: "Marketplaces"
+description: "The four payment challenges every marketplace must solve — pay-in, splitting, pay-out, and seller onboarding — and the infrastructure behind platforms like Uber and Airbnb."
+theme: "Products & Use Cases"
+readingTime: "8 min read"
+order: 4
+relatedTopics: ["push-to-card", "kyc-and-identity", "compliance-and-regulation"]
+glossaryTerms:
+  - term: "Payment Splitting"
+    definition: "Dividing a single customer payment between multiple recipients — the platform's commission and the seller's share."
+  - term: "Marketplace Payout"
+    definition: "Disbursing funds to sellers — via bank transfer, push-to-card, issued debit card, or wallet balance."
+  - term: "Money Transmission License"
+    definition: "A US state-level license required to hold or transmit funds on behalf of others — a major compliance requirement for marketplaces."
+  - term: "Seller Onboarding"
+    definition: "The KYC/KYB process of verifying seller identity and legitimacy before allowing them to receive payments on a marketplace."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## The Hardest Payment Problem
+
+Accepting a payment from a customer is, at this point, a solved problem. Stripe, Adyen, Braintree — any payment processor can charge a card and deposit the funds in your bank account. The infrastructure is mature, the APIs are clean, the documentation is thorough.
+
+Now make it harder. Instead of depositing those funds in your own bank account, you need to split them — 20% to your platform, 80% to a seller you've never met in person, who lives in a different state (or country), and who you need to verify isn't a sanctioned entity or money launderer. Oh, and the seller wants their money instantly, not in a week.
+
+That's the marketplace payment problem. And it's dramatically more complex than standard e-commerce payments. Every marketplace — from Uber to Airbnb to Etsy to DoorDash — must solve four interconnected challenges: pay-in, splitting, pay-out, and seller onboarding. Get any one wrong, and the marketplace breaks.
+
+## The Four Parts
+
+<MermaidDiagram
+  chart={`flowchart LR
+    subgraph PAYIN["1. Pay-In"]
+      C[Customer] -->|Pays $100| P[Platform]
+    end
+    subgraph SPLIT["2. Splitting"]
+      P -->|Platform fee: $20| PL[Platform Account]
+      P -->|Seller share: $80| SL[Seller Ledger]
+    end
+    subgraph PAYOUT["3. Pay-Out"]
+      SL -->|ACH / Push-to-card /<br/>Issued debit card| S[Seller]
+    end
+    subgraph ONBOARD["4. Seller Onboarding"]
+      S2[New Seller] -->|KYC/KYB<br/>Identity verification<br/>Sanctions screening| P
+    end`}
+  caption="The four marketplace payment challenges: every platform must handle pay-in from customers, split funds, disburse to sellers, and verify seller identities"
+/>
+
+### Pay-In: Collecting From Customers
+
+The pay-in side — collecting money from the customer — is the most straightforward part. Customers pay via credit card, debit card, Apple Pay, bank transfer, or whatever payment methods the marketplace supports. The platform's payment processor handles the standard card authorization, clearing, and settlement flow.
+
+But even pay-in has marketplace-specific wrinkles. When Uber charges you $35 for a ride, who is the "merchant" from the card network's perspective? Is it Uber the platform? Or is it the individual driver? This distinction matters because the card networks have specific rules about marketplaces. Visa requires that the entity processing the payment is the entity delivering the goods or services — or is properly registered as a payment facilitator.
+
+Most marketplaces operate as payment facilitators (PayFacs), meaning they aggregate many sub-merchants (sellers) under a single merchant account. The platform processes payments on behalf of its sellers, which simplifies onboarding (sellers don't each need their own merchant account) but creates regulatory obligations.
+
+### Splitting: Dividing the Money
+
+<GlossaryTerm term="Payment Splitting" definition="Dividing a single customer payment between multiple recipients — the platform's commission and the seller's share.">Payment splitting</GlossaryTerm> is where marketplace payments diverge from normal commerce. A customer pays $100. The platform takes $20 as its commission. The seller receives $80. That sounds simple, but consider the complexity:
+
+**Multi-seller orders.** A customer on DoorDash orders from a restaurant ($30 food) and adds items from a convenience store ($15 snacks). The single $45 payment must be split between two sellers, each with potentially different commission rates, plus DoorDash's platform fee, plus the delivery driver's payout, plus tip allocation.
+
+**Refunds and adjustments.** A customer disputes part of an order. The platform issues a $10 partial refund. Does that come from the platform's commission? The seller's share? Both proportionally? The splitting logic must handle refunds, chargebacks, promotional discounts, and adjustment credits — each with its own allocation rules.
+
+**Tax withholding.** In some jurisdictions, the platform must withhold taxes on seller earnings and remit them to tax authorities. In the US, marketplaces must issue 1099-K forms to sellers who exceed $600 in annual sales. This requires accurate record-keeping at the per-seller level.
+
+**Ledger integrity.** Every dollar that enters the platform must be accounted for. The platform maintains internal ledgers — a ledger for each seller's balance, a ledger for the platform's earned fees, ledgers for held funds, pending payouts, and reserves. These ledgers must balance perfectly. A penny discrepancy in a system processing millions of transactions can cascade into a significant reconciliation problem.
+
+### Pay-Out: Getting Money to Sellers
+
+<GlossaryTerm term="Marketplace Payout" definition="Disbursing funds to sellers — via bank transfer, push-to-card, issued debit card, or wallet balance.">Marketplace payouts</GlossaryTerm> — disbursing funds to sellers — is where the rubber meets the road. Sellers care intensely about how fast they get paid. The payout experience directly affects seller satisfaction, retention, and platform competitiveness.
+
+**ACH (bank transfer).** The most common payout method. The platform initiates an ACH credit to the seller's bank account. Standard ACH takes 1-3 business days. Same-day ACH is available for a higher fee. ACH is cheap ($0.10-0.30 per transaction) and reliable, but requires the seller to provide their bank routing and account numbers — and it's not instant.
+
+**Push-to-card.** Platforms like Lyft and DoorDash offer instant payouts via Visa Direct or Mastercard Send. The seller's earnings are pushed to their debit card within minutes. This typically costs $0.25-0.50 per transaction, and platforms often charge a small fee ($0.50-1.99) to the seller for the convenience of instant access. Drivers overwhelmingly prefer instant payouts — Lyft reports that drivers who use instant cashout are meaningfully more active on the platform.
+
+**Issued debit cards.** Some platforms issue their own branded debit cards to sellers. DoorDash's DasherDirect card, for example, gives delivery drivers a debit card where their earnings are deposited after every delivery — no waiting for weekly ACH. The platform earns interchange when sellers spend with the card, creating a secondary revenue stream. And the card becomes a retention tool — sellers are less likely to switch to a competing platform when their daily cash flow is tied to a platform-issued card.
+
+**Wallet balance.** Sellers can hold their earnings in a platform wallet balance and use it for purchases within the ecosystem. This reduces payout costs (no ACH or push-to-card fees) and keeps money on the platform. Amazon pays third-party sellers into their Amazon account balance by default.
+
+### Seller Onboarding: The Compliance Gate
+
+Before a seller receives a single dollar, the marketplace must verify their identity. This is <GlossaryTerm term="Seller Onboarding" definition="The KYC/KYB process of verifying seller identity and legitimacy before allowing them to receive payments on a marketplace.">seller onboarding</GlossaryTerm>, and it's a regulatory requirement, not an optional nicety.
+
+**KYC (Know Your Customer).** For individual sellers, the platform must verify their identity — typically by collecting their name, date of birth, Social Security number (in the US), and address, then verifying this information against government databases. Some platforms require document verification (driver's license, passport).
+
+**KYB (Know Your Business).** For business sellers, the platform must verify the business entity — confirming it's registered, identifying the beneficial owners (individuals who own 25%+ of the business), and verifying the business address.
+
+**Sanctions screening.** The platform must screen every seller against government sanctions lists — OFAC (US), EU sanctions lists, UN sanctions lists. Onboarding a sanctioned entity is a serious regulatory violation with severe penalties.
+
+**Ongoing monitoring.** Onboarding isn't a one-time event. Platforms must continuously monitor sellers for suspicious activity — unusual transaction patterns, sudden changes in volume, complaints from buyers that suggest fraud.
+
+The tension in seller onboarding is between thoroughness and conversion. A 20-minute onboarding flow with document uploads and identity verification creates friction — potential sellers abandon the process. A 2-minute onboarding flow with minimal verification creates risk — fraudulent sellers exploit the platform. Every marketplace navigates this tradeoff, and the best ones use progressive verification: let sellers start with minimal information, then require additional verification as they reach transaction thresholds.
+
+## The Regulatory Minefield
+
+Marketplace payments touch one of the most complex areas of financial regulation: money transmission.
+
+In the US, holding or transmitting funds on behalf of others requires a <GlossaryTerm term="Money Transmission License" definition="A US state-level license required to hold or transmit funds on behalf of others — a major compliance requirement for marketplaces.">Money Transmission License (MTL)</GlossaryTerm> — and these licenses are issued at the state level. That means obtaining separate licenses in 48 states (plus DC and territories), each with its own application process, bonding requirements, and ongoing compliance obligations. The process takes 12-24 months and costs $1-5 million in legal and licensing fees.
+
+In the EU, similar activity requires an E-Money Institution license or Payment Institution license under PSD2. Different regulatory framework, same fundamental principle: if you're holding someone else's money, regulators want to know about it.
+
+This is why platforms like Stripe Connect and Adyen for Platforms exist. These services handle the fund-holding and regulatory complexity so that the marketplace doesn't have to obtain its own money transmission licenses. Stripe, as a licensed money transmitter, holds seller funds in its accounts. The marketplace uses Stripe's APIs to manage pay-in, splitting, and pay-out, but Stripe — not the marketplace — is the regulated entity holding the funds.
+
+The tradeoff is cost and control. Using Stripe Connect means paying Stripe's fees (typically 0.25-0.50% plus per-transaction fees on payouts) and operating within Stripe's product constraints. Building your own payment infrastructure means obtaining licenses, building compliance programs, and managing fund-holding — but gives you full control over the seller experience and economics.
+
+## Real-World Architectures
+
+**Uber.** When a rider pays $35 for a trip, Uber collects the payment via card, takes its platform commission (roughly 25-30%), and the remainder goes to the driver. Drivers can cash out instantly via push-to-card (Visa Direct) for a small fee, or wait for weekly ACH deposits. Uber processes hundreds of millions of trips per year, each requiring real-time splitting, ledger tracking, and payout calculation. The scale is staggering.
+
+**Airbnb.** A guest books a $500/night stay. Airbnb collects the full amount at booking time but doesn't release funds to the host until 24 hours after check-in — protecting against cancellations and fraud. Airbnb takes a service fee from both the guest (typically 14%) and the host (3%). Host payouts are available via ACH, PayPal, or international wire transfer. The payout timing and hold structure is more complex than Uber because stays can be booked months in advance.
+
+**Etsy.** Sellers list products, buyers pay through Etsy Payments. Etsy takes a 6.5% transaction fee plus a $0.25 listing fee. Seller funds are deposited on a regular schedule (daily, weekly, biweekly, or monthly — seller chooses). Etsy must handle the full complexity of returns, partial refunds, multi-item orders, and international sellers across hundreds of currencies and tax jurisdictions.
+
+**DoorDash.** Each order involves three parties: the restaurant, the delivery driver (Dasher), and DoorDash. A single $30 order payment must be split between the restaurant's food cost, DoorDash's commission, the Dasher's delivery fee, and tip allocation. DoorDash's DasherDirect card pays drivers after every delivery, turning payout into a real-time retention tool.
+
+## The Platform Stack
+
+A modern marketplace payment stack typically includes:
+
+- **Payment processor** (Stripe Connect, Adyen for Platforms, PayPal for Marketplaces) — handles pay-in, fund holding, and regulatory compliance
+- **Ledger system** — tracks balances, splits, holds, and payouts per seller (often custom-built for complex marketplaces)
+- **Payout provider** — handles disbursements via ACH, push-to-card, or international wire
+- **Identity verification** (Persona, Jumio, Onfido) — handles KYC/KYB for seller onboarding
+- **Tax reporting** (Stripe Tax, Avalara) — handles 1099-K generation and tax withholding
+- **Fraud and risk** — monitors for fraudulent sellers, suspicious transaction patterns, and payment abuse
+
+Building a marketplace is hard. Building the payment infrastructure for a marketplace is harder. The companies that get it right create powerful network effects — more sellers attract more buyers, which attract more sellers. The companies that get it wrong face regulatory fines, seller churn, and payment losses that can sink the business. Payments aren't just a feature of a marketplace. They're the foundation.

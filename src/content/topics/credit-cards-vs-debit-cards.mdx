@@ -1,0 +1,142 @@
+---
+title: "Credit Cards vs Debit Cards"
+description: "They look the same and work the same way at checkout — but credit and debit cards have fundamentally different economics, protections, and risks."
+theme: "Card Ecosystem"
+readingTime: "7 min read"
+order: 3
+relatedTopics: ["interchange-fees", "card-networks", "chargebacks-and-disputes"]
+glossaryTerms:
+  - term: "Good Funds Model"
+    definition: "The debit card model — money must be in your account before you can spend it."
+  - term: "Credit Line"
+    definition: "The maximum amount a credit card issuer will lend you, checked during each authorization."
+  - term: "Signature Debit"
+    definition: "When a debit card transaction is routed over credit rails (Visa/MC) using signature verification instead of a PIN."
+  - term: "PIN Debit"
+    definition: "When a debit card transaction is routed over PIN debit networks using PIN verification — typically lower interchange."
+  - term: "Reward Points"
+    definition: "Incentives funded by interchange revenue that credit card issuers offer to encourage card usage."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## Same Plastic, Different Universe
+
+Pull a credit card and a debit card out of your wallet. They look nearly identical — same size, same chip, same Visa or Mastercard logo, same 16-digit number. At the checkout counter, they work the same way. Tap, dip, or swipe. Wait for the beep. Grab your receipt.
+
+But behind that identical experience, two completely different financial systems are at work. One is spending your money. The other is borrowing someone else's. And that single distinction creates a cascade of differences in economics, risk, regulation, consumer protection, and merchant strategy that shapes the entire payments industry.
+
+## Your Money vs. Their Money
+
+The fundamental difference is simple.
+
+A debit card operates on the <GlossaryTerm term="Good Funds Model" definition="The debit card model — money must be in your account before you can spend it.">good funds model</GlossaryTerm>. When you use a debit card, the issuer checks whether you have enough money in your checking account to cover the purchase. If you have $500 in your account and try to buy something for $600, the transaction gets declined (assuming you haven't opted into overdraft). You're spending money you already have.
+
+A credit card operates on a lending model. The issuing bank has extended you a <GlossaryTerm term="Credit Line" definition="The maximum amount a credit card issuer will lend you, checked during each authorization.">credit line</GlossaryTerm> — say, $10,000. When you make a purchase, the issuer checks whether this transaction would push you over your credit limit. If not, they approve it and effectively lend you the money. You don't pay the bank back until your statement arrives, typically 20–30 days later. If you don't pay the full balance, you start accruing interest — often at 20%+ APR.
+
+This distinction — your money versus a short-term loan — is the root of everything else that differs between these two products.
+
+## The Authorization Check: Same Flow, Different Logic
+
+The transaction flow for credit and debit cards is architecturally identical. The merchant's terminal sends an authorization request through the acquirer, across the card network, to the issuing bank's processor. The processor makes a decision and sends back an approve or decline.
+
+But the *logic* inside that authorization check is different.
+
+For a **debit card**, the issuer processor checks your available checking account balance. Is there $47.50 available right now? Yes — approved. The processor places a hold on those funds immediately. Your available balance drops in real time.
+
+For a **credit card**, the issuer processor checks your available credit. You have a $10,000 limit and $3,200 in current charges, leaving $6,800 available. Is $47.50 within that available credit? Yes — approved. The processor adds $47.50 to your outstanding balance.
+
+Same message format (ISO 8583). Same network routing. Same two-second response time. But the decision engine is checking fundamentally different things — a bank balance versus a credit limit.
+
+## Two Ways to Route a Debit Card
+
+Here's where things get interesting. A debit card doesn't just have one way to process a transaction — it has two, and the choice between them has enormous economic consequences.
+
+<GlossaryTerm term="Signature Debit" definition="When a debit card transaction is routed over credit rails (Visa/MC) using signature verification instead of a PIN.">Signature debit</GlossaryTerm> routes the transaction over the credit card network rails (Visa or Mastercard). The cardholder signs the receipt (or, more commonly these days, no verification at all for small amounts). The transaction follows the dual-message flow — authorization now, clearing later. Interchange rates are higher, similar to credit card rates.
+
+<GlossaryTerm term="PIN Debit" definition="When a debit card transaction is routed over PIN debit networks using PIN verification — typically lower interchange.">PIN debit</GlossaryTerm> routes the transaction over PIN debit networks (like Interlink, STAR, or PULSE). The cardholder enters a PIN. The transaction follows a single-message flow — authorization and clearing happen simultaneously. Interchange rates are significantly lower.
+
+<MermaidDiagram
+  chart={`graph TD
+    DC[Debit Card Used at Checkout] --> Q{How is it routed?}
+    Q -->|"Run as Credit"| SIG[Signature Debit<br/>Visa/MC Credit Rails]
+    Q -->|"Enter PIN"| PIN[PIN Debit<br/>Interlink, STAR, PULSE]
+    SIG --> HI[Higher Interchange<br/>~0.80-1.05%]
+    SIG --> DM[Dual-Message<br/>Auth now, clear later]
+    PIN --> LI[Lower Interchange<br/>~0.30-0.50%]
+    PIN --> SM[Single-Message<br/>Auth + clear together]`}
+  caption="The same debit card can take two very different paths, with very different costs"
+/>
+
+This routing choice is why the checkout terminal asks "Debit or Credit?" when you insert a debit card. It's not asking what type of card you have — it already knows. It's asking which *network rail* you want to use.
+
+And this matters enormously to merchants. Walmart, for example, aggressively routes all debit card transactions to PIN debit networks. On billions of dollars in annual debit transactions, the interchange difference between signature and PIN routing saves Walmart hundreds of millions of dollars per year. Walmart was one of the loudest advocates for the Durbin Amendment, which requires every debit card to support at least two unaffiliated networks — giving merchants the power to route to the cheapest option.
+
+## The Interchange Gap
+
+The economic difference between credit and debit is stark.
+
+A typical **credit card** transaction on a consumer rewards card costs the merchant around 2.0%–3.0% in interchange fees. Premium cards (like the Chase Sapphire Reserve or Amex Platinum) are at the higher end because the interchange funds those generous rewards programs.
+
+A typical **signature debit** transaction costs around 0.80%–1.05% in interchange.
+
+A **regulated debit** transaction (from a bank with over $10 billion in assets, capped by the Durbin Amendment) costs roughly 21 cents plus 0.05% — on a $100 purchase, that's about $0.26. Compare that to $2.50 for a premium credit card on the same purchase.
+
+An **exempt debit** transaction (from a small bank or credit union below the Durbin threshold) costs more — around 0.70%–1.00% — because the interchange cap doesn't apply.
+
+This gap is the single biggest reason merchants have strong preferences about which cards their customers use.
+
+## Why Merchants Prefer Debit
+
+For a merchant operating on thin margins — a grocery store at 1–2% net margin, a gas station at even less — the difference between a 2.5% credit card interchange fee and a $0.26 regulated debit fee is the difference between profit and loss on a transaction.
+
+This is why many merchants steer customers toward debit. Some offer cash-back at the register (a service that costs nothing in interchange). Some set minimum purchase amounts for credit cards (allowed under the Durbin Amendment, up to $10). Some, like Costco, negotiated exclusive network deals to minimize their blended interchange cost.
+
+Gas stations are a fascinating case study. Fuel margins are razor-thin — sometimes just a few cents per gallon. A 2% credit card fee on a $60 fill-up is $1.20, which can exceed the station's entire profit margin on that sale. This is why many gas stations offer a "cash price" and a "credit price" — the spread reflects the interchange cost.
+
+## Why Banks Push Credit
+
+If merchants prefer debit, banks overwhelmingly prefer credit. The economics are compelling.
+
+**Interchange revenue.** A bank issuing credit cards earns 2–3% interchange on every purchase. On debit, especially regulated debit, they earn a fraction of that. A large bank processing $100 billion in annual credit card volume generates $2–3 billion in interchange alone.
+
+**Interest income.** This is the big one. About half of credit card holders carry a balance month to month, paying 20%+ APR. Interest income is the largest revenue source for most credit card issuers — even larger than interchange.
+
+**Annual fees.** Premium cards charge $95–$695 in annual fees. There's no equivalent for debit cards.
+
+Banks invest heavily in credit card marketing, sign-up bonuses, and rewards programs to drive credit card adoption. Those 100,000-point sign-up bonuses and 3% cash-back categories exist because the lifetime value of a credit card customer — through interchange, interest, and fees — vastly exceeds that of a debit card holder.
+
+## Consumer Protection: Reg E vs. Reg Z
+
+The legal protections differ significantly between credit and debit cards, governed by different regulations.
+
+**Credit cards** are covered by **Regulation Z** (Truth in Lending Act). Your maximum liability for unauthorized transactions is $50, and most issuers offer zero-liability policies. You can dispute charges before paying — the bank must investigate while you keep your money. Credit cards also provide billing error protections, the right to withhold payment during disputes, and mandatory disclosure of terms.
+
+**Debit cards** are covered by **Regulation E** (Electronic Fund Transfer Act). Liability depends on how quickly you report the unauthorized transaction. Report within two business days and your liability is capped at $50. Between 2 and 60 days, it jumps to $500. After 60 days, you could be on the hook for everything. And here's the critical difference: with debit, the money is *already gone from your account*. You have to wait for the bank to investigate and return your funds.
+
+This is why security-conscious consumers prefer credit cards for online purchases and travel. If your credit card number is stolen, you dispute the charge and never pay. If your debit card number is stolen, money vanishes from your checking account and you wait days or weeks to get it back — potentially missing rent payments or other bills in the meantime.
+
+## The Travel and Recurring Payment Question
+
+Certain industries strongly prefer credit cards for practical reasons.
+
+**Hotels and rental cars** place authorization holds for hundreds of dollars. With a credit card, this hold reduces your available credit — annoying but manageable. With a debit card, it freezes actual cash in your checking account, which can cause bounced checks and missed payments. Many hotels and rental agencies won't accept debit cards for this reason, or they require additional deposits.
+
+**Airlines and travel** involve transactions that are fulfilled weeks or months in the future. If the airline goes bankrupt, credit card holders have chargeback rights. Debit card holders have weaker protections for future-delivery disputes.
+
+**Subscription services** prefer credit cards because they don't expire with the checking account balance. A debit card transaction can fail simply because the account is low on funds that day, creating involuntary churn.
+
+## The Rewards Ecosystem
+
+<GlossaryTerm term="Reward Points" definition="Incentives funded by interchange revenue that credit card issuers offer to encourage card usage.">Reward points</GlossaryTerm>, cash back, airline miles — the entire credit card rewards ecosystem is funded primarily by interchange revenue. Banks collect 2–3% interchange from merchants and return a portion to cardholders as rewards — typically 1–2% in value.
+
+This creates an interesting wealth transfer. Merchants pay higher interchange on rewards cards. They raise prices to cover the cost. All customers pay the higher prices. But only credit card users with rewards cards get money back. Debit card users and cash users effectively subsidize credit card rewards — a dynamic that regulators and consumer advocates have increasingly scrutinized.
+
+Some debit cards have tried to offer rewards, but the math is much harder. With interchange capped at 21 cents for regulated debit, there's little revenue to fund a rewards program. Neobanks that partner with small, Durbin-exempt banks have slightly more room — which is one reason companies like Chime and Cash App partner with community banks rather than megabanks.
+
+## The Bottom Line
+
+Credit and debit cards are two fundamentally different financial products wearing the same uniform. One spends your money; the other lends you money. One costs merchants a quarter; the other costs them two and a half dollars. One takes your cash the moment you tap; the other gives you a month to pay.
+
+Understanding this distinction — and all its downstream consequences for interchange, routing, regulation, consumer protection, and business models — is essential for anyone working in payments or fintech. Every product decision, pricing model, and partnership strategy in the card ecosystem traces back to this one question: whose money is it?

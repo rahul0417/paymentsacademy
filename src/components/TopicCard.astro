@@ -265,8 +265,6 @@ const colors = themeColors[theme] || themeColors['Foundations'];
     });
   }
   applyDarkModeColors();
-  // Re-apply when theme attribute changes
   const observer = new MutationObserver(applyDarkModeColors);
   observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyDarkModeColors);
 </script>

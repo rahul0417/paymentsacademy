@@ -4,7 +4,7 @@ description: "Instant, disposable, programmable — how virtual cards work, why 
 theme: "Products & Use Cases"
 readingTime: "6 min read"
 order: 1
-relatedTopics: ["issuer-processors", "expense-management", "acceptance-environments"]
+relatedTopics: ["issuer-processors", "expense-management", "acceptance-environments", "embedded-finance", "buy-now-pay-later"]
 glossaryTerms:
   - term: "Virtual Card"
     definition: "A digital-only card number generated instantly, usable for online purchases or added to mobile wallets — no physical plastic needed."
@@ -72,6 +72,10 @@ Virtual cards have found product-market fit across a surprisingly wide range of 
 **Rewards and incentives.** Need to send a $100 prize to a contest winner instantly? Generate a virtual card, email or text them the number, and they can spend it immediately. No mailing gift cards. No waiting. Insurance companies use this for instant claim payouts. Employers use it for spot bonuses. Market research firms use it to compensate survey participants.
 
 **QA and testing.** Software teams need to test payment flows constantly. Virtual cards let QA engineers generate fresh card numbers for every test case — different amounts, different card types, different decline scenarios. No sharing a single test card across the team. No worrying about hitting transaction limits on a test card.
+
+**BNPL checkout.** Buy Now, Pay Later 2.0 providers use single-use virtual cards to enable in-app shopping experiences. The consumer browses and selects items within the BNPL app, and when they're ready to check out, the BNPL provider generates a virtual card loaded with the exact purchase amount. The consumer uses that card to complete the transaction at the merchant — the merchant sees a normal card payment, while the consumer pays the BNPL provider back in installments. This model lets BNPL providers work at any merchant that accepts cards, without requiring direct merchant integrations.
+
+**Embedded finance card issuing.** Virtual card issuing has become a key embedded finance product. Software platforms — from vertical SaaS companies to marketplaces — can now issue cards to their users and earn interchange revenue on every transaction. Stripe Issuing and Marqeta provide the infrastructure that makes this possible at scale, handling the card network integrations, compliance, and transaction processing. For the platform, each card swipe generates revenue without the user ever leaving the platform's ecosystem.
 
 **Subscription management.** Here's a clever consumer use case: assign a unique virtual card to each subscription service. Netflix gets one card number. Spotify gets another. Your gym gets a third. If you want to cancel a subscription that makes cancellation difficult, just deactivate that specific virtual card. The charge declines, and the service can't bill you. More importantly, if one service has a data breach, only that one card number is compromised — not the card you use everywhere.
 

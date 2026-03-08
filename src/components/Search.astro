@@ -177,13 +177,7 @@
     padding: 0 1px;
   }
 
-  .search-no-results {
-    padding: 2rem 1rem;
-    text-align: center;
-    color: var(--color-text-light);
-    font-size: 0.875rem;
-  }
-
+  .search-no-results,
   .search-loading {
     padding: 2rem 1rem;
     text-align: center;
@@ -327,9 +321,7 @@
     }
 
     function escapeHtml(str) {
-      var div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
     function getResultItems() {

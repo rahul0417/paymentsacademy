@@ -4,7 +4,7 @@ description: "The technology companies that connect issuing banks to card networ
 theme: "Card Ecosystem"
 readingTime: "12 min read"
 order: 6
-relatedTopics: ["anatomy-of-a-swipe", "acquirer-processors"]
+relatedTopics: ["anatomy-of-a-swipe", "acquirer-processors", "embedded-finance", "credit-card-as-a-service"]
 glossaryTerms:
   - term: "Issuer Processor"
     definition: "A technology company that handles transaction authorization, card management, and settlement on behalf of the issuing bank."
@@ -118,6 +118,40 @@ Starting in the 2010s, a new generation of processors emerged, built from the gr
 | **Typical clients** | Major banks, established programs | Fintechs, neobanks, embedded finance |
 
 Despite every advantage listed in the right column, the legacy systems still process the overwhelming majority of global card transactions. TSYS alone handled 35 billion transactions per year before the FIS acquisition. The modern processors are growing fast — but the incumbents' installed base is enormous.
+
+## The Evolving Role: From Bank Vendor to Platform Backbone
+
+Historically, issuer processors existed to serve banks. A bank would select a processor like TSYS or Fiserv, sign a multi-year contract, and the processor would handle the technical plumbing while the bank owned the customer relationship, made credit decisions, and provided the capital. The processor was a back-office vendor — powerful, but invisible.
+
+That model is changing fundamentally. Modern issuer processors increasingly serve fintechs, platforms, and consumer brands directly through APIs — often with the bank itself reduced to a regulatory wrapper in the background. The customer relationship belongs to the fintech. The product decisions belong to the platform. The processor is no longer just plumbing; it's the backbone that makes the entire program possible.
+
+This shift has given rise to two distinct models that are important to understand: **pure-play processors** and **Credit Card as a Service (CCaaS) platforms**.
+
+### Pure-Play Processors vs. CCaaS Providers
+
+Pure-play processors — FIS, Fiserv, Global Payments, and the legacy TSYS infrastructure — focus exclusively on transaction processing. They handle authorization, routing, clearing, and settlement. What they don't do is provide lending capital, make credit decisions, or underwrite risk. A bank using FIS still needs its own credit team, its own capital reserves, and its own underwriting models. The processor is a pipe, not a brain.
+
+Marqeta and Stripe Issuing fall into a similar category on the modern side — they provide excellent debit card issuing infrastructure through APIs, but they don't extend into credit issuance or underwriting. Their strength is enabling platforms to move money on prepaid and debit rails with real-time control.
+
+CCaaS providers take a fundamentally different approach. Companies like Deserve layer credit issuance, capital provision, and underwriting on top of the processing infrastructure. Instead of handing a bank a set of APIs and saying "build your credit card program," a CCaaS provider delivers the entire credit card stack — processing, credit decisioning, capital, compliance, and program management — as a unified service.
+
+The distinction matters because it determines who can launch a credit card program and how fast. With a pure-play processor, you still need a bank partner willing to lend, a credit team to build underwriting models, and capital to fund the portfolio. With a CCaaS provider, much of that complexity is abstracted away.
+
+### The CCaaS Advantage: Modular, Repeatable Infrastructure
+
+The traditional approach to launching a credit card program — even with a modern processor — often resembled a white-label model: each new customer meant significant customization, bespoke integrations, and months of configuration. Modern CCaaS platforms take a different approach, offering modular, repeatable infrastructure that can be configured rather than rebuilt for each new program.
+
+Think of it as the difference between building a house from raw lumber every time versus assembling one from pre-engineered components. The components are standardized and tested, but they snap together in different configurations to produce distinct products. A retailer's co-branded credit card, a fintech's credit-builder product, and a platform's embedded credit offering can all run on the same underlying infrastructure — configured differently, but sharing the same reliable foundation.
+
+This modularity is what makes it possible for non-bank platforms to enter the credit card space at all. Without it, the cost and complexity of standing up a credit card program would remain prohibitive for all but the largest institutions.
+
+### BaaS and the Non-Bank Issuing Wave
+
+The rise of issuer processors as platform-facing infrastructure has converged with the broader Banking-as-a-Service movement. Modern processors now integrate tightly with BaaS providers, creating a combined stack that enables non-bank platforms — retailers, SaaS companies, gig economy platforms, even airlines — to issue cards under their own brand.
+
+On the debit and prepaid side, Marqeta and Stripe Issuing have made it straightforward for platforms to embed card issuing into their products. A marketplace can issue seller payout cards; a corporate platform can spin up virtual cards for each employee; an earned-wage-access app can give workers instant access to pay — all without the platform holding a banking license.
+
+On the credit side, CCaaS providers extend this model to credit cards — a significantly more complex product because it involves lending, credit risk, and regulatory obligations that go far beyond moving existing money around. The integration of processing, BaaS, and credit infrastructure is what makes embedded credit card programs viable for the first time.
 
 ## Geographic Coverage: Where Processors Dominate
 

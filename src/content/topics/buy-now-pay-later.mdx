@@ -2,9 +2,9 @@
 title: "Buy Now, Pay Later"
 description: "How BNPL works behind the scenes — the mechanics, the players, and why installment payments are disrupting traditional credit cards."
 theme: "Non-Card Payments"
-readingTime: "7 min read"
+readingTime: "10 min read"
 order: 3
-relatedTopics: ["credit-cards-vs-debit-cards", "interchange-fees", "fraud-and-risk"]
+relatedTopics: ["credit-cards-vs-debit-cards", "interchange-fees", "fraud-and-risk", "embedded-finance", "credit-card-as-a-service"]
 glossaryTerms:
   - term: "BNPL"
     definition: "Buy Now, Pay Later — a financing option letting consumers split purchases into installments, typically interest-free."
@@ -69,11 +69,21 @@ This creates an unusual dynamic: the BNPL provider's primary revenue comes from 
 
 **Klarna** (Sweden, founded 2005) pioneered the model in Europe. Klarna originally offered an <GlossaryTerm term="Open Invoice" definition="Klarna's original model — buy now, receive an invoice, pay within 14-30 days.">open invoice</GlossaryTerm> model — consumers would receive goods first, then pay an invoice within 14–30 days. This "try before you buy" approach was culturally aligned with Scandinavian consumer expectations and dominated online retail in Sweden, Germany, and the Netherlands. Klarna later expanded into the "Pay in 4" installment model that now dominates globally.
 
-**Affirm** (US, founded 2012 by PayPal co-founder Max Levchin) focuses on higher-value purchases with longer payment plans — 3, 6, or 12 months. Affirm performs more rigorous credit assessments and offers interest-bearing loans for larger purchases. It generates virtual card numbers at the point of sale: when a consumer is approved at checkout, Affirm creates a one-time-use virtual Visa card number, funds it, and uses it to pay the merchant through standard card rails.
+**Affirm** (US, founded 2012 by PayPal co-founder Max Levchin) focuses on higher-value purchases with longer payment plans — 3, 6, or 12 months. Affirm performs more rigorous credit assessments and offers interest-bearing loans for larger purchases. It generates virtual card numbers at the point of sale: when a consumer is approved at checkout, Affirm creates a one-time-use virtual Visa card number, funds it, and uses it to pay the merchant through standard card rails. Affirm has also launched **Debit+**, a physical debit card that lets consumers decide on a per-transaction basis whether to pay in full or split the purchase into installments. Debit+ blurs the line between debit and BNPL — it's a debit card that carries installment lending capability, allowing consumers to turn any swipe into a financing decision at the moment of purchase rather than at checkout online.
 
 **Afterpay** (Australia, acquired by Block/Square in 2022) popularized "Pay in 4" in Australia and expanded globally. Its acquisition by Block integrated BNPL directly into the Square merchant ecosystem and Cash App consumer ecosystem.
 
 **PayPal Pay Later** leverages PayPal's existing merchant relationships and consumer base to offer BNPL — a natural extension for a platform that already sits between consumers and merchants.
+
+## BNPL 1.0 vs. BNPL 2.0
+
+The BNPL industry has evolved through two distinct phases, and understanding the shift between them explains where the market is heading.
+
+**BNPL 1.0** was merchant-driven. Providers like Klarna, Afterpay, and Affirm integrated directly into merchant checkout flows. The product was straightforward: fixed installments — typically four payments spread over six to eight weeks — offered at the point of sale. The merchant initiated the relationship by adding BNPL as a checkout option, and the provider earned revenue through merchant fees (typically around 6%). Merchants justified paying these premium fees because BNPL reliably increased average order value, improved cart conversion rates, and drove repeat purchases. The math worked: if offering BNPL at checkout converts even a fraction of abandoned carts, the incremental revenue easily covers the higher fee.
+
+**BNPL 2.0** flips the model. Instead of waiting for consumers to encounter BNPL at a merchant's checkout, providers are building consumer-first experiences — app-driven, always available, and not tied to any specific merchant. The ambition is what some in the industry call "Buy Now, Pay Anything Later." Affirm's Debit+ card is a clear example: rather than needing a merchant integration, the consumer carries a card that can turn any purchase into installments. Klarna's app now includes price comparison, deal discovery, and package tracking — features that look more like a shopping super app than a payment option.
+
+This shift from BNPL 1.0 to 2.0 represents a move from being a checkout feature that merchants opt into, to being a consumer financial tool that works everywhere. The providers that successfully make this transition will own the consumer relationship directly, rather than renting it from merchants at checkout.
 
 ## Merchant-Side vs. Issuer-Side Installments
 
@@ -117,11 +127,15 @@ The direction is clear: BNPL is being treated as credit, not as a payment method
 
 ## Why BNPL Threatens Credit Cards
 
-The competitive tension between BNPL and credit cards is real.
+The competitive tension between BNPL and credit cards is real — and it's best understood through the lens of unbundling.
+
+A credit card is a monolithic product. It bundles together a line of credit, an installment option (minimum payments), fraud protection, rewards, purchase insurance, and a payment credential — all in one piece of plastic. BNPL represents the unbundling of the credit card: taking the installment financing function and offering it as a standalone product that's simpler, more transparent, and purpose-built. Just as fintech has unbundled other monolithic financial products (neobanks unbundling the branch experience, Venmo unbundling person-to-person transfers), BNPL unbundles credit card financing into a specialized, consumer-friendly offering.
+
+The market being disrupted is enormous. US consumer credit stands at roughly $8 trillion. Credit card issuers collect approximately $121 billion in interest charges annually from revolving balances. American consumers pay another $11 billion in overdraft fees and $3 billion in late fees. BNPL's value proposition is to capture a share of this spending by offering a financing alternative that doesn't charge interest on short-term plans and doesn't require a traditional credit application.
 
 Credit cards make money when consumers carry balances and pay interest (average US credit card APR: ~24%). BNPL offers interest-free installments. For a consumer choosing between putting a $500 purchase on a credit card and potentially paying 24% interest, or splitting it into four interest-free payments via Klarna, the math is obvious.
 
-BNPL is particularly attractive to younger consumers (Gen Z and millennials) who are skeptical of traditional credit cards and credit card debt. Many BNPL users don't have credit cards — or choose not to use them.
+There's a generational dimension to this shift that goes beyond simple product preference. The 2008 financial crisis left a lasting mark on younger consumers. A generation that watched their parents struggle with mortgage debt and credit card balances grew up fundamentally suspicious of credit products. As Affirm founder Max Levchin has put it, young people became "fundamentally suspicious of credit." Many retreated to debit cards — paying only with money they already had — and avoided credit cards entirely. BNPL found a receptive audience in this cohort: it offers the ability to spread payments over time without the open-ended revolving debt, hidden fees, and compounding interest that define the credit card experience. For consumers who distrust credit but still want purchasing flexibility, BNPL occupies a middle ground between the discipline of debit and the flexibility of credit.
 
 Card issuers have responded by launching their own installment products. Chase offers "My Chase Plan," Amex has "Plan It," and Citi has "Flex Pay" — all allowing cardholders to convert purchases into installment plans. These issuer-side installment products let banks compete with BNPL while keeping transactions on their card rails and maintaining the customer relationship.
 

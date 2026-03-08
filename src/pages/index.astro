@@ -2,61 +2,13 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
 import TopicCard from '../components/TopicCard.astro';
-import { getCollection } from 'astro:content';
+import { themes, getTopicsByTheme } from '../data/themes';
 
-// Fetch published topics
-const allTopics = await getCollection('topics');
-
-// Define theme order
-const themes = [
-  {
-    name: 'Foundations',
-    description: 'Core concepts that underpin the entire payments ecosystem.',
-  },
-  {
-    name: 'Transaction Lifecycle',
-    description: 'Follow a payment from initiation to final settlement.',
-  },
-  {
-    name: 'Card Ecosystem',
-    description: 'The networks, banks, and economics behind every card payment.',
-  },
-  {
-    name: 'Non-Card Payments',
-    description: 'Payment methods beyond plastic — from bank transfers to crypto.',
-  },
-  {
-    name: 'Moving Money',
-    description: 'How funds travel across borders, banks, and networks.',
-  },
-  {
-    name: 'Products & Use Cases',
-    description: 'Real-world applications built on payments infrastructure.',
-  },
-  {
-    name: 'Trust & Compliance',
-    description: 'The rules, risks, and safeguards that keep payments secure.',
-  },
-];
-
-// Group published topics by theme
-const topicsByTheme = new Map<string, typeof allTopics>();
-for (const topic of allTopics) {
-  const theme = topic.data.theme;
-  if (!topicsByTheme.has(theme)) {
-    topicsByTheme.set(theme, []);
-  }
-  topicsByTheme.get(theme)!.push(topic);
-}
-
-// Sort topics within each theme by order
-for (const [, topics] of topicsByTheme) {
-  topics.sort((a, b) => a.data.order - b.data.order);
-}
+const { topicsByTheme } = await getTopicsByTheme();
 ---
 
 <BaseLayout
-  title="FintechAcademy"
+  title="PaymentsAcademy"
   description="A free, open knowledge base that explains the payments ecosystem — from card swipes to cross-border settlements — in plain language."
 >
   <Hero />
@@ -179,18 +131,6 @@ for (const [, topics] of topicsByTheme) {
   @media (min-width: 1024px) {
     .topic-grid {
       grid-template-columns: repeat(3, 1fr);
-    }
-  }
-
-  /* Animations */
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
     }
   }
 

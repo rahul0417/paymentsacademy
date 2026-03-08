@@ -1,6 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
 import glossaryData from '../data/glossary.json';
+
+// Build topic name mapping dynamically from content collection
+const allTopics = await getCollection('topics');
+const topicNames: Record<string, string> = Object.fromEntries(
+  allTopics.map((t) => [t.id, t.data.title])
+);
 
 // Sort terms alphabetically
 const sortedTerms = [...glossaryData].sort((a, b) =>
@@ -11,7 +18,6 @@ const sortedTerms = [...glossaryData].sort((a, b) =>
 const grouped = new Map<string, typeof sortedTerms>();
 for (const entry of sortedTerms) {
   const firstChar = entry.term[0].toUpperCase();
-  // Group numeric-starting terms under '#'
   const letter = /[A-Z]/.test(firstChar) ? firstChar : '#';
   if (!grouped.has(letter)) {
     grouped.set(letter, []);
@@ -19,46 +25,12 @@ for (const entry of sortedTerms) {
   grouped.get(letter)!.push(entry);
 }
 
-// All letters that have entries
 const activeLetters = Array.from(grouped.keys()).sort();
-// Full alphabet for nav
 const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-
-// Topic slug to display name mapping
-const topicNames: Record<string, string> = {
-  'authorization': 'Authorization',
-  'clearing-and-settlement': 'Clearing & Settlement',
-  'card-networks': 'Card Networks',
-  'interchange-fees': 'Interchange Fees',
-  'fraud-and-risk': 'Fraud & Risk',
-  'compliance-and-regulation': 'Compliance & Regulation',
-  'kyc-and-identity': 'KYC & Identity',
-  'buy-now-pay-later': 'Buy Now, Pay Later',
-  'chargebacks-and-disputes': 'Chargebacks & Disputes',
-  'digital-wallets': 'Digital Wallets',
-  'cross-border-payments': 'Cross-Border Payments',
-  'push-to-card': 'Push to Card',
-  'real-time-payments': 'Real-Time Payments',
-  'virtual-cards': 'Virtual Cards',
-  'expense-management': 'Expense Management',
-  'subscriptions-and-recurring': 'Subscriptions & Recurring',
-  'marketplaces': 'Marketplaces',
-  'b2b-payments': 'B2B Payments',
-  'issuer-processors': 'Issuer Processors',
-  'acquirer-processors': 'Acquirer Processors',
-  'credit-cards-vs-debit-cards': 'Credit Cards vs Debit Cards',
-  'acceptance-environments': 'Acceptance Environments',
-  'liability': 'Liability',
-  'cash-and-atm': 'Cash & ATM',
-  'crypto-and-defi': 'Crypto & DeFi',
-  'bank-based-payments': 'Bank-Based Payments',
-  'payments-ecosystem-overview': 'Payments Ecosystem Overview',
-  'anatomy-of-a-swipe': 'Anatomy of a Swipe',
-};
 ---
 
 <BaseLayout
-  title="Glossary | FintechAcademy"
+  title="Glossary | PaymentsAcademy"
   description="A comprehensive glossary of 137 fintech and payments terms — from ACH to Zero Liability — explained in plain language."
 >
   <section class="glossary-section">
@@ -67,7 +39,7 @@ const topicNames: Record<string, string> = {
       <div class="glossary-header">
         <h1 class="glossary-heading">Glossary</h1>
         <p class="glossary-intro">
-          137 payments and fintech terms explained in plain language. Jump to a
+          {glossaryData.length} payments and fintech terms explained in plain language. Jump to a
           letter or search to find what you need.
         </p>
       </div>
@@ -147,47 +119,70 @@ const topicNames: Record<string, string> = {
   const termCards = document.querySelectorAll('.term-card');
   const letterLinks = document.querySelectorAll('.letter-nav .letter-link');
 
+  // Pre-build search index to avoid reading DOM on every keystroke
+  const searchIndex = Array.from(termCards).map((card) => {
+    const el = card as HTMLElement;
+    return {
+      el,
+      term: el.dataset.term || '',
+      definition: el.querySelector('.term-definition')?.textContent?.toLowerCase() || '',
+    };
+  });
+
+  // Map letter groups by ID for fast lookup
+  const letterGroupMap = new Map<string, HTMLElement>();
+  letterGroups.forEach((g) => {
+    const el = g as HTMLElement;
+    if (el.id) letterGroupMap.set(el.id, el);
+  });
+
+  let debounceTimer: ReturnType<typeof setTimeout>;
+
   searchInput.addEventListener('input', () => {
-    const query = searchInput.value.toLowerCase().trim();
-    let visibleCount = 0;
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      const query = searchInput.value.toLowerCase().trim();
+      let visibleCount = 0;
+      const visibleByGroup = new Map<string, number>();
 
-    termCards.forEach((card) => {
-      const el = card as HTMLElement;
-      const term = el.dataset.term || '';
-      const definition = el.querySelector('.term-definition')?.textContent?.toLowerCase() || '';
-      const matches = !query || term.includes(query) || definition.includes(query);
-      el.style.display = matches ? '' : 'none';
-      if (matches) visibleCount++;
-    });
-
-    // Hide empty letter groups
-    letterGroups.forEach((group) => {
-      const el = group as HTMLElement;
-      const visibleTerms = el.querySelectorAll('.term-card:not([style*="display: none"])');
-      el.style.display = visibleTerms.length > 0 ? '' : 'none';
-    });
-
-    // Update letter nav active states
-    letterLinks.forEach((link) => {
-      const el = link as HTMLElement;
-      const href = el.getAttribute('href');
-      if (href) {
-        const letterId = href.replace('#', '');
-        const group = document.getElementById(letterId);
-        if (group) {
-          el.classList.toggle('letter-hidden', group.style.display === 'none');
+      searchIndex.forEach(({ el, term, definition }) => {
+        const matches = !query || term.includes(query) || definition.includes(query);
+        el.style.display = matches ? '' : 'none';
+        if (matches) {
+          visibleCount++;
+          const groupEl = el.closest('.letter-group') as HTMLElement;
+          if (groupEl?.id) {
+            visibleByGroup.set(groupEl.id, (visibleByGroup.get(groupEl.id) || 0) + 1);
+          }
         }
+      });
+
+      // Hide empty letter groups using pre-computed counts
+      letterGroupMap.forEach((el, id) => {
+        el.style.display = (visibleByGroup.get(id) || 0) > 0 ? '' : 'none';
+      });
+
+      // Update letter nav active states
+      letterLinks.forEach((link) => {
+        const el = link as HTMLElement;
+        const href = el.getAttribute('href');
+        if (href) {
+          const letterId = href.replace('#', '');
+          const group = letterGroupMap.get(letterId);
+          if (group) {
+            el.classList.toggle('letter-hidden', group.style.display === 'none');
+          }
+        }
+      });
+
+      if (query) {
+        searchCount.textContent = `${visibleCount} result${visibleCount !== 1 ? 's' : ''}`;
+      } else {
+        searchCount.textContent = '';
       }
-    });
 
-    // Show count when filtering
-    if (query) {
-      searchCount.textContent = `${visibleCount} result${visibleCount !== 1 ? 's' : ''}`;
-    } else {
-      searchCount.textContent = '';
-    }
-
-    noResults.style.display = visibleCount === 0 && query ? '' : 'none';
+      noResults.style.display = visibleCount === 0 && query ? '' : 'none';
+    }, 150);
   });
 </script>
 
@@ -397,18 +392,6 @@ const topicNames: Record<string, string> = {
     color: var(--color-text-light);
     font-size: 1.05rem;
     padding: 3rem 0;
-  }
-
-  /* Animations */
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
   }
 
   /* Dark Mode */

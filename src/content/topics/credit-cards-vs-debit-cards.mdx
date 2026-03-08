@@ -2,9 +2,9 @@
 title: "Credit Cards vs Debit Cards"
 description: "They look the same and work the same way at checkout — but credit and debit cards have fundamentally different economics, protections, and risks."
 theme: "Card Ecosystem"
-readingTime: "7 min read"
+readingTime: "11 min read"
 order: 3
-relatedTopics: ["interchange-fees", "card-networks", "chargebacks-and-disputes"]
+relatedTopics: ["interchange-fees", "card-networks", "chargebacks-and-disputes", "buy-now-pay-later", "credit-card-as-a-service"]
 glossaryTerms:
   - term: "Good Funds Model"
     definition: "The debit card model — money must be in your account before you can spend it."
@@ -20,6 +20,16 @@ glossaryTerms:
 
 import GlossaryTerm from '../../components/GlossaryTerm.astro';
 import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## A Brief History of the Credit Card
+
+The credit card as we know it started in 1949, when Diners Club introduced the first open-loop charge card — a single piece of cardboard that could be used at multiple restaurants and merchants rather than being tied to a single store. It was a charge card, not a revolving credit card (you had to pay in full each month), but it established the fundamental model: a third party sits between buyer and seller, guarantees payment to the merchant, and bills the consumer later.
+
+Bank-issued credit cards followed in the late 1950s. Bank of America launched BankAmericard in 1958 in Fresno, California, and eventually licensed it to other banks. By the mid-1970s, the infrastructure had scaled nationally, and the brands we know today emerged: BankAmericard became Visa in 1976, and the rival Interbank Card Association's Master Charge became Mastercard in 1979. By 1978, more than 11,000 banks had joined these networks, and 52 million Americans carried two or more credit cards.
+
+The next major shift came with the co-branded rewards era. Between 1986 and 1991, airlines and card issuers discovered that co-branded cards — Continental Airlines with Eastern Airlines (1986), American Airlines with Citibank (1987), and American Express with Delta (1991) — could use rewards as a powerful differentiator. Instead of competing solely on interest rates or credit limits, issuers could compete on the value of their rewards programs. This fundamentally changed how credit cards were marketed and why consumers chose one card over another.
+
+Today, there are roughly 1.12 billion credit cards in circulation in the United States alone. The average American carries 4 open revolving credit card accounts. And the market is heavily concentrated: six issuers — Bank of America, JP Morgan Chase, Capital One, American Express, Citibank, and Wells Fargo — dominate issuance. This concentration matters because it shapes interchange negotiations, rewards economics, and the competitive dynamics that every fintech entrant must navigate.
 
 ## Same Plastic, Different Universe
 
@@ -134,6 +144,14 @@ Certain industries strongly prefer credit cards for practical reasons.
 This creates an interesting wealth transfer. Merchants pay higher interchange on rewards cards. They raise prices to cover the cost. All customers pay the higher prices. But only credit card users with rewards cards get money back. Debit card users and cash users effectively subsidize credit card rewards — a dynamic that regulators and consumer advocates have increasingly scrutinized.
 
 Some debit cards have tried to offer rewards, but the math is much harder. With interchange capped at 21 cents for regulated debit, there's little revenue to fund a rewards program. Neobanks that partner with small, Durbin-exempt banks have slightly more room — which is one reason companies like Chime and Cash App partner with community banks rather than megabanks.
+
+## The Generational Shift and Blurring Lines
+
+The 2008 financial crisis reshaped how an entire generation thinks about credit. Younger consumers — millennials and Gen Z — watched their parents struggle with credit card debt during the Great Recession and grew suspicious of revolving credit altogether. Many retreated to debit cards, seeking the simplicity and control of the good funds model. Spending only what you have felt safer than maintaining a credit line you might misuse.
+
+This cultural shift created an opening for buy-now-pay-later (BNPL) products. BNPL offered a middle path: the ability to split a purchase into installments without a traditional credit card, without a revolving credit line, and often without interest (at least for shorter-term plans). For a generation that distrusted credit cards but still wanted purchasing flexibility, BNPL felt like a fundamentally different product — even though, economically, it is still a form of short-term lending.
+
+More recently, the traditional line between credit and debit has started to blur in ways that would have been unthinkable a decade ago. Products like Affirm Debit+ combine a debit card with per-transaction installment options — you carry what looks and acts like a debit card, but at checkout you can choose to split any purchase into installments. It is a debit card that can behave like a credit product on a transaction-by-transaction basis. These hybrid products challenge the clean binary of "your money vs. their money" and suggest that the next generation of card products may not fit neatly into either category.
 
 ## The Bottom Line
 

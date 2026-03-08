@@ -4,7 +4,7 @@ description: "ACH, SEPA, BACS, and the world of bank-to-bank transfers — how m
 theme: "Non-Card Payments"
 readingTime: "9 min read"
 order: 1
-relatedTopics: ["real-time-payments", "cross-border-payments", "b2b-payments"]
+relatedTopics: ["real-time-payments", "cross-border-payments", "b2b-payments", "neobanking", "embedded-finance"]
 glossaryTerms:
   - term: "ACH"
     definition: "Automated Clearing House — the US system for batch bank-to-bank transfers, handling 82% of US electronic payments."
@@ -149,6 +149,14 @@ Bank-based payments aren't superior to cards in every way. They come with real l
 **No rewards.** Consumers earn points, cash back, and miles from credit cards. Bank transfers offer none of these incentives, which limits consumer enthusiasm for switching.
 
 **International complexity.** ACH only works in the US. SEPA only works in Europe. BACS only works in the UK. Cross-border bank transfers between different systems remain expensive and slow — a problem that card networks solved decades ago with their global interoperability.
+
+## Neobanks and BaaS: Built on Bank Rails
+
+Neobanks rely heavily on bank-based payment rails as their primary money movement infrastructure. Without physical branches for cash handling, ACH, wire transfers, and real-time payments are the essential plumbing that enables deposits, withdrawals, bill payments, and peer-to-peer transfers. When a neobank customer receives their paycheck via direct deposit, transfers money to a friend, or pays their rent, those transactions flow over ACH or RTP — not card networks.
+
+Banking-as-a-Service platforms make these rails accessible to embedded finance companies without requiring direct network membership. A BaaS provider connects to ACH, wire, and RTP networks through its sponsor bank partners, then exposes those capabilities via APIs. An embedded finance platform — say, a gig economy app that wants to offer instant payouts to its workers — can initiate RTP transfers through the BaaS provider's API without ever joining the ACH network or establishing a direct relationship with the Federal Reserve. The sponsor bank handles the network membership, compliance, and settlement, while the platform focuses on the user experience.
+
+This abstraction layer is what makes modern fintech possible at scale. A decade ago, offering bank transfers required a direct banking relationship and months of integration work. Today, a platform can go live with ACH and RTP capabilities in weeks through a BaaS provider — though the regulatory responsibility still flows through to the sponsor bank.
 
 Despite these limitations, the direction is clear. Bank-based payments are growing faster than card payments in most markets. As real-time payment systems mature and Open Banking expands, bank-to-bank transfers will capture an increasing share of payment volume — especially for use cases where card economics don't make sense.
 

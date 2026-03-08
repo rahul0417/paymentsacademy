@@ -4,7 +4,7 @@ description: "Know Your Customer — why payments companies must verify identity
 theme: "Trust & Compliance"
 readingTime: "7 min read"
 order: 1
-relatedTopics: ["compliance-and-regulation", "marketplaces", "issuer-processors"]
+relatedTopics: ["compliance-and-regulation", "marketplaces", "issuer-processors", "neobanking", "embedded-finance"]
 glossaryTerms:
   - term: "KYC"
     definition: "Know Your Customer — the process of verifying a customer's identity before allowing them to open accounts or transact."
@@ -139,6 +139,14 @@ KYC requirements vary dramatically across jurisdictions. The US relies heavily o
 For companies operating globally, this means building different verification flows for each market. The four data points that work in the US are meaningless in a country without Social Security numbers. The document types, database sources, and regulatory requirements shift with every border.
 
 This is why KYC orchestration platforms — the Personas, Alloys, and Socures of the world — are so valuable. They abstract the complexity of dozens of data providers and regulatory frameworks into a single API. The fintech company defines its risk policies; the orchestration layer figures out which checks to run, in which order, for which country.
+
+## KYC in the Neobank and BaaS World
+
+For neobanks, KYC and KYB aren't just compliance requirements — they're make-or-break capabilities. Compliance gaps in AML/KYC are consistently cited as one of the top reasons neobanks fail, whether through regulatory enforcement actions, sponsor bank relationship breakdowns, or outright license revocations. A neobank that can't onboard customers quickly *and* compliantly will lose on both fronts: too much friction drives customers away, and too little scrutiny invites regulatory consequences.
+
+The Banking-as-a-Service (BaaS) model adds another layer of complexity. When a fintech platform uses a BaaS provider to offer deposit accounts or card products, the sponsor bank remains ultimately responsible for KYC compliance. But that doesn't let the platform off the hook. The sponsor bank expects — and regulators require — that the platform implements robust identity verification flows. If the platform's KYC is sloppy, the sponsor bank faces enforcement action, and the platform loses its banking partner.
+
+Companies that pursue direct bank partnerships instead of BaaS face an even steeper climb. A direct banking relationship typically requires 200+ page compliance policies covering KYC, AML, BSA, and related obligations, plus a full-time compliance team of 10 to 50 people depending on the institution's size and risk profile. This compliance infrastructure cost is a major reason most early-stage fintechs opt for BaaS partnerships rather than going direct.
 
 ## The Bottom Line
 

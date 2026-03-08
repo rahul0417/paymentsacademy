@@ -4,7 +4,7 @@ description: "The hidden fee behind every card transaction — who pays it, who 
 theme: "Card Ecosystem"
 readingTime: "9 min read"
 order: 4
-relatedTopics: ["card-networks", "credit-cards-vs-debit-cards", "clearing-and-settlement"]
+relatedTopics: ["card-networks", "credit-cards-vs-debit-cards", "clearing-and-settlement", "embedded-finance", "credit-card-as-a-service"]
 glossaryTerms:
   - term: "Interchange"
     definition: "A fee paid by the merchant's bank (acquirer) to the cardholder's bank (issuer) on each card transaction."
@@ -162,5 +162,17 @@ If you're building a fintech company, interchange is likely either your primary 
 **If you're a merchant platform or PSP**, interchange is the largest cost in your payment acceptance stack. Your pricing model (blended vs. interchange-plus), your network routing strategy (PIN debit vs. signature), and your merchant mix (low-MCC grocery vs. high-MCC luxury retail) all drive profitability.
 
 **If you're building anything on card rails**, interchange sets the floor for transaction costs and defines the economic relationships between every participant in the ecosystem.
+
+### Interchange as Embedded Finance Revenue
+
+For platforms offering embedded card products, interchange is a primary revenue stream — and often a transformative one. Consider a SaaS platform that issues business expense cards to its customers through an embedded finance partnership. That platform earns 1 to 3% interchange on every transaction its customers make. For a platform with thousands of business customers swiping cards daily, interchange revenue can reach 2 to 5x the platform's core subscription revenue. This is why vertical SaaS companies from restaurant management to construction software are racing to embed card products.
+
+### Co-Brand Interchange Sharing
+
+In co-branded card programs, interchange revenue doesn't flow to a single party — it's shared between the issuing bank, the Credit Card-as-a-Service (CCaaS) provider (if one is involved), and the brand partner. The issuing bank earns interchange on every swipe, then shares a portion with the brand partner as a rebate or revenue share. If a CCaaS provider like Deserve or Cardless is powering the program, they take a slice as well. This interchange sharing arrangement is what makes co-brand partnerships financially viable for all parties: the brand drives card adoption and transaction volume, the bank earns interest and fee income, and the CCaaS provider earns its technology fee from the interchange pool.
+
+### BNPL Merchant Economics
+
+Buy Now, Pay Later providers occupy an unusual position in the interchange landscape. BNPL providers typically charge merchants around 6% per transaction — roughly double or triple the 2 to 3% that card payments cost. So why do merchants accept this? Because BNPL drives measurably higher average order values (often 30 to 50% higher), better cart conversion rates (reducing abandonment at checkout), and more repeat purchases from customers who might not have bought at all without the installment option. For merchants, the higher per-transaction cost is offset by the incremental revenue that BNPL generates.
 
 Interchange isn't glamorous. But it's the single most important number in payments.

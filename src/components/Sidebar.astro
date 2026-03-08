@@ -1,5 +1,5 @@
 ---
-import { getCollection } from 'astro:content';
+import { themeNames, getTopicsByTheme } from '../data/themes';
 
 interface Props {
   currentSlug: string;
@@ -7,25 +7,11 @@ interface Props {
 
 const { currentSlug } = Astro.props;
 
-const allTopics = await getCollection('topics');
+const { topicsByTheme } = await getTopicsByTheme();
 
-const themeOrder = [
-  'Foundations',
-  'Transaction Lifecycle',
-  'Card Ecosystem',
-  'Non-Card Payments',
-  'Moving Money',
-  'Products & Use Cases',
-  'Trust & Compliance',
-] as const;
-
-// Group topics by theme and sort by order within each theme
-const groupedTopics = themeOrder.map((theme) => {
-  const topics = allTopics
-    .filter((t) => t.data.theme === theme)
-    .sort((a, b) => a.data.order - b.data.order);
-  return { theme, topics };
-}).filter((group) => group.topics.length > 0);
+const groupedTopics = themeNames
+  .map((theme) => ({ theme, topics: topicsByTheme.get(theme) || [] }))
+  .filter((group) => group.topics.length > 0);
 ---
 
 <aside class="sidebar" id="topic-sidebar">

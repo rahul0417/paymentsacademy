@@ -275,7 +275,7 @@ const badgeColor = themeColors[theme] || 'var(--color-text-medium)';
     }
   }
 
-  @media (prefers-color-scheme: dark) {
+  html[data-theme="dark"] {
     .topic-title {
       color: var(--color-night-text);
     }

@@ -1,0 +1,378 @@
+---
+---
+
+<!-- Search Modal Overlay -->
+<div id="search-overlay" class="search-overlay" role="dialog" aria-modal="true" aria-label="Site search" hidden>
+  <div class="search-backdrop"></div>
+  <div class="search-container">
+    <div class="search-header">
+      <div class="search-input-wrapper">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <circle cx="7" cy="7" r="5" />
+          <path d="M11 11l3.5 3.5" />
+        </svg>
+        <input
+          id="search-input"
+          type="text"
+          placeholder="Search articles, topics, glossary..."
+          autocomplete="off"
+          autofocus
+        />
+        <kbd class="search-esc">Esc</kbd>
+      </div>
+    </div>
+    <div id="search-results" class="search-results">
+      <div class="search-empty">
+        <p class="search-empty-text">Start typing to search across all content.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .search-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 10vh;
+  }
+
+  .search-overlay[hidden] {
+    display: none;
+  }
+
+  .search-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 54, 34, 0.4);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .search-container {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 1rem;
+    background: var(--color-white);
+    border-radius: 0.75rem;
+    box-shadow: 0 20px 60px rgba(6, 54, 34, 0.2), 0 0 0 1px rgba(6, 54, 34, 0.08);
+    overflow: hidden;
+    max-height: 70vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .search-header {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--color-pale-mint-dark);
+  }
+
+  .search-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.4rem 0.5rem;
+    border-radius: 0.5rem;
+    background: var(--color-pale-mint);
+    border: 1.5px solid transparent;
+    transition: border-color 0.2s ease;
+  }
+
+  .search-input-wrapper:focus-within {
+    border-color: var(--color-racing-green);
+  }
+
+  .search-icon {
+    flex-shrink: 0;
+    color: var(--color-text-light);
+  }
+
+  #search-input {
+    flex: 1;
+    background: none;
+    border: none;
+    outline: none;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    color: var(--color-text-dark);
+    min-width: 0;
+  }
+
+  #search-input::placeholder {
+    color: var(--color-text-light);
+  }
+
+  .search-esc {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.15rem 0.4rem;
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    color: var(--color-text-light);
+    background: var(--color-white);
+    border: 1px solid var(--color-pale-mint-dark);
+    border-radius: 0.25rem;
+    line-height: 1;
+  }
+
+  .search-results {
+    overflow-y: auto;
+    padding: 0.5rem;
+  }
+
+  .search-empty {
+    padding: 2rem 1rem;
+    text-align: center;
+  }
+
+  .search-empty-text {
+    color: var(--color-text-light);
+    font-size: 0.875rem;
+    margin: 0;
+  }
+
+  .search-result-item {
+    display: block;
+    padding: 0.75rem 0.75rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: background-color 0.15s ease;
+  }
+
+  .search-result-item:hover,
+  .search-result-item.active {
+    background: var(--color-pale-mint);
+  }
+
+  .search-result-title {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--color-racing-green);
+    margin: 0 0 0.25rem 0;
+    line-height: 1.3;
+  }
+
+  .search-result-excerpt {
+    font-size: 0.82rem;
+    color: var(--color-text-medium);
+    margin: 0;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .search-result-excerpt mark {
+    background: var(--color-peach);
+    color: var(--color-text-dark);
+    border-radius: 2px;
+    padding: 0 1px;
+  }
+
+  .search-no-results {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: var(--color-text-light);
+    font-size: 0.875rem;
+  }
+
+  .search-loading {
+    padding: 2rem 1rem;
+    text-align: center;
+    color: var(--color-text-light);
+    font-size: 0.875rem;
+  }
+
+  /* Dark mode */
+  html[data-theme="dark"] {
+    .search-backdrop {
+      background: rgba(0, 0, 0, 0.6);
+    }
+
+    .search-container {
+      background: var(--color-night-surface);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--color-night-elevated);
+    }
+
+    .search-header {
+      border-bottom-color: var(--color-night-elevated);
+    }
+
+    .search-input-wrapper {
+      background: var(--color-night);
+    }
+
+    .search-input-wrapper:focus-within {
+      border-color: var(--color-night-accent);
+    }
+
+    .search-icon {
+      color: var(--color-night-text-muted);
+    }
+
+    #search-input {
+      color: var(--color-night-text);
+    }
+
+    #search-input::placeholder {
+      color: var(--color-night-text-muted);
+    }
+
+    .search-esc {
+      background: var(--color-night-elevated);
+      border-color: var(--color-night-elevated);
+      color: var(--color-night-text-muted);
+    }
+
+    .search-empty-text,
+    .search-no-results,
+    .search-loading {
+      color: var(--color-night-text-muted);
+    }
+
+    .search-result-item:hover,
+    .search-result-item.active {
+      background: var(--color-night-elevated);
+    }
+
+    .search-result-title {
+      color: var(--color-night-accent);
+    }
+
+    .search-result-excerpt {
+      color: var(--color-night-text-muted);
+    }
+
+    .search-result-excerpt mark {
+      background: rgba(255, 218, 179, 0.25);
+      color: var(--color-night-text);
+    }
+  }
+</style>
+
+<script is:inline>
+  (function() {
+    var pagefind = null;
+    var activeIndex = -1;
+
+    var overlay = document.getElementById('search-overlay');
+    var input = document.getElementById('search-input');
+    var resultsContainer = document.getElementById('search-results');
+
+    async function initPagefind() {
+      if (pagefind) return;
+      try {
+        pagefind = await import('/pagefind/pagefind.js');
+        await pagefind.init();
+      } catch (e) {
+        console.warn('Pagefind not available — run a production build first.', e);
+      }
+    }
+
+    function openSearch() {
+      overlay.hidden = false;
+      document.body.style.overflow = 'hidden';
+      input.value = '';
+      resetResults();
+      requestAnimationFrame(function() { input.focus(); });
+      initPagefind();
+    }
+
+    function closeSearch() {
+      overlay.hidden = true;
+      document.body.style.overflow = '';
+      activeIndex = -1;
+    }
+
+    function resetResults() {
+      resultsContainer.innerHTML =
+        '<div class="search-empty"><p class="search-empty-text">Start typing to search across all content.</p></div>';
+      activeIndex = -1;
+    }
+
+    var debounceTimer;
+    async function performSearch(query) {
+      if (!query.trim()) { resetResults(); return; }
+      if (!pagefind) {
+        resultsContainer.innerHTML = '<div class="search-loading">Loading search index...</div>';
+        await initPagefind();
+        if (!pagefind) {
+          resultsContainer.innerHTML = '<div class="search-no-results">Search is unavailable. Build the site first.</div>';
+          return;
+        }
+      }
+      var search = await pagefind.search(query);
+      var results = await Promise.all(search.results.slice(0, 8).map(function(r) { return r.data(); }));
+
+      if (results.length === 0) {
+        resultsContainer.innerHTML = '<div class="search-no-results">No results for \u201c<strong>' + escapeHtml(query) + '</strong>\u201d</div>';
+        activeIndex = -1;
+        return;
+      }
+
+      resultsContainer.innerHTML = results.map(function(r, i) {
+        return '<a href="' + r.url + '" class="search-result-item" data-index="' + i + '">' +
+          '<p class="search-result-title">' + escapeHtml(r.meta && r.meta.title ? r.meta.title : 'Untitled') + '</p>' +
+          '<p class="search-result-excerpt">' + (r.excerpt || '') + '</p></a>';
+      }).join('');
+      activeIndex = -1;
+    }
+
+    function escapeHtml(str) {
+      var div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function getResultItems() {
+      return Array.from(resultsContainer.querySelectorAll('.search-result-item'));
+    }
+
+    function updateActiveItem(items) {
+      items.forEach(function(item, i) { item.classList.toggle('active', i === activeIndex); });
+      if (activeIndex >= 0 && items[activeIndex]) {
+        items[activeIndex].scrollIntoView({ block: 'nearest' });
+      }
+    }
+
+    input.addEventListener('input', function() {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(function() { performSearch(input.value); }, 200);
+    });
+
+    input.addEventListener('keydown', function(e) {
+      var items = getResultItems();
+      if (e.key === 'ArrowDown') {
+        e.preventDefault(); activeIndex = Math.min(activeIndex + 1, items.length - 1); updateActiveItem(items);
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault(); activeIndex = Math.max(activeIndex - 1, -1); updateActiveItem(items);
+      } else if (e.key === 'Enter' && activeIndex >= 0 && items[activeIndex]) {
+        e.preventDefault(); items[activeIndex].click();
+      } else if (e.key === 'Escape') {
+        e.preventDefault(); closeSearch();
+      }
+    });
+
+    overlay.addEventListener('click', function(e) {
+      if (e.target.classList.contains('search-backdrop')) closeSearch();
+    });
+
+    document.addEventListener('keydown', function(e) {
+      var tag = e.target.tagName;
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      if (e.key === '/' && !e.metaKey && !e.ctrlKey) { e.preventDefault(); openSearch(); }
+    });
+
+    document.querySelectorAll('.search-trigger').forEach(function(btn) {
+      btn.addEventListener('click', function(e) { e.preventDefault(); openSearch(); });
+    });
+  })();
+</script>

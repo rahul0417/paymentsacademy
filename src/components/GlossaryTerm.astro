@@ -75,7 +75,7 @@ const termSlug = term.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, '');
     visibility: visible;
   }
 
-  @media (prefers-color-scheme: dark) {
+  html[data-theme="dark"] {
     .glossary-term {
       border-bottom-color: var(--color-night-accent);
     }

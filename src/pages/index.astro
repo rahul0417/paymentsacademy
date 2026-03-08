@@ -7,7 +7,7 @@ import { getCollection } from 'astro:content';
 // Fetch published topics
 const allTopics = await getCollection('topics');
 
-// Define theme order and placeholder topics for coming-soon themes
+// Define theme order
 const themes = [
   {
     name: 'Foundations',
@@ -16,62 +16,26 @@ const themes = [
   {
     name: 'Transaction Lifecycle',
     description: 'Follow a payment from initiation to final settlement.',
-    placeholders: [
-      'Authorization',
-      'Clearing & Settlement',
-      'Chargebacks & Disputes',
-    ],
   },
   {
     name: 'Card Ecosystem',
     description: 'The networks, banks, and economics behind every card payment.',
-    placeholders: [
-      'Card Networks',
-      'Credit vs Debit Cards',
-      'Interchange Fees',
-      'Acceptance Environments',
-    ],
   },
   {
     name: 'Non-Card Payments',
     description: 'Payment methods beyond plastic — from bank transfers to crypto.',
-    placeholders: [
-      'Bank-Based Payments',
-      'Digital Wallets',
-      'Buy Now Pay Later',
-      'Cash & ATM',
-      'Crypto & DeFi',
-    ],
   },
   {
     name: 'Moving Money',
     description: 'How funds travel across borders, banks, and networks.',
-    placeholders: [
-      'Cross-Border Payments',
-      'Push-to-Card',
-      'Real-Time Payments',
-    ],
   },
   {
     name: 'Products & Use Cases',
     description: 'Real-world applications built on payments infrastructure.',
-    placeholders: [
-      'Virtual Cards',
-      'Expense Management',
-      'Subscriptions & Recurring',
-      'Marketplaces',
-      'B2B Payments',
-    ],
   },
   {
     name: 'Trust & Compliance',
     description: 'The rules, risks, and safeguards that keep payments secure.',
-    placeholders: [
-      'KYC & Identity',
-      'Compliance & Regulation',
-      'Fraud & Risk',
-      'Liability',
-    ],
   },
 ];
 
@@ -110,8 +74,6 @@ for (const [, topics] of topicsByTheme) {
 
       {themes.map((theme, themeIndex) => {
         const publishedTopics = topicsByTheme.get(theme.name) || [];
-        const placeholders = theme.placeholders || [];
-        const hasPublished = publishedTopics.length > 0;
 
         return (
           <div
@@ -124,7 +86,6 @@ for (const [, topics] of topicsByTheme) {
             </div>
 
             <div class="topic-grid">
-              {/* Published topics */}
               {publishedTopics.map((topic) => (
                 <TopicCard
                   title={topic.data.title}
@@ -132,14 +93,6 @@ for (const [, topics] of topicsByTheme) {
                   theme={topic.data.theme}
                   readingTime={topic.data.readingTime}
                   href={`/topics/${topic.id}`}
-                />
-              ))}
-
-              {/* Placeholder coming-soon topics */}
-              {placeholders.map((title) => (
-                <TopicCard
-                  title={title}
-                  theme={theme.name}
                 />
               ))}
             </div>
@@ -242,7 +195,7 @@ for (const [, topics] of topicsByTheme) {
   }
 
   /* Dark mode */
-  @media (prefers-color-scheme: dark) {
+  html[data-theme="dark"] {
     .topics-heading {
       color: var(--color-night-text);
     }

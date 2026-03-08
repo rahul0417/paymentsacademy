@@ -195,7 +195,7 @@ const colors = themeColors[theme] || themeColors['Foundations'];
   }
 
   /* Dark mode */
-  @media (prefers-color-scheme: dark) {
+  html[data-theme="dark"] {
     .card {
       background-color: var(--color-night-surface);
       border-color: var(--color-night-elevated);
@@ -251,15 +251,22 @@ const colors = themeColors[theme] || themeColors['Foundations'];
 <script>
   // Apply dark mode colors to theme badges
   function applyDarkModeColors() {
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     document.querySelectorAll('.card-theme[data-dark-bg]').forEach((el) => {
       const badge = el as HTMLElement;
       if (isDark) {
         badge.style.backgroundColor = badge.dataset.darkBg || '';
         badge.style.color = badge.dataset.darkText || '';
+      } else {
+        // Reset to light mode inline styles from the template
+        badge.style.backgroundColor = '';
+        badge.style.color = '';
       }
     });
   }
   applyDarkModeColors();
+  // Re-apply when theme attribute changes
+  const observer = new MutationObserver(applyDarkModeColors);
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyDarkModeColors);
 </script>

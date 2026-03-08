@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "postbuild": "npx pagefind --site dist",
     "preview": "astro preview",
     "astro": "astro",
     "ingest": "node scripts/ingest.mjs"
@@ -19,5 +20,8 @@
     "mermaid": "^11.12.3",
     "pdf-parse": "^1.1.1",
     "tailwindcss": "^4.2.1"
+  },
+  "devDependencies": {
+    "pagefind": "^1.4.0"
   }
 }

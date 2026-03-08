@@ -38,6 +38,23 @@ const fullTitle = title === 'FintechAcademy' ? title : `${title} — FintechAcad
     <meta property="og:type" content="website" />
 
     <title>{fullTitle}</title>
+
+    <!-- Apply theme before paint to prevent flash -->
+    <script is:inline>
+      (function() {
+        try {
+          var stored = localStorage.getItem('theme-preference');
+        } catch(e) {
+          var stored = null;
+        }
+        var preference = stored || 'system';
+        var resolved = preference === 'system'
+          ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+          : preference;
+        document.documentElement.setAttribute('data-theme', resolved);
+        document.documentElement.setAttribute('data-theme-preference', preference);
+      })();
+    </script>
   </head>
   <body class="min-h-screen flex flex-col">
     <Header />

@@ -1,0 +1,528 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import glossaryData from '../data/glossary.json';
+
+// Sort terms alphabetically
+const sortedTerms = [...glossaryData].sort((a, b) =>
+  a.term.localeCompare(b.term, 'en', { sensitivity: 'base' })
+);
+
+// Group by first letter
+const grouped = new Map<string, typeof sortedTerms>();
+for (const entry of sortedTerms) {
+  const firstChar = entry.term[0].toUpperCase();
+  // Group numeric-starting terms under '#'
+  const letter = /[A-Z]/.test(firstChar) ? firstChar : '#';
+  if (!grouped.has(letter)) {
+    grouped.set(letter, []);
+  }
+  grouped.get(letter)!.push(entry);
+}
+
+// All letters that have entries
+const activeLetters = Array.from(grouped.keys()).sort();
+// Full alphabet for nav
+const alphabet = '#ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+
+// Topic slug to display name mapping
+const topicNames: Record<string, string> = {
+  'authorization': 'Authorization',
+  'clearing-and-settlement': 'Clearing & Settlement',
+  'card-networks': 'Card Networks',
+  'interchange-fees': 'Interchange Fees',
+  'fraud-and-risk': 'Fraud & Risk',
+  'compliance-and-regulation': 'Compliance & Regulation',
+  'kyc-and-identity': 'KYC & Identity',
+  'buy-now-pay-later': 'Buy Now, Pay Later',
+  'chargebacks-and-disputes': 'Chargebacks & Disputes',
+  'digital-wallets': 'Digital Wallets',
+  'cross-border-payments': 'Cross-Border Payments',
+  'push-to-card': 'Push to Card',
+  'real-time-payments': 'Real-Time Payments',
+  'virtual-cards': 'Virtual Cards',
+  'expense-management': 'Expense Management',
+  'subscriptions-and-recurring': 'Subscriptions & Recurring',
+  'marketplaces': 'Marketplaces',
+  'b2b-payments': 'B2B Payments',
+  'issuer-processors': 'Issuer Processors',
+  'acquirer-processors': 'Acquirer Processors',
+  'credit-cards-vs-debit-cards': 'Credit Cards vs Debit Cards',
+  'acceptance-environments': 'Acceptance Environments',
+  'liability': 'Liability',
+  'cash-and-atm': 'Cash & ATM',
+  'crypto-and-defi': 'Crypto & DeFi',
+  'bank-based-payments': 'Bank-Based Payments',
+  'payments-ecosystem-overview': 'Payments Ecosystem Overview',
+  'anatomy-of-a-swipe': 'Anatomy of a Swipe',
+};
+---
+
+<BaseLayout
+  title="Glossary | FintechAcademy"
+  description="A comprehensive glossary of 137 fintech and payments terms — from ACH to Zero Liability — explained in plain language."
+>
+  <section class="glossary-section">
+    <div class="glossary-container">
+      <!-- Header -->
+      <div class="glossary-header">
+        <h1 class="glossary-heading">Glossary</h1>
+        <p class="glossary-intro">
+          137 payments and fintech terms explained in plain language. Jump to a
+          letter or search to find what you need.
+        </p>
+      </div>
+
+      <!-- Search -->
+      <div class="search-wrapper">
+        <div class="search-box">
+          <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            type="text"
+            id="glossary-search"
+            placeholder="Search terms..."
+            autocomplete="off"
+          />
+          <span id="search-count" class="search-count"></span>
+        </div>
+      </div>
+
+      <!-- Letter Nav -->
+      <nav class="letter-nav" aria-label="Alphabetical navigation">
+        {alphabet.map((letter) => {
+          const isActive = activeLetters.includes(letter);
+          return isActive ? (
+            <a href={`#letter-${letter}`} class="letter-link">{letter}</a>
+          ) : (
+            <span class="letter-link letter-disabled">{letter}</span>
+          );
+        })}
+      </nav>
+
+      <!-- Glossary List -->
+      <div id="glossary-list" class="glossary-list">
+        <p id="no-results" class="no-results" style="display: none;">
+          No terms match your search.
+        </p>
+
+        {activeLetters.map((letter) => (
+          <div class="letter-group" data-letter={letter} id={`letter-${letter}`}>
+            <h2 class="letter-heading">{letter}</h2>
+            <div class="terms-list">
+              {grouped.get(letter)!.map((entry) => (
+                <div class="term-card" data-term={entry.term.toLowerCase()}>
+                  <div class="term-content">
+                    <h3 class="term-name">{entry.term}</h3>
+                    <p class="term-definition">{entry.definition}</p>
+                    {entry.relatedTopic && (
+                      <a
+                        href={`/topics/${entry.relatedTopic}`}
+                        class="term-topic-link"
+                      >
+                        Learn more: {topicNames[entry.relatedTopic] || entry.relatedTopic}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <line x1="5" y1="12" x2="19" y2="12"></line>
+                          <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const searchInput = document.getElementById('glossary-search') as HTMLInputElement;
+  const searchCount = document.getElementById('search-count') as HTMLSpanElement;
+  const noResults = document.getElementById('no-results') as HTMLParagraphElement;
+  const letterGroups = document.querySelectorAll('.letter-group');
+  const termCards = document.querySelectorAll('.term-card');
+  const letterLinks = document.querySelectorAll('.letter-nav .letter-link');
+
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase().trim();
+    let visibleCount = 0;
+
+    termCards.forEach((card) => {
+      const el = card as HTMLElement;
+      const term = el.dataset.term || '';
+      const definition = el.querySelector('.term-definition')?.textContent?.toLowerCase() || '';
+      const matches = !query || term.includes(query) || definition.includes(query);
+      el.style.display = matches ? '' : 'none';
+      if (matches) visibleCount++;
+    });
+
+    // Hide empty letter groups
+    letterGroups.forEach((group) => {
+      const el = group as HTMLElement;
+      const visibleTerms = el.querySelectorAll('.term-card:not([style*="display: none"])');
+      el.style.display = visibleTerms.length > 0 ? '' : 'none';
+    });
+
+    // Update letter nav active states
+    letterLinks.forEach((link) => {
+      const el = link as HTMLElement;
+      const href = el.getAttribute('href');
+      if (href) {
+        const letterId = href.replace('#', '');
+        const group = document.getElementById(letterId);
+        if (group) {
+          el.classList.toggle('letter-hidden', group.style.display === 'none');
+        }
+      }
+    });
+
+    // Show count when filtering
+    if (query) {
+      searchCount.textContent = `${visibleCount} result${visibleCount !== 1 ? 's' : ''}`;
+    } else {
+      searchCount.textContent = '';
+    }
+
+    noResults.style.display = visibleCount === 0 && query ? '' : 'none';
+  });
+</script>
+
+<style>
+  /* Glossary Section */
+  .glossary-section {
+    padding: 2rem 1.5rem 5rem;
+  }
+
+  .glossary-container {
+    max-width: 52rem;
+    margin: 0 auto;
+  }
+
+  /* Header */
+  .glossary-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    animation: fadeInUp 0.6s ease both;
+  }
+
+  .glossary-heading {
+    font-family: var(--font-heading);
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--color-racing-green);
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.02em;
+  }
+
+  .glossary-intro {
+    font-size: 1.05rem;
+    color: var(--color-text-medium);
+    max-width: 32rem;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* Search */
+  .search-wrapper {
+    margin-bottom: 1.5rem;
+    animation: fadeInUp 0.6s ease 0.1s both;
+  }
+
+  .search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 1rem;
+    color: var(--color-text-light);
+    pointer-events: none;
+  }
+
+  #glossary-search {
+    width: 100%;
+    padding: 0.85rem 1rem 0.85rem 2.75rem;
+    border: 1.5px solid var(--color-pale-mint-dark);
+    border-radius: 0.75rem;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    color: var(--color-text-dark);
+    background: var(--color-white);
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+
+  #glossary-search::placeholder {
+    color: var(--color-text-light);
+  }
+
+  #glossary-search:focus {
+    border-color: var(--color-racing-green);
+    box-shadow: 0 0 0 3px rgba(6, 54, 34, 0.08);
+  }
+
+  .search-count {
+    position: absolute;
+    right: 1rem;
+    font-size: 0.8rem;
+    color: var(--color-text-light);
+    pointer-events: none;
+  }
+
+  /* Letter Nav */
+  .letter-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    justify-content: center;
+    margin-bottom: 2.5rem;
+    padding: 0.75rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--color-white);
+    border-bottom: 1px solid var(--color-pale-mint-dark);
+    animation: fadeInUp 0.6s ease 0.15s both;
+  }
+
+  .letter-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-racing-green);
+    text-decoration: none;
+    border-radius: 0.375rem;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .letter-link:hover {
+    background: var(--color-pale-mint);
+  }
+
+  .letter-disabled {
+    color: var(--color-text-light);
+    opacity: 0.4;
+    cursor: default;
+  }
+
+  .letter-disabled:hover {
+    background: transparent;
+  }
+
+  .letter-hidden {
+    opacity: 0.3;
+  }
+
+  /* Letter Groups */
+  .letter-group {
+    margin-bottom: 2.5rem;
+  }
+
+  .letter-heading {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-racing-green);
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid var(--color-pale-mint);
+  }
+
+  /* Term Cards */
+  .terms-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .term-card {
+    padding: 1.25rem 1.5rem;
+    background: var(--color-white);
+    border: 1px solid var(--color-pale-mint-dark);
+    border-radius: 0.75rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .term-card:hover {
+    border-color: var(--color-racing-green);
+    box-shadow: 0 2px 8px rgba(6, 54, 34, 0.06);
+  }
+
+  .term-name {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-racing-green);
+    margin-bottom: 0.4rem;
+  }
+
+  .term-definition {
+    font-size: 0.95rem;
+    color: var(--color-text-medium);
+    line-height: 1.65;
+    margin-bottom: 0.5rem;
+  }
+
+  .term-topic-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-racing-green);
+    text-decoration: none;
+    opacity: 0.8;
+    transition: opacity 0.15s;
+  }
+
+  .term-topic-link:hover {
+    opacity: 1;
+    text-decoration: underline;
+  }
+
+  /* No Results */
+  .no-results {
+    text-align: center;
+    color: var(--color-text-light);
+    font-size: 1.05rem;
+    padding: 3rem 0;
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Dark Mode */
+  html[data-theme="dark"] {
+    .glossary-heading {
+      color: var(--color-night-text);
+    }
+
+    .glossary-intro {
+      color: var(--color-night-text-muted);
+    }
+
+    #glossary-search {
+      background: var(--color-night-surface);
+      border-color: var(--color-night-elevated);
+      color: var(--color-night-text);
+    }
+
+    #glossary-search::placeholder {
+      color: var(--color-night-text-muted);
+    }
+
+    #glossary-search:focus {
+      border-color: var(--color-night-accent);
+      box-shadow: 0 0 0 3px rgba(255, 218, 179, 0.1);
+    }
+
+    .search-icon {
+      color: var(--color-night-text-muted);
+    }
+
+    .search-count {
+      color: var(--color-night-text-muted);
+    }
+
+    .letter-nav {
+      background: var(--color-night);
+      border-bottom-color: var(--color-night-elevated);
+    }
+
+    .letter-link {
+      color: var(--color-night-text);
+    }
+
+    .letter-link:hover {
+      background: var(--color-night-elevated);
+    }
+
+    .letter-disabled {
+      color: var(--color-night-text-muted);
+    }
+
+    .letter-disabled:hover {
+      background: transparent;
+    }
+
+    .letter-heading {
+      color: var(--color-night-text);
+      border-bottom-color: var(--color-night-elevated);
+    }
+
+    .term-card {
+      background: var(--color-night-surface);
+      border-color: var(--color-night-elevated);
+    }
+
+    .term-card:hover {
+      border-color: var(--color-night-accent);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .term-name {
+      color: var(--color-night-text);
+    }
+
+    .term-definition {
+      color: var(--color-night-text-muted);
+    }
+
+    .term-topic-link {
+      color: var(--color-night-accent);
+    }
+
+    .no-results {
+      color: var(--color-night-text-muted);
+    }
+  }
+
+  /* Responsive */
+  @media (min-width: 768px) {
+    .glossary-section {
+      padding: 3rem 2rem 6rem;
+    }
+
+    .glossary-heading {
+      font-size: 2.5rem;
+    }
+
+    .letter-link {
+      width: 2.25rem;
+      height: 2.25rem;
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .letter-link {
+      width: 1.75rem;
+      height: 1.75rem;
+      font-size: 0.75rem;
+    }
+
+    .term-card {
+      padding: 1rem 1.15rem;
+    }
+  }
+</style>

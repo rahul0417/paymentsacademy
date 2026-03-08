@@ -196,7 +196,7 @@ a:hover {
 }
 
 /* --- Dark Mode --- */
-@media (prefers-color-scheme: dark) {
+html[data-theme="dark"] {
   body {
     background-color: var(--color-night);
     color: var(--color-night-text);

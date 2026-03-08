@@ -56,7 +56,7 @@ const diagramId = `mermaid-${Math.random().toString(36).slice(2, 9)}`;
     font-family: var(--font-body);
   }
 
-  @media (prefers-color-scheme: dark) {
+  html[data-theme="dark"] {
     .mermaid-diagram {
       background-color: var(--color-night-surface);
       border-color: var(--color-night-elevated);
@@ -76,7 +76,7 @@ const diagramId = `mermaid-${Math.random().toString(36).slice(2, 9)}`;
   async function initMermaid() {
     const mermaid = (await import('mermaid')).default;
 
-    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
     mermaid.initialize({
       startOnLoad: false,

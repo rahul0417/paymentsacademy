@@ -1,4 +1,7 @@
 ---
+import ThemeToggle from './ThemeToggle.astro';
+import Search from './Search.astro';
+
 const navItems = [
   { label: 'Home', href: '/' },
   { label: 'Topics', href: '/topics' },
@@ -39,6 +42,8 @@ const navItems = [
             </li>
           ))}
         </ul>
+
+        <ThemeToggle />
 
         <!-- Search placeholder -->
         <button
@@ -97,6 +102,8 @@ const navItems = [
     </div>
   </div>
 </header>
+
+<Search />
 
 <style>
   .header-inner {
@@ -181,7 +188,7 @@ const navItems = [
     line-height: 1;
   }
 
-  @media (prefers-color-scheme: dark) {
+  html[data-theme="dark"] {
     .header-inner {
       background-color: color-mix(in srgb, var(--color-night) 85%, transparent);
     }

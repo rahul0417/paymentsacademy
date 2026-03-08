@@ -4,7 +4,7 @@ description: "ACH, SEPA, BACS, and the world of bank-to-bank transfers — how m
 theme: "Non-Card Payments"
 readingTime: "9 min read"
 order: 1
-relatedTopics: ["real-time-payments", "cross-border-payments", "b2b-payments", "neobanking", "embedded-finance"]
+relatedTopics: ["real-time-payments", "cross-border-payments", "b2b-payments", "neobanking", "embedded-finance", "open-banking", "electronic-money-institutions"]
 glossaryTerms:
   - term: "ACH"
     definition: "Automated Clearing House — the US system for batch bank-to-bank transfers, handling 82% of US electronic payments."
@@ -113,6 +113,22 @@ The UK went further with its Open Banking Implementation Entity, mandating stand
 Why does this matter for payments? Because Open Banking enables a new type of bank-to-bank payment that bypasses cards entirely. Instead of entering card details at checkout, a consumer can authorize a direct bank transfer through their banking app. The merchant avoids card interchange fees. The payment settles quickly (often instantly with Faster Payments or SEPA Instant). And the consumer authenticates with their bank's security — no card number to steal.
 
 Companies like TrueLayer, Plaid, and Tink are building the infrastructure layer that makes Open Banking payments seamless for merchants and consumers.
+
+### Pay by Bank: How It Actually Works
+
+The most tangible consumer-facing application of Open Banking is **Pay by Bank** — a checkout option that lets customers pay directly from their bank account instead of entering card details. The mechanics follow a clear flow: the customer selects "Pay by Bank" at checkout, chooses their bank from a list, is redirected to their bank's app or website for authentication (typically via biometrics or their existing banking credentials), and the bank sends the payment directly to the merchant's account. The entire process takes seconds.
+
+What makes Pay by Bank commercially compelling is the fee structure. Because the payment bypasses card networks entirely, there are no interchange fees, no scheme assessment fees, and no issuer markups. Typical Pay by Bank fees run around 0.5% of the transaction value — compared to 2-3% for card payments. For a merchant processing $10 million annually, switching even a portion of transactions from cards to Pay by Bank can save hundreds of thousands of dollars per year.
+
+The trade-off is consumer incentive. Card payments offer rewards points, cashback, and purchase protection. Pay by Bank offers none of these. Merchant adoption is growing fastest in use cases where the consumer doesn't strongly prefer cards — bill payments, rent, high-value purchases where the percentage-based card fee becomes painful, and account funding flows.
+
+### Variable Recurring Payments (VRP)
+
+The UK has pioneered **Variable Recurring Payments (VRP)** — an open banking innovation that extends the Pay by Bank concept to recurring payments. Traditional direct debits (via BACS) work well for fixed recurring amounts, but they are inflexible for variable charges and slow to set up. VRP solves this by allowing a customer to grant a merchant ongoing consent to initiate payments from their bank account, within agreed parameters — maximum amount per payment, maximum frequency, and total spending limits.
+
+The customer authenticates once with their bank to set up the VRP mandate, and subsequent payments are initiated automatically without requiring re-authentication — as long as they fall within the pre-agreed limits. If a payment exceeds the parameters, the customer must re-authenticate.
+
+VRP launched in the UK in 2022, initially for "sweeping" use cases (moving money between a customer's own accounts). Its expansion to commercial use cases — subscriptions, utility billing, loan repayments — is underway and represents a potential challenger to the direct debit system that has dominated recurring payments for decades. The combination of real-time settlement (via Faster Payments), lower fees than cards, and flexible payment amounts positions VRP as a significant evolution in how recurring payments work.
 
 ## Bank Redirect Methods: Country-Specific Champions
 

@@ -4,7 +4,7 @@ description: "The regulatory framework governing payments — from consumer prot
 theme: "Trust & Compliance"
 readingTime: "9 min read"
 order: 2
-relatedTopics: ["kyc-and-identity", "chargebacks-and-disputes", "interchange-fees", "neobanking", "embedded-finance"]
+relatedTopics: ["kyc-and-identity", "chargebacks-and-disputes", "interchange-fees", "neobanking", "embedded-finance", "electronic-money-institutions", "open-banking"]
 glossaryTerms:
   - term: "Regulation E"
     definition: "US federal regulation protecting consumers in electronic fund transfers, including debit card transactions and ACH."
@@ -178,6 +178,26 @@ For fintech companies, this creates genuine uncertainty. A product that's accept
 Not every fintech needs — or can obtain — a full banking license on day one. Electronic Money Institution (EMI) licenses offer a lighter-weight regulatory path. An EMI license allows a company to issue electronic money (e-money) and provide payment services, but it does not permit lending or taking traditional deposits. Many neobanks start with an EMI license because it's faster to obtain and requires less capital than a full banking charter, while still enabling core products like accounts, cards, and transfers.
 
 The typical licensing progression follows three phases. First, a BaaS foundation: the fintech launches using a Banking-as-a-Service provider and a sponsor bank's license, which can be operational in 6 to 12 months. Second, an EMI license: the company applies for its own e-money license, a process that typically takes 12 to 24 months depending on the jurisdiction. Third, a full banking license: the company pursues a complete banking charter that enables deposit-taking and lending, which takes 18 to 36 months. Revolut, for example, operated under an EMI license for years before obtaining its UK banking license — a process that took over three years of regulatory engagement.
+
+### EMI Capital and Safeguarding Requirements
+
+The capital requirements for EMI licenses reflect their lighter regulatory footprint. In the EU, a full EMI license requires a minimum initial capital of EUR 350,000 — a fraction of the EUR 5 million or more typically required for a banking license. Small EMI licenses, designed for companies with average outstanding e-money below EUR 5 million, require just EUR 50,000 in initial capital.
+
+But capital requirements are only part of the picture. EMI licensees are subject to strict **safeguarding requirements**: 100% of customer funds must be ring-fenced in segregated accounts held at a credit institution, completely separate from the EMI's own operating funds. Unlike bank deposits (which are protected by deposit insurance schemes like FSCS or FDIC up to certain limits and can be used by the bank for lending), safeguarded funds must be available for redemption at any time. This means that even if the EMI becomes insolvent, customer funds are protected in full — they sit outside the company's estate and cannot be claimed by creditors.
+
+This safeguarding obligation is both a strength and a constraint. It provides robust customer protection without requiring deposit insurance. But it also means EMIs cannot use customer funds to generate lending revenue — a fundamental limitation that ultimately drives many successful EMIs toward seeking a full banking license.
+
+### PSD3 and the Payment Services Regulation (PSR)
+
+The EU agreed on the PSD3 framework in November 2025, marking the most significant overhaul of European payment regulation since PSD2. PSD3 is expected to take effect around 2028, with an 18-to-24-month transition period for existing licensees.
+
+The changes are substantial. First, EMD2 (the Electronic Money Directive 2) is being repealed and merged into PSD3, creating a unified regulatory framework. EMIs will become a sub-category of payment institutions under a single, consolidated license — eliminating the current dual-regime complexity where e-money and payment services are governed by separate directives.
+
+Second, PSD3 introduces **Verification of Payee** as a mandatory requirement. Before a payment is executed, the payer's PSP must verify that the payee's name matches the account holder at the receiving institution. This directly targets authorized push payment (APP) fraud, which has become one of the fastest-growing fraud categories in Europe.
+
+Third, fraud liability rules are being enhanced. PSPs will face greater liability for fraud losses, particularly in cases where they fail to implement adequate fraud prevention measures. This shifts the incentive structure: PSPs that underinvest in fraud detection will bear more of the financial consequences.
+
+Finally, PSD3 establishes **mandatory API performance standards** for open banking. Under PSD2, many banks provided technically compliant but practically unusable APIs — slow, unreliable, and poorly documented. PSD3 sets explicit performance benchmarks that bank APIs must meet, closing the gap between the regulation's intent and its real-world implementation.
 
 ## Regulatory Scrutiny of BaaS Partnerships
 

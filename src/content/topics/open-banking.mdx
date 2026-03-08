@@ -1,0 +1,493 @@
+---
+title: "Open Banking"
+description: "How regulators forced banks to share data via APIs, creating a new ecosystem of third-party financial services — from account aggregation to pay-by-bank to variable recurring payments."
+theme: "Non-Card Payments"
+readingTime: "18 min read"
+order: 3
+relatedTopics: ["bank-based-payments", "real-time-payments", "fraud-and-risk", "compliance-and-regulation", "embedded-finance", "digital-wallets"]
+glossaryTerms:
+  - term: "Open Banking"
+    definition: "The principle that customers own their financial data and should be able to share it with authorized third parties via secure APIs, enforced by regulation."
+  - term: "PSD2"
+    definition: "Payment Services Directive 2 — the EU regulation (effective 2018) that mandated banks provide APIs for account information and payment initiation to licensed third parties."
+  - term: "AISP"
+    definition: "Account Information Service Provider — a regulated entity authorized to access and read bank account data (balances, transactions) with the customer's consent."
+  - term: "PISP"
+    definition: "Payment Initiation Service Provider — a regulated entity authorized to initiate payments directly from a customer's bank account with their consent."
+  - term: "ASPSP"
+    definition: "Account Servicing Payment Service Provider — the bank or financial institution that holds the customer's account and must provide API access under open banking rules."
+  - term: "TPP"
+    definition: "Third Party Provider — any licensed entity (AISP or PISP) that accesses bank data or initiates payments through open banking APIs."
+  - term: "SCA"
+    definition: "Strong Customer Authentication — a PSD2 requirement mandating two-factor authentication using knowledge, possession, and/or inherence for electronic payments."
+  - term: "VRP"
+    definition: "Variable Recurring Payments — a UK open banking innovation allowing customers to authorize a provider to make multiple future payments with variable amounts within set limits."
+  - term: "Open Finance"
+    definition: "The extension of open banking principles beyond bank accounts to insurance, pensions, investments, mortgages, and other financial products."
+  - term: "Screen Scraping"
+    definition: "The pre-open-banking method of accessing bank data by storing customer login credentials and programmatically navigating the bank's website — insecure and now largely banned."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## The Principle: You Own Your Financial Data
+
+For decades, your bank held your financial data — transaction history, balances, spending patterns — and you had no standardized way to share it with anyone else. If a budgeting app wanted to read your transactions, it had to resort to <GlossaryTerm term="Screen Scraping" definition="The pre-open-banking method of accessing bank data by storing customer login credentials and programmatically navigating the bank's website — insecure and now largely banned.">screen scraping</GlossaryTerm>: you'd hand over your online banking username and password, and the app would log in as you, pretend to be a human browsing the website, and extract your data. It was fragile, insecure, and put consumers at risk.
+
+<GlossaryTerm term="Open Banking" definition="The principle that customers own their financial data and should be able to share it with authorized third parties via secure APIs, enforced by regulation.">Open Banking</GlossaryTerm> is the regulatory and technical response to this problem. The core principle is straightforward: customers own their financial data and should be able to share it with authorized third parties through secure, standardized APIs — not by handing over their passwords.
+
+This sounds simple. It is, conceptually. But the implications are enormous. When you force banks to provide API access to customer data and payment initiation, you unlock an entirely new category of financial services: account aggregation apps that show all your accounts in one place, lending platforms that can verify income in seconds instead of weeks, payment methods that bypass card networks entirely, and subscription management tools that can see every recurring charge across all your accounts.
+
+By 2025, there were 183 million open banking users globally, with projections reaching 645 million by 2029. The global open banking market was valued at USD 35.3 billion in 2025 and is expected to reach USD 190.9 billion by 2034, growing at a CAGR of 20.8%.
+
+## The Regulatory Drivers
+
+Open Banking didn't happen organically. Banks had no incentive to open their data to competitors. It took regulators forcing the issue.
+
+### PSD2: Europe's Big Bang (2018)
+
+The EU's <GlossaryTerm term="PSD2" definition="Payment Services Directive 2 — the EU regulation (effective 2018) that mandated banks provide APIs for account information and payment initiation to licensed third parties.">Payment Services Directive 2 (PSD2)</GlossaryTerm>, effective January 2018, was the landmark regulation. It created two new categories of regulated financial entities:
+
+- **AISPs** (Account Information Service Providers) — authorized to read account data
+- **PISPs** (Payment Initiation Service Providers) — authorized to initiate payments
+
+PSD2 required every bank in the EU to provide free APIs enabling these services, provided the customer explicitly consented. It also mandated Strong Customer Authentication (SCA) for electronic payments and banned surcharges on most electronic payment methods.
+
+Critically, PSD2 was a directive — meaning each EU member state had to transpose it into national law, leading to inconsistent implementation across countries.
+
+### UK: The CMA Order and OBIE (2018)
+
+The UK took a parallel but distinct path. In 2016, the Competition and Markets Authority (CMA) concluded that older, larger banks did not have to compete hard enough for customers' business, and ordered the nine largest UK banks (CMA9) to adopt and maintain common API standards for open banking. The Open Banking Implementation Entity (OBIE) was established to design and maintain these standards.
+
+The UK approach was more prescriptive than PSD2. Rather than just mandating that banks provide APIs, the CMA Order specified common API standards, a trust framework, and a directory of authorized participants. This made the UK the most mature open banking market in the world. By mid-2025, active UK open banking users reached 15.16 million — nearly one-third of all UK adults — and are projected to hit 33.1 million (60.5% of adults) by 2026.
+
+### CFPB Section 1033: The US Catches Up (2024 — In Flux)
+
+The United States was late to the open banking party. The Consumer Financial Protection Bureau (CFPB) finalized its Personal Financial Data Rights rule under Section 1033 of the Dodd-Frank Act in October 2024. The rule required data providers to make consumer financial data available in electronic form to consumers and authorized third parties.
+
+However, the rule's trajectory has been turbulent. Bank industry groups challenged it in federal court. In July 2025, the Eastern District of Kentucky stayed proceedings after the CFPB announced it would comprehensively reexamine the rule. In August 2025, the CFPB issued an Advance Notice of Proposed Rulemaking seeking comments on key implementation issues — including who qualifies as a consumer "representative," fee structures for data access, and data security and privacy frameworks. The original compliance deadline of June 30, 2026 remains nominal, but the CFPB has indicated it will not enforce the rule while the new rulemaking is underway. In October 2025, the court formally enjoined the CFPB from enforcing the rule.
+
+The US market has therefore evolved largely through market-driven solutions — primarily Plaid, MX, and Finicity — rather than regulatory mandate.
+
+### Consumer Data Right: Australia's Broader Approach (2020)
+
+Australia's Consumer Data Right (CDR) began with banking in July 2020 but was always designed as an economy-wide framework. Unlike PSD2, which focused on payments, the CDR gives consumers the right to share their data across any designated sector. It has already extended beyond banking to energy and telecommunications, with insurance and superannuation under consideration.
+
+### Other Key Regulatory Frameworks
+
+**Brazil** launched its open banking framework in phases starting in 2021 and has become one of the most advanced markets globally. By 2025, the ecosystem processed over 96 billion API calls monthly, with Payment Initiation API calls growing 194% in 2024 alone. Brazil has expanded to Open Finance, covering insurance, investments, and pensions.
+
+**India** took a unique approach with the Account Aggregator (AA) framework, regulated by the RBI. AAs are classified as a type of Non-Banking Financial Company (NBFC) that facilitate consent-based data sharing between Financial Information Providers (FIPs) — banks, mutual funds, NBFCs — and Financial Information Users (FIUs) — lenders, wealth managers, fintechs. By December 2025, 126 financial institutions were live on the framework, with over 2.61 billion financial accounts enabled for data sharing and more than 140 million consents processed.
+
+**Saudi Arabia's** SAMA (Saudi Arabian Monetary Authority) executed what is considered the fastest "Zero to One" implementation globally, mandating a single standard based on the UK Open Banking model and enforcing compliance. Fintech adoption rose by 40% in two years.
+
+**Nigeria** became the first African country to adopt clearly stipulated open banking regulation. The Central Bank of Nigeria published operational guidelines in March 2023, with banks required to begin implementation by August 2025. A phased go-live is expected in early 2026.
+
+## Key Concepts: The Participants
+
+Understanding open banking requires knowing who the players are and what they're allowed to do.
+
+<MermaidDiagram
+  chart={`flowchart LR
+    C[Customer] -->|Gives consent| TPP[Third Party Provider]
+    TPP -->|Registered in directory| DIR[Trust Framework / Directory]
+    DIR -->|Verified identity| ASPSP[Bank - ASPSP]
+    subgraph TPP_Types["TPP Types"]
+      direction TB
+      AISP["AISP\n(Read account data)"]
+      PISP["PISP\n(Initiate payments)"]
+    end
+    TPP --- TPP_Types
+    AISP -->|API: GET /accounts| ASPSP
+    PISP -->|API: POST /payments| ASPSP
+    ASPSP -->|Account data / Payment confirmation| TPP
+    TPP -->|Service delivered| C`}
+  caption="The open banking ecosystem: customers consent to TPPs accessing their bank (ASPSP) via regulated APIs, with a trust framework verifying all participants."
+/>
+
+### ASPSPs — The Banks
+
+<GlossaryTerm term="ASPSP" definition="Account Servicing Payment Service Provider — the bank or financial institution that holds the customer's account and must provide API access under open banking rules.">ASPSPs</GlossaryTerm> (Account Servicing Payment Service Providers) are the banks and financial institutions that hold customer accounts. Under open banking rules, they must provide API access to authorized third parties. They don't choose whether to participate — regulation compels them.
+
+### AISPs — Account Information Readers
+
+<GlossaryTerm term="AISP" definition="Account Information Service Provider — a regulated entity authorized to access and read bank account data (balances, transactions) with the customer's consent.">AISPs</GlossaryTerm> can access account information: balances, transaction history, account holder details. They have read-only access — they cannot move money or modify anything. A budgeting app like Yolt or Emma that aggregates your accounts from multiple banks operates as an AISP. A lender that verifies your income by reading your bank transactions acts as an AISP.
+
+### PISPs — Payment Initiators
+
+<GlossaryTerm term="PISP" definition="Payment Initiation Service Provider — a regulated entity authorized to initiate payments directly from a customer's bank account with their consent.">PISPs</GlossaryTerm> can initiate payments from a customer's bank account. When a merchant offers "Pay by Bank" at checkout, a PISP is orchestrating that payment. The PISP doesn't hold funds or have access to account information beyond what's needed for the payment — it simply tells the bank to send a specific amount to a specific payee, with the customer's authenticated consent.
+
+### Strong Customer Authentication (SCA)
+
+<GlossaryTerm term="SCA" definition="Strong Customer Authentication — a PSD2 requirement mandating two-factor authentication using knowledge, possession, and/or inherence for electronic payments.">SCA</GlossaryTerm> is the security bedrock of open banking. PSD2 mandates that electronic payments require authentication using at least two of three factors:
+
+- **Knowledge** — something the user knows (password, PIN)
+- **Possession** — something the user has (mobile phone, hardware token)
+- **Inherence** — something the user is (fingerprint, face recognition)
+
+These factors must be independent — compromising one must not compromise the others. Additionally, for payment transactions, the authentication must be dynamically linked to the specific amount and payee (a requirement called "Dynamic Linking"). This means a payment authentication for 50 euros to Amazon cannot be replayed to authorize 500 euros to a different merchant.
+
+In practice, SCA usually means a customer authenticates via their banking app — entering a PIN and confirming with biometrics, for example — before any data is shared or payment is initiated.
+
+### Consent Management
+
+Consent is the gatekeeper of open banking. A <GlossaryTerm term="TPP" definition="Third Party Provider — any licensed entity (AISP or PISP) that accesses bank data or initiates payments through open banking APIs.">TPP</GlossaryTerm> must obtain explicit, informed consent from the customer before accessing any data. The consent specifies:
+
+- **What data** — account balances, transaction history, specific accounts
+- **For how long** — consent has a defined expiry, typically requiring reauthorization every 90 days for ongoing access
+- **With whom** — the specific TPP receiving the data
+- **For what purpose** — the stated reason for data access
+
+Under PSD3/PSR, banks will be required to provide customers with a consent dashboard — an integrated interface where customers can view, monitor, and revoke all access authorizations they've granted to AISPs and PISPs.
+
+## How It Works Technically
+
+### Bank APIs and Standards
+
+Open banking APIs follow RESTful design patterns and are documented using specifications like the UK's Open Banking Standard or the Berlin Group's NextGenPSD2. The APIs typically cover:
+
+- **Account and Transaction API** — `GET /accounts`, `GET /accounts/{id}/transactions`
+- **Payment Initiation API** — `POST /domestic-payments`, `POST /international-payments`
+- **Confirmation of Funds API** — `POST /funds-confirmations`
+
+In the UK, the Open Banking Implementation Entity mandated a single API standard across all CMA9 banks, ensuring consistency. In the EU under PSD2, the Berlin Group's NextGenPSD2 specification became the dominant standard, though banks could choose alternative implementations as long as they met regulatory requirements — leading to more fragmentation.
+
+### TPP Registration and the Trust Framework
+
+Before a TPP can access any bank's API, it must be:
+
+1. **Licensed** by the relevant financial regulator (FCA in the UK, national competent authorities in the EU)
+2. **Registered** in the open banking directory/trust framework
+3. **Issued eIDAS certificates** (in the EU) — qualified electronic certificates that cryptographically identify the TPP and its permissions
+
+eIDAS (Electronic Identification, Authentication and Trust Services) certificates serve a dual purpose: they identify the TPP to the bank, and they indicate whether the TPP is licensed as an AISP, PISP, or both. Banks verify these certificates on every API call.
+
+### OAuth2 and OpenID Connect Flows
+
+The authentication and authorization flow in open banking is built on OAuth2 and OpenID Connect (OIDC). Here's how it works in practice:
+
+<MermaidDiagram
+  chart={`sequenceDiagram
+    participant User as Customer
+    participant TPP as Third Party Provider
+    participant Bank as Bank (ASPSP)
+    Note over User,Bank: Customer wants to connect bank account to budgeting app
+    User->>TPP: 1. Requests service (e.g., "connect my bank")
+    TPP->>Bank: 2. Authorization request (client_id, scope, redirect_uri)
+    Bank->>User: 3. Redirects to bank login page
+    User->>Bank: 4. Authenticates (SCA: password + biometric)
+    User->>Bank: 5. Reviews and approves consent
+    Bank->>TPP: 6. Authorization code (via redirect)
+    TPP->>Bank: 7. Exchanges code for access token
+    Bank->>TPP: 8. Access token + refresh token
+    TPP->>Bank: 9. API calls with access token
+    Bank->>TPP: 10. Account data / payment confirmation`}
+  caption="The OAuth2/OpenID Connect flow in open banking: the customer authenticates directly with their bank, never sharing credentials with the TPP."
+/>
+
+The critical security feature: the customer never shares their banking credentials with the TPP. They authenticate directly with their bank. The TPP receives only an access token — a scoped, time-limited credential that grants access to specific data or payment capabilities. If the TPP is compromised, the attacker gets a limited token, not the customer's login credentials.
+
+### Screen Scraping vs. API Access
+
+Before open banking mandated APIs, <GlossaryTerm term="Screen Scraping" definition="The pre-open-banking method of accessing bank data by storing customer login credentials and programmatically navigating the bank's website — insecure and now largely banned.">screen scraping</GlossaryTerm> was the only option. The comparison is stark:
+
+| | Screen Scraping | Open Banking APIs |
+|---|---|---|
+| **Credentials** | Customer shares bank login with third party | Customer authenticates directly with bank |
+| **Security** | Third party stores passwords; single point of compromise | Token-based; no credential sharing |
+| **Reliability** | Breaks when bank changes website layout | Standardized, contractually maintained |
+| **Data quality** | Parsed from HTML; inconsistent formatting | Structured JSON; standardized schemas |
+| **Regulatory status** | Largely banned under PSD2/PSD3 | Mandated and regulated |
+| **Bank cooperation** | Banks actively block scrapers | Banks required to maintain APIs |
+
+PSD2 effectively banned screen scraping for regulated entities by requiring TPPs to use dedicated APIs. However, it included a "fallback mechanism" allowing TPPs to use the bank's customer-facing interface if the dedicated API was unavailable — a provision that has been contentious and is being tightened under PSD3.
+
+## Use Cases
+
+### Account Aggregation
+
+The most visible consumer use case. An aggregator app connects to multiple banks via AISP APIs and presents a unified view of all accounts — checking, savings, credit cards, investments — in a single dashboard. This enables budgeting, spending analysis, net worth tracking, and financial planning across institutions.
+
+Examples include Plaid-powered apps in the US, Tink-powered services in Europe, and the Account Aggregator framework in India.
+
+### Payment Initiation: Pay by Bank
+
+<GlossaryTerm term="PISP" definition="Payment Initiation Service Provider — a regulated entity authorized to initiate payments directly from a customer's bank account with their consent.">Payment initiation</GlossaryTerm> enables direct bank-to-bank payments at checkout — bypassing card networks entirely. A customer selects "Pay by Bank," is redirected to their banking app, authenticates with SCA, and the payment is initiated as an account-to-account transfer.
+
+The merchant benefits are substantial. Traditional credit card processing costs merchants 1.5-3% of the transaction amount (interchange fees comprise 70-90% of total processing fees). Pay-by-bank costs are dramatically lower — Plaid estimates up to 40% cost reduction versus credit cards, while Adyen estimates up to 85% savings potential, though the Federal Reserve cautions these claims should be approached carefully since pay-by-bank involves its own setup fees, transaction fees, and processor costs.
+
+In the US, approximately 11% of adults have conducted at least one open banking payment transaction, with 72% of Gen Z and 66% of millennials expressing willingness to use them. Walmart, in partnership with Fiserv, announced plans to offer instant Pay-by-Bank for both online and in-person purchases starting in 2025.
+
+Pay-by-bank payments also settle faster than cards. Using instant payment rails (Faster Payments in the UK, SEPA Instant in Europe, FedNow/RTP in the US), merchants can receive confirmed funds in seconds rather than waiting days for card settlement.
+
+### Lending and Credit Decisioning
+
+Open banking has transformed lending. Instead of asking borrowers for paper bank statements (which can be forged), lenders use AISP access to read transaction history directly from the bank. This enables:
+
+- **Income verification** — categorizing transaction types and calculating stable income streams automatically
+- **Affordability assessment** — analyzing spending patterns, existing obligations, and cash flow
+- **Faster decisions** — reducing underwriting from days to minutes
+
+In India, the Account Aggregator framework has reduced the cost of lending underwriting by 95%.
+
+### Identity Verification
+
+Banks have already KYC'd their customers. Open banking APIs can leverage this — a TPP can confirm a customer's identity by verifying they can authenticate with their bank, providing a lightweight form of identity assurance without duplicating the full KYC process.
+
+### Personal Finance Management
+
+Budgeting apps, subscription trackers, financial coaching tools, and savings automation platforms all rely on open banking data. By reading transaction data via AISP APIs, these tools can categorize spending, identify recurring charges, detect opportunities to save, and even automate transfers to savings accounts.
+
+## Pay by Bank: The Card Network Disruptor
+
+Pay by Bank deserves special attention because it represents the most direct threat to card networks from open banking.
+
+<MermaidDiagram
+  chart={`flowchart LR
+    subgraph Card["Card Payment Flow"]
+      direction TB
+      C1[Customer] --> M1[Merchant]
+      M1 --> A1[Acquirer]
+      A1 --> N1[Card Network\nVisa/Mastercard]
+      N1 --> I1[Issuing Bank]
+      I1 -->|Interchange: 1.5-3%| N1
+    end
+    subgraph OB["Pay by Bank Flow"]
+      direction TB
+      C2[Customer] --> M2[Merchant]
+      M2 --> P2[PISP Provider]
+      P2 --> B2[Customer's Bank]
+      B2 -->|Direct transfer\nvia instant rails| MB2[Merchant's Bank]
+    end`}
+  caption="Card payments flow through multiple intermediaries, each taking fees. Pay-by-bank transfers directly between banks, dramatically reducing costs."
+/>
+
+### How It Works
+
+1. Customer selects "Pay by Bank" at checkout (online or in-store)
+2. A PISP provider presents a list of supported banks
+3. Customer selects their bank and is redirected to their banking app
+4. Customer authenticates via SCA (biometrics + PIN)
+5. Customer confirms the payment amount and payee
+6. The bank initiates an account-to-account transfer to the merchant
+7. Using instant payment rails, funds arrive in seconds
+
+### Why Merchants Want It
+
+- **Lower fees** — no interchange, no card network assessments, no scheme fees
+- **Irrevocable payments** — unlike card payments, bank transfers cannot be charged back (though consumer protection frameworks still apply)
+- **Real-time settlement** — funds confirmed in seconds rather than T+2 or T+3 settlement windows
+- **No card data to secure** — reduces PCI DSS compliance burden since no card numbers are handled
+
+### Why Consumer Adoption Is Slow
+
+Despite merchant enthusiasm, consumer adoption faces headwinds:
+
+- **No rewards** — credit cards offer cash back, points, and miles. Pay-by-bank offers none of these. US consumers earned over $40 billion in credit card rewards in 2022 alone.
+- **No credit** — cards let consumers spend beyond their current balance. Bank payments draw directly from available funds.
+- **Security perceptions** — 56% of US consumers cite security concerns as their primary reason for non-adoption, despite pay-by-bank actually being more secure than cards due to SCA.
+- **Unfamiliar intermediaries** — consumers don't recognize PISP providers and are hesitant to authorize access to their bank accounts.
+- **Friction** — redirecting to a banking app and authenticating adds steps compared to a stored card one-click checkout.
+
+The current US payment landscape remains dominated by credit cards (32% of transactions), debit cards (30%), and cash (16%). Displacing cards requires either compelling consumer incentives or merchant-side pressure.
+
+## Variable Recurring Payments (VRP)
+
+<GlossaryTerm term="VRP" definition="Variable Recurring Payments — a UK open banking innovation allowing customers to authorize a provider to make multiple future payments with variable amounts within set limits.">VRPs</GlossaryTerm> are a UK-originated innovation that addresses one of open banking's biggest limitations: every single payment previously required a separate SCA authentication. For one-off purchases, that's fine. For recurring payments — subscriptions, utility bills, loan repayments — requiring the customer to authenticate each time makes open banking impractical compared to direct debit.
+
+VRPs solve this by allowing customers to set up a long-lived consent. The customer authorizes a regulated provider to make multiple future payments from their bank account, with amounts and timing that can vary within limits the customer defines (e.g., "up to 200 pounds per month," "no more than 50 pounds per individual payment").
+
+### Sweeping VRP vs. Commercial VRP
+
+**Sweeping VRP** — the first phase — covers moving money between your own accounts. The CMA9 banks were mandated to support sweeping VRP, enabling use cases like automatic savings (sweep excess balance to a savings account) or paying down credit card debt from your current account.
+
+**Commercial VRP (cVRP)** extends this to payments to third parties — merchants, billers, charities, subscription services, government. This is the commercially transformative use case. In January 2025, the FCA announced expectations for a new commercial VRP scheme. By December 2025, 31 firms from across the ecosystem established the UK Payments Initiative (UKPI), with first live payments expected in Q1 2026.
+
+Initial commercial VRP use cases include utility payments, financial services payments, and payments to local and central government.
+
+### VRP vs. Direct Debit
+
+VRPs offer several advantages over traditional direct debits:
+
+- **Customer control** — customers set maximum payment limits and can revoke consent instantly
+- **Real-time processing** — payments settle over Faster Payments rails, not the 3-day BACS cycle
+- **Variable amounts** — payments can flex within defined parameters without requiring new mandates
+- **Transparency** — customers can see exactly what payments are scheduled and have been made
+
+VRPs currently account for approximately 16% of all open banking transactions in the UK, and total open banking payment volumes grew 53% year-on-year in 2025.
+
+## Open Banking vs. Open Finance
+
+<GlossaryTerm term="Open Finance" definition="The extension of open banking principles beyond bank accounts to insurance, pensions, investments, mortgages, and other financial products.">Open Finance</GlossaryTerm> extends the same principles — customer-permissioned data sharing via APIs — beyond bank accounts to the entire financial ecosystem.
+
+| | Open Banking | Open Finance |
+|---|---|---|
+| **Scope** | Bank accounts (current, savings) | All financial products |
+| **Data types** | Balances, transactions, payments | + Insurance policies, pension values, investment portfolios, mortgage details, crypto holdings |
+| **Regulatory maturity** | Well-established (PSD2, CMA Order) | Emerging (PSD3/PSR, Brazil, CDR Australia) |
+| **Consumer benefit** | See all bank accounts in one place | See complete financial picture in one place |
+| **Use cases** | Account aggregation, pay by bank, income verification | Holistic financial planning, pension switching, insurance comparison with pre-filled data |
+
+Brazil is the global leader in Open Finance adoption, having expanded beyond banking data to include insurance, investments, pensions, and foreign exchange. Australia's CDR was designed as an economy-wide framework from the start, extending beyond financial services to energy and telecommunications.
+
+In the EU, PSD3 and the proposed Financial Data Access (FiDA) regulation are expected to expand open banking principles to insurance, pensions, and investment products — though this is still in legislative development.
+
+## Global Adoption: Where the World Stands
+
+### Mature Markets
+
+**United Kingdom** — The most mature open banking ecosystem. 15.16 million active users by mid-2025, with 33.1 million projected for 2026. Standardized APIs across the CMA9 banks. Commercial VRP launching in 2026. HM Treasury expected to introduce legislation in 2026 granting the FCA new powers to set open banking rules under a Long-Term Regulatory Framework.
+
+**Brazil** — Arguably the most advanced Open Finance implementation. 9.8 million users in 2025. Over 96 billion API calls processed monthly. Payment Initiation API calls grew 194% in 2024, hitting 159 million. Brazil has expanded to cover insurance, investments, pensions, and foreign exchange.
+
+**India** — The Account Aggregator framework has achieved remarkable scale. 126 financial institutions live as of December 2025. Over 2.61 billion financial accounts enabled for data sharing. 140 million+ consents processed. The cost of lending underwriting has dropped by 95%. The Digital Personal Data Protection (DPDP) Act is increasingly shaping the framework's evolution.
+
+### Advancing Markets
+
+**European Union** — PSD2 established the foundation, but fragmented implementation across member states limited impact. PSD3 and PSR (agreed November 2025) aim to fix this with mandatory API performance standards, consent dashboards, enhanced fraud liability, and Verification of Payee requirements. Expected to enter into force in early 2026 with a 21-month transition period.
+
+**Australia** — CDR is technically sophisticated but consumer adoption has been slower than hoped. The framework's economy-wide design (extending to energy and telecom) is ambitious. Current focus: extending to non-bank lenders and considering insurance and superannuation.
+
+**Saudi Arabia** — SAMA has mandated a single standard based on UK Open Banking, enforcing compliance with remarkable speed. Fintech adoption rose 40% in two years.
+
+### Developing Markets
+
+**United States** — Market-driven adoption via Plaid, MX, and Finicity, but regulatory uncertainty following the CFPB Section 1033 rule being effectively enjoined. 78% of digital banking apps rely on API connections. FedNow (launched 2023) provides instant payment rails for future pay-by-bank services.
+
+**Nigeria** — First African country with formal open banking regulation. CBN operational guidelines published 2023. Banks mandated to implement by August 2025, with phased go-live expected early 2026. Standardized API and robust consent management framework tied to BVN (Bank Verification Number).
+
+**Canada** — Consumer-driven banking framework launching in 2026, designed to replace screen scraping with secure API connections. Discussions underway to expand beyond banking to open finance.
+
+## Key Players and Infrastructure Providers
+
+The open banking ecosystem is served by a layer of infrastructure providers — companies that build the APIs, aggregate bank connections, and provide developer-friendly interfaces.
+
+### US-Focused
+
+- **Plaid** — Market leader with approximately 18% global market share. Connects to 12,000+ financial institutions. Provides account linking, identity verification, income verification, and payment initiation. Powers apps like Venmo, Robinhood, and Coinbase.
+- **MX Technologies** — Specializes in data enhancement and financial data connectivity. Strong in credit union and community bank connectivity.
+- **Finicity (Mastercard)** — Acquired by Mastercard. Focuses on verified financial data for lending, payments, and personal finance. Integrated into Mastercard's open banking strategy.
+
+### Europe-Focused
+
+- **Tink (Visa)** — Acquired by Visa for $2.2 billion. Pan-European coverage across 18 markets. Strong in transaction enrichment, risk insights, and payment initiation. Powers budgeting and investment apps.
+- **TrueLayer** — UK-headquartered, expanding across Europe. Strong in payment initiation, particularly for e-commerce and iGaming. Focuses on converting card payments to account-to-account.
+- **Yapily** — European open banking infrastructure covering 2,000+ banks. API-first approach. Used by financial institutions and fintechs for account data and payment initiation.
+
+### Global / Multi-Regional
+
+- **GoCardless** — Global direct debit and open banking payment platform. Processes over $30 billion annually. Uses open banking for instant bank payment alongside traditional direct debit rails.
+- **Mastercard (via Finicity and Aiia)** — Building an open banking network combining Finicity (US/Canada), Aiia (Europe), and proprietary connectivity.
+- **Visa (via Tink)** — Integrating Tink's open banking capabilities into Visa's network services.
+
+The strategic pattern is clear: the card networks are acquiring open banking companies rather than fighting the trend. Visa bought Tink for $2.2 billion. Mastercard acquired both Finicity and Aiia. They're positioning to participate in the bank-to-bank payments future, even though it threatens their core card interchange business.
+
+## PSD3 and the Payment Services Regulation: What's Next in Europe
+
+On 27 November 2025, the European Parliament and the Council of the EU reached provisional political agreement on the texts of PSD3 and the Payment Services Regulation (PSR) — the successors to PSD2.
+
+### Why Two Instruments?
+
+<GlossaryTerm term="PSD2" definition="Payment Services Directive 2 — the EU regulation (effective 2018) that mandated banks provide APIs for account information and payment initiation to licensed third parties.">PSD2</GlossaryTerm> was a directive, requiring each member state to transpose it into national law — leading to inconsistent implementation. The new framework splits the legislation:
+
+- **PSR (Regulation)** — covers security, SCA, and obligations of payment service providers. Directly applicable across all EU member states without national transposition. This ensures consistency.
+- **PSD3 (Directive)** — covers licensing and supervision of payment service providers. Still requires national transposition.
+
+### Key Changes from PSD2
+
+**Mandatory API Performance Standards** — Banks will face binding standards for API availability, latency, and reliability. Under PSD2, many banks provided APIs that technically met the letter of the law but were so unreliable or slow that TPPs couldn't build viable services. PSD3/PSR closes this gap.
+
+**Consent Dashboard Requirement** — Banks must provide customers with an integrated dashboard to monitor and control all access authorizations granted to AISPs and PISPs.
+
+**Verification of Payee** — Payment service providers must check that a payee's name matches their unique identifier (account number/IBAN) for all credit transfers. If the verification mechanism fails and fraud occurs, the payment service provider is liable.
+
+**Enhanced Fraud Liability** — If a fraudster initiates or manipulates a transaction, it is treated as an unauthorized transaction, and the payment service provider bears liability. This represents a significant shift in the fraud liability framework.
+
+**Screen Scraping Restrictions** — The fallback mechanism that allowed TPPs to access bank data via the customer-facing interface (effectively screen scraping) when APIs were unavailable is being tightened.
+
+### Timeline
+
+The agreed text is expected to be formally adopted and enter into force by late Q1 or early Q2 2026, with a 21-month transition period. This means full compliance is expected by approximately late 2027 or early 2028.
+
+## Risks and Challenges
+
+### Consumer Trust and Adoption
+
+Open banking requires consumers to authorize third parties to access their bank accounts — a concept many find uncomfortable. Building trust requires education, clear consent mechanisms, and visible control. The 56% of US consumers citing security concerns as a barrier highlights the gap between open banking's actual security (stronger than cards, thanks to SCA) and consumer perception.
+
+### API Reliability
+
+Bank APIs are the single point of failure for every open banking service. If a bank's API goes down, every TPP connected to it is affected. Under PSD2, some banks provided APIs with poor uptime, slow response times, or frequent breaking changes. PSD3/PSR's mandatory performance standards aim to address this, but it remains a live concern — especially in markets without binding API performance requirements.
+
+### Liability Framework
+
+When something goes wrong in an open banking transaction, who is liable? If a PISP initiates a payment to the wrong payee, is it the PISP's fault, the bank's fault, or the customer's fault? PSD2 left some ambiguity here. PSD3/PSR provides clearer rules — particularly around Verification of Payee and fraudulent transactions — but the multi-party nature of open banking means liability disputes will remain complex.
+
+### Data Privacy
+
+Open banking involves sharing granular financial data — transaction-level detail that reveals where you shop, how much you earn, and what you spend on. GDPR provides a strong privacy framework in Europe, but:
+
+- GDPR doesn't apply outside Europe
+- The sheer volume of data flowing through the ecosystem increases the attack surface
+- There is a risk of non-consensual secondary use of personal data — a TPP sharing or selling data beyond what the customer consented to
+
+### Fraud in Open Banking
+
+Ironically, while open banking's SCA requirements make transactions more secure than cards, the ecosystem creates new fraud vectors:
+
+- **Authorized Push Payment (APP) fraud** — a fraudster tricks the customer into authorizing a legitimate open banking payment to the wrong account. The payment is technically "authorized" by the customer, making it harder to reverse.
+- **Social engineering** — fraudsters impersonate TPPs or bank staff to get customers to approve malicious consent requests.
+- **Malicious TPPs** — the risk that a licensed entity acts improperly, or that its systems are compromised, exposing customer data at scale.
+
+### Fragmentation
+
+Different countries implement open banking differently. API standards, consent models, regulatory requirements, and available data sets all vary. A TPP operating across the UK, EU, US, and Brazil must navigate four completely different frameworks, API specifications, and regulatory environments. This fragmentation raises costs and slows innovation.
+
+## The Future
+
+Open banking is evolving from a regulatory mandate into a foundational layer of financial infrastructure. Several trends are shaping its trajectory:
+
+**Open Finance expansion** — the extension from bank accounts to all financial products is inevitable. PSD3/PSR, the EU's proposed FiDA regulation, Brazil's open finance ecosystem, and Australia's economy-wide CDR all point in this direction.
+
+**Premium APIs and commercial models** — as the ecosystem matures, banks are beginning to offer premium APIs with enhanced data, better performance, and richer functionality — creating new revenue streams rather than viewing open banking purely as a regulatory cost.
+
+**Commercial VRP scale-up** — the UK's commercial VRP scheme, launching in 2026, could demonstrate a viable open banking alternative to direct debit for recurring payments. If successful, other markets will follow.
+
+**Card network adaptation** — Visa and Mastercard are not passively watching. By acquiring open banking infrastructure (Tink, Finicity, Aiia), they're positioning to be intermediaries in the bank-to-bank payments world, even as it erodes their card interchange revenue. The question is whether they can maintain their economics in a world where bank-to-bank payments grow at the expense of card transactions.
+
+**AI-powered financial services** — open banking data, combined with AI/ML, enables hyper-personalized financial products: dynamic credit limits based on real-time cash flow, automated savings based on spending patterns, and predictive financial health monitoring. This data layer is what makes open banking commercially valuable beyond payments.
+
+The fundamental shift is irreversible. Customers own their financial data. Banks must share it via APIs. Third parties can build on top of it. The question is no longer whether open banking will reshape financial services, but how fast — and who captures the value.
+
+Sources:
+- [Open Banking - Wikipedia](https://en.wikipedia.org/wiki/Open_banking)
+- [What is Open Banking? Complete Guide 2025 | Quiltt](https://www.quiltt.io/guides/what-is-open-banking-complete-guide-2025)
+- [What is open banking? - Open Banking UK](https://www.openbanking.org.uk/what-is-open-banking/)
+- [PSD3 & PSR: What EU's New Payment Rules Mean | Flagright](https://www.flagright.com/post/impact-of-payment-services-directive-3-psr-on-payment-processors)
+- [PSD3: The EU's Third Payment Services Directive | J.P. Morgan](https://www.jpmorgan.com/insights/payments/operations-optimization/psd3)
+- [PSD3 breakthrough: EU legislators agree | Linklaters](https://financialregulation.linklaters.com/post/102lw90/psd3-breakthrough-eu-legislators-agree-payments-regulation-reforms)
+- [Open Banking: AISP, PISP & ASPSP Explained | Macro Global](https://www.macroglobal.co.uk/blog/regulatory-technology/open-banking-psd2/aisp-pisp-aspsp-explained/)
+- [Open Banking API Guide | TrueLayer](https://truelayer.com/reports/open-banking-guide/open-banking-apis/)
+- [Open Banking Adoption Statistics 2026 | SQ Magazine](https://sqmagazine.co.uk/open-banking-adoption-statistics/)
+- [Open Banking Adoption Statistics 2026 | CoinLaw](https://coinlaw.io/open-banking-adoption-statistics/)
+- [The state of open banking regulation worldwide 2025 | The Payments Association](https://thepaymentsassociation.org/article/the-state-open-banking-regulation-worldwide-in-2025/)
+- [Pay-by-Bank and the Merchant Payments Use Case | Federal Reserve](https://www.federalreserve.gov/econres/notes/feds-notes/pay-by-bank-and-the-merchant-payments-use-case-benefits-20250707.html)
+- [How Pay by Bank Is Transforming Payments | Bank of America](https://business.bofa.com/en-us/content/pay-by-bank-future-of-payments.html)
+- [FCA announces commercial VRP scheme | Open Banking Expo](https://www.openbankingexpo.com/news/fca-announces-commercial-vrp-scheme-to-get-underway-in-2025/)
+- [Open banking: a year of progress | FCA](https://www.fca.org.uk/news/news-stories/open-banking-2025-progress)
+- [UK's New Commercial Open Banking Scheme | Open Banking UK](https://www.openbanking.org.uk/news/an-industry-first-the-uks-new-commercial-open-banking-scheme/)
+- [VRP Open Banking Guide | Open Banking Tracker](https://www.openbankingtracker.com/guides/vrp-open-banking)
+- [Open Banking vs. Open Finance | Qwist](https://qwist.com/en/resources/wiki/open-banking-vs-open-finance/)
+- [Open finance vs open banking | Tink](https://tink.com/blog/open-banking/difference-open-banking-open-finance/)
+- [Open Banking Security Risks | SEON](https://seon.io/resources/open-banking-risk-and-fraud/)
+- [Is open banking safe? | Stripe](https://stripe.com/resources/more/open-banking-security-what-you-need-to-know)
+- [CFPB Personal Financial Data Rights | CFPB](https://www.consumerfinance.gov/personal-financial-data-rights/)
+- [CFPB Section 1033 Rule Stayed | Consumer Financial Services Law Monitor](https://www.consumerfinancialserviceslawmonitor.com/2025/07/cfpb-section-1033-open-banking-rule-stayed-as-cfpb-initiates-new-rulemaking/)
+- [What is SCA in open banking? | TrueLayer](https://truelayer.com/blog/compliance-and-regulation/avoid-sca-conversion-issues-with-open-banking/)
+- [Strong Customer Authentication | FCA](https://www.fca.org.uk/firms/strong-customer-authentication)
+- [India's Journey in Open Banking | ORF](https://www.orfonline.org/research/india-s-journey-in-open-banking-consent-control-and-connectivity)
+- [Account Aggregator Framework | Government of India](https://financialservices.gov.in/beta/en/account-aggregator-framework)
+- [Nigeria's Central Bank approves Open Banking | Not A Deep Dive](https://www.notadeepdive.com/p/open-banking-nigeria)
+- [Open Banking Market Size | Fortune Business Insights](https://www.fortunebusinessinsights.com/open-banking-market-112359)
+- [How PSD3 and PSR will shape EU financial services | EY](https://www.ey.com/en_gl/insights/financial-services/emeia/how-psd3-and-psr-will-shape-trends-in-eu-financial-services)

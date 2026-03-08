@@ -12,12 +12,12 @@
 /* --- Color System (CSS Custom Properties) --- */
 @theme {
   /* Primary brand palette */
-  --color-racing-green: #0D4D2B;
-  --color-racing-green-light: #1A6B3C;
-  --color-racing-green-dark: #0A3D22;
+  --color-racing-green: #063622;
+  --color-racing-green-light: #0A4D30;
+  --color-racing-green-dark: #042A19;
 
-  --color-pale-mint: #E8F5E9;
-  --color-pale-mint-dark: #C8E6C9;
+  --color-pale-mint: #DDF8E7;
+  --color-pale-mint-dark: #B8E8C0;
 
   --color-peach: #FFDAB3;
   --color-peach-dark: #FFB74D;
@@ -31,10 +31,10 @@
   --color-text-light: #7A7A7A;
 
   /* Dark mode palette */
-  --color-night: #0F1F17;
-  --color-night-surface: #162A1E;
-  --color-night-elevated: #1D3526;
-  --color-night-text: #E8F5E9;
+  --color-night: #091A12;
+  --color-night-surface: #0E2518;
+  --color-night-elevated: #15301F;
+  --color-night-text: #DDF8E7;
   --color-night-text-muted: #9CB8A2;
   --color-night-accent: #FFDAB3;
 
@@ -174,7 +174,7 @@ a:hover {
 
 .prose img {
   border-radius: 0.5rem;
-  box-shadow: 0 2px 16px rgba(13, 77, 43, 0.08);
+  box-shadow: 0 2px 16px rgba(6, 54, 34, 0.08);
 }
 
 /* --- Scrollbar --- */

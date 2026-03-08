@@ -27,4 +27,11 @@ yarn-debug.log*
 yarn-error.log*
 
 # Source EPUB files (large binaries)
-Source/
+Source/*.epub
+Source/*.pdf
+Source/*.docx
+Source/*.pptx
+
+# Extracted source text (generated)
+Source/extracted/*.txt
+Source/extracted/manifest.json

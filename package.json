@@ -6,14 +6,18 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "ingest": "node scripts/ingest.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.13",
     "@tailwindcss/typography": "^0.5.19",
     "@tailwindcss/vite": "^4.2.1",
+    "adm-zip": "^0.5.16",
     "astro": "^5.17.1",
+    "mammoth": "^1.8.0",
     "mermaid": "^11.12.3",
+    "pdf-parse": "^1.1.1",
     "tailwindcss": "^4.2.1"
   }
 }

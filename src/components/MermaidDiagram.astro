@@ -14,60 +14,9 @@ const diagramId = `mermaid-${Math.random().toString(36).slice(2, 9)}`;
     <div class="mermaid-loading">
       <span>Loading diagram...</span>
     </div>
-    <!-- Expand hint overlay -->
-    <button class="mermaid-expand-hint" aria-label="Expand diagram" type="button">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="6 1 1 1 1 6" />
-        <polyline points="12 17 17 17 17 12" />
-        <line x1="1" y1="1" x2="7" y2="7" />
-        <line x1="17" y1="17" x2="11" y2="11" />
-      </svg>
-    </button>
   </div>
   {caption && <figcaption class="mermaid-caption">{caption}</figcaption>}
 </figure>
-
-<!-- Fullscreen overlay (one per page, injected once) -->
-<div class="mermaid-overlay" id="mermaid-overlay" aria-hidden="true" role="dialog" aria-label="Expanded diagram view">
-  <div class="mermaid-overlay-backdrop"></div>
-  <div class="mermaid-overlay-content">
-    <div class="mermaid-overlay-toolbar">
-      <span class="mermaid-overlay-caption"></span>
-      <div class="mermaid-overlay-actions">
-        <button class="mermaid-overlay-btn" id="mermaid-zoom-out" aria-label="Zoom out" type="button">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-            <circle cx="8" cy="8" r="6" />
-            <line x1="5" y1="8" x2="11" y2="8" />
-            <line x1="13" y1="13" x2="17" y2="17" />
-          </svg>
-        </button>
-        <button class="mermaid-overlay-btn" id="mermaid-zoom-reset" aria-label="Reset zoom" type="button">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-            <path d="M1 7h6M1 7l3-3M1 7l3 3" />
-            <path d="M17 11h-6M17 11l-3-3M17 11l-3 3" />
-          </svg>
-        </button>
-        <button class="mermaid-overlay-btn" id="mermaid-zoom-in" aria-label="Zoom in" type="button">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
-            <circle cx="8" cy="8" r="6" />
-            <line x1="8" y1="5" x2="8" y2="11" />
-            <line x1="5" y1="8" x2="11" y2="8" />
-            <line x1="13" y1="13" x2="17" y2="17" />
-          </svg>
-        </button>
-        <button class="mermaid-overlay-btn mermaid-overlay-close" id="mermaid-overlay-close" aria-label="Close" type="button">
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-            <line x1="4" y1="4" x2="14" y2="14" />
-            <line x1="14" y1="4" x2="4" y2="14" />
-          </svg>
-        </button>
-      </div>
-    </div>
-    <div class="mermaid-overlay-viewport" id="mermaid-overlay-viewport">
-      <!-- SVG clone injected here -->
-    </div>
-  </div>
-</div>
 
 <style>
   .mermaid-container {
@@ -107,36 +56,6 @@ const diagramId = `mermaid-${Math.random().toString(36).slice(2, 9)}`;
     font-style: italic;
   }
 
-  /* Expand hint button */
-  .mermaid-expand-hint {
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    background: var(--color-white);
-    border: 1px solid var(--color-pale-mint-dark);
-    border-radius: 0.375rem;
-    padding: 0.35rem;
-    color: var(--color-text-light);
-    cursor: zoom-in;
-    opacity: 0;
-    transition: opacity 0.2s ease, color 0.2s ease, background-color 0.2s ease;
-    z-index: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .mermaid-diagram:hover .mermaid-expand-hint,
-  .mermaid-diagram:focus-visible .mermaid-expand-hint {
-    opacity: 1;
-  }
-
-  .mermaid-expand-hint:hover {
-    color: var(--color-racing-green);
-    background-color: var(--color-pale-mint);
-    border-color: var(--color-racing-green-light);
-  }
-
   .mermaid-caption {
     text-align: center;
     font-size: 0.85rem;
@@ -146,118 +65,6 @@ const diagramId = `mermaid-${Math.random().toString(36).slice(2, 9)}`;
     font-family: var(--font-body);
   }
 
-  /* ── Fullscreen overlay ── */
-  .mermaid-overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    display: none;
-    flex-direction: column;
-  }
-
-  .mermaid-overlay.open {
-    display: flex;
-  }
-
-  .mermaid-overlay-backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(6, 54, 34, 0.85);
-    backdrop-filter: blur(4px);
-    -webkit-backdrop-filter: blur(4px);
-  }
-
-  .mermaid-overlay-content {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-
-  .mermaid-overlay-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.75rem 1.25rem;
-    background: rgba(6, 54, 34, 0.95);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    flex-shrink: 0;
-  }
-
-  .mermaid-overlay-caption {
-    font-family: var(--font-body);
-    font-size: 0.85rem;
-    color: rgba(255, 255, 255, 0.7);
-    font-style: italic;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 60%;
-  }
-
-  .mermaid-overlay-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-  }
-
-  .mermaid-overlay-btn {
-    background: none;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 0.375rem;
-    padding: 0.4rem;
-    color: rgba(255, 255, 255, 0.7);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
-  }
-
-  .mermaid-overlay-btn:hover {
-    color: var(--color-white);
-    background-color: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.3);
-  }
-
-  .mermaid-overlay-close {
-    margin-left: 0.5rem;
-    border-color: rgba(255, 183, 77, 0.3);
-    color: var(--color-peach);
-  }
-
-  .mermaid-overlay-close:hover {
-    background-color: rgba(255, 183, 77, 0.15);
-    border-color: var(--color-peach);
-    color: var(--color-peach);
-  }
-
-  .mermaid-overlay-viewport {
-    flex: 1;
-    overflow: auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 2rem;
-    cursor: grab;
-  }
-
-  .mermaid-overlay-viewport:active {
-    cursor: grabbing;
-  }
-
-  .mermaid-overlay-viewport :global(svg) {
-    max-width: 90vw;
-    max-height: calc(100vh - 8rem);
-    width: auto;
-    height: auto;
-    transition: transform 0.15s ease;
-    filter: drop-shadow(0 4px 24px rgba(0, 0, 0, 0.3));
-    transform-origin: center center;
-  }
-
-  /* ── Dark mode ── */
   html[data-theme="dark"] {
     .mermaid-diagram {
       background-color: var(--color-night-surface);
@@ -274,211 +81,391 @@ const diagramId = `mermaid-${Math.random().toString(36).slice(2, 9)}`;
       color: var(--color-night-text-muted);
     }
 
-    .mermaid-expand-hint {
-      background: var(--color-night-elevated);
-      border-color: var(--color-night-surface);
-      color: var(--color-night-text-muted);
-    }
-
-    .mermaid-expand-hint:hover {
-      color: var(--color-night-text);
-      background: var(--color-night-surface);
-      border-color: var(--color-night-accent);
-    }
-
     .mermaid-caption {
       color: var(--color-night-text-muted);
-    }
-
-    .mermaid-overlay-backdrop {
-      background: rgba(9, 26, 18, 0.92);
-    }
-
-    .mermaid-overlay-toolbar {
-      background: rgba(9, 26, 18, 0.97);
-      border-bottom-color: var(--color-night-elevated);
     }
   }
 </style>
 
 <script>
-  async function initMermaid() {
-    const mermaid = (await import('mermaid')).default;
+  // Guard: only run once per page even if multiple MermaidDiagram components exist
+  if (!(window as any).__mermaidInitialized) {
+    (window as any).__mermaidInitialized = true;
 
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    async function initMermaid() {
+      const mermaid = (await import('mermaid')).default;
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
-    mermaid.initialize({
-      startOnLoad: false,
-      theme: 'base',
-      themeVariables: {
-        primaryColor: isDark ? '#15301F' : '#DDF8E7',
-        primaryTextColor: isDark ? '#DDF8E7' : '#063622',
-        primaryBorderColor: isDark ? '#FFDAB3' : '#063622',
-        lineColor: isDark ? '#9CB8A2' : '#4A4A4A',
-        secondaryColor: isDark ? '#0E2518' : '#B8E8C0',
-        tertiaryColor: isDark ? '#091A12' : '#DDF8E7',
-        noteBkgColor: isDark ? '#15301F' : '#DDF8E7',
-        noteTextColor: isDark ? '#DDF8E7' : '#063622',
-        noteBorderColor: isDark ? '#FFDAB3' : '#063622',
-        actorBkg: isDark ? '#15301F' : '#DDF8E7',
-        actorBorder: isDark ? '#FFDAB3' : '#063622',
-        actorTextColor: isDark ? '#DDF8E7' : '#063622',
-        signalColor: isDark ? '#DDF8E7' : '#063622',
-        signalTextColor: isDark ? '#DDF8E7' : '#063622',
-        labelBoxBkgColor: isDark ? '#15301F' : '#DDF8E7',
-        labelBoxBorderColor: isDark ? '#FFDAB3' : '#063622',
-        labelTextColor: isDark ? '#DDF8E7' : '#063622',
-        fontFamily: 'Inter, system-ui, sans-serif',
-        fontSize: '14px',
-      },
-    });
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'base',
+        themeVariables: {
+          primaryColor: isDark ? '#15301F' : '#DDF8E7',
+          primaryTextColor: isDark ? '#DDF8E7' : '#063622',
+          primaryBorderColor: isDark ? '#FFDAB3' : '#063622',
+          lineColor: isDark ? '#9CB8A2' : '#4A4A4A',
+          secondaryColor: isDark ? '#0E2518' : '#B8E8C0',
+          tertiaryColor: isDark ? '#091A12' : '#DDF8E7',
+          noteBkgColor: isDark ? '#15301F' : '#DDF8E7',
+          noteTextColor: isDark ? '#DDF8E7' : '#063622',
+          noteBorderColor: isDark ? '#FFDAB3' : '#063622',
+          actorBkg: isDark ? '#15301F' : '#DDF8E7',
+          actorBorder: isDark ? '#FFDAB3' : '#063622',
+          actorTextColor: isDark ? '#DDF8E7' : '#063622',
+          signalColor: isDark ? '#DDF8E7' : '#063622',
+          signalTextColor: isDark ? '#DDF8E7' : '#063622',
+          labelBoxBkgColor: isDark ? '#15301F' : '#DDF8E7',
+          labelBoxBorderColor: isDark ? '#FFDAB3' : '#063622',
+          labelTextColor: isDark ? '#DDF8E7' : '#063622',
+          fontFamily: 'Inter, system-ui, sans-serif',
+          fontSize: '14px',
+        },
+      });
 
-    const containers = document.querySelectorAll('.mermaid-diagram');
-    for (const container of containers) {
-      const source = container.querySelector('.mermaid-source');
-      const loading = container.querySelector('.mermaid-loading');
-      if (!source) continue;
+      // Render all diagrams
+      const containers = document.querySelectorAll('.mermaid-diagram');
+      for (const container of containers) {
+        const source = container.querySelector('.mermaid-source');
+        const loading = container.querySelector('.mermaid-loading');
+        if (!source) continue;
 
-      const chartDef = source.textContent?.trim();
-      if (!chartDef) continue;
+        const chartDef = source.textContent?.trim();
+        if (!chartDef) continue;
 
-      try {
-        const id = container.id || `mermaid-${Math.random().toString(36).slice(2, 9)}`;
-        const { svg } = await mermaid.render(id + '-svg', chartDef);
-        if (loading) loading.remove();
-        source.remove();
-        container.insertAdjacentHTML('beforeend', svg);
-      } catch (err) {
-        console.error('Mermaid render error:', err);
-        if (loading) {
-          loading.innerHTML = '<span style="color: var(--color-peach-dark);">Diagram could not be rendered.</span>';
+        try {
+          const id = container.id || `mermaid-${Math.random().toString(36).slice(2, 9)}`;
+          const { svg } = await mermaid.render(id + '-svg', chartDef);
+          if (loading) loading.remove();
+          source.remove();
+          container.insertAdjacentHTML('beforeend', svg);
+        } catch (err) {
+          console.error('Mermaid render error:', err);
+          if (loading) {
+            loading.innerHTML = '<span style="color: var(--color-peach-dark);">Diagram could not be rendered.</span>';
+          }
         }
       }
+
+      // After all diagrams are rendered, set up the expand overlay
+      setupExpandOverlay();
     }
 
-    // ── Fullscreen expand setup ──
-    initExpandOverlay();
-  }
-
-  function initExpandOverlay() {
-    const overlay = document.getElementById('mermaid-overlay');
-    const viewport = document.getElementById('mermaid-overlay-viewport');
-    const captionEl = overlay?.querySelector('.mermaid-overlay-caption');
-    const closeBtn = document.getElementById('mermaid-overlay-close');
-    const zoomInBtn = document.getElementById('mermaid-zoom-in');
-    const zoomOutBtn = document.getElementById('mermaid-zoom-out');
-    const zoomResetBtn = document.getElementById('mermaid-zoom-reset');
-    const backdrop = overlay?.querySelector('.mermaid-overlay-backdrop');
-
-    if (!overlay || !viewport) return;
-
-    let currentScale = 1;
-    const ZOOM_STEP = 0.25;
-    const MIN_SCALE = 0.25;
-    const MAX_SCALE = 4;
-
-    function openOverlay(svgEl: SVGElement, caption: string) {
-      const clone = svgEl.cloneNode(true) as SVGElement;
-
-      // Ensure the SVG has a viewBox so it scales properly.
-      // Mermaid often sets width/height attributes but no viewBox.
-      if (!clone.getAttribute('viewBox')) {
-        const w = clone.getAttribute('width') || clone.getBoundingClientRect?.()?.width || 800;
-        const h = clone.getAttribute('height') || clone.getBoundingClientRect?.()?.height || 400;
-        clone.setAttribute('viewBox', `0 0 ${parseFloat(String(w))} ${parseFloat(String(h))}`);
-      }
-
-      // Remove fixed dimensions so CSS can control sizing
-      clone.removeAttribute('width');
-      clone.removeAttribute('height');
-      clone.removeAttribute('style');
-
-      viewport.innerHTML = '';
-      viewport.appendChild(clone);
-      if (captionEl) captionEl.textContent = caption || '';
-      currentScale = 1;
-      applyZoom();
-      overlay.classList.add('open');
-      overlay.setAttribute('aria-hidden', 'false');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeOverlay() {
-      overlay.classList.remove('open');
+    function setupExpandOverlay() {
+      // Create the overlay element once, appended to document.body
+      const overlay = document.createElement('div');
+      overlay.id = 'mermaid-fullscreen-overlay';
       overlay.setAttribute('aria-hidden', 'true');
-      document.body.style.overflow = '';
-      viewport.innerHTML = '';
-    }
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-label', 'Expanded diagram view');
+      overlay.innerHTML = `
+        <div class="mmd-overlay-backdrop"></div>
+        <div class="mmd-overlay-content">
+          <div class="mmd-overlay-toolbar">
+            <span class="mmd-overlay-caption"></span>
+            <div class="mmd-overlay-actions">
+              <button class="mmd-overlay-btn" data-action="zoom-out" aria-label="Zoom out" type="button">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                  <circle cx="8" cy="8" r="6"/><line x1="5" y1="8" x2="11" y2="8"/><line x1="13" y1="13" x2="17" y2="17"/>
+                </svg>
+              </button>
+              <button class="mmd-overlay-btn" data-action="zoom-reset" aria-label="Reset zoom" type="button">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                  <path d="M3 9h4M3 9l2-2M3 9l2 2"/><path d="M15 9h-4M15 9l-2-2M15 9l-2 2"/>
+                </svg>
+              </button>
+              <button class="mmd-overlay-btn" data-action="zoom-in" aria-label="Zoom in" type="button">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                  <circle cx="8" cy="8" r="6"/><line x1="8" y1="5" x2="8" y2="11"/><line x1="5" y1="8" x2="11" y2="8"/><line x1="13" y1="13" x2="17" y2="17"/>
+                </svg>
+              </button>
+              <button class="mmd-overlay-btn mmd-overlay-close" data-action="close" aria-label="Close" type="button">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <line x1="4" y1="4" x2="14" y2="14"/><line x1="14" y1="4" x2="4" y2="14"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="mmd-overlay-viewport"></div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
 
-    function applyZoom() {
-      const svg = viewport.querySelector('svg');
-      if (svg) svg.style.transform = `scale(${currentScale})`;
-    }
-
-    function zoomIn() {
-      currentScale = Math.min(MAX_SCALE, currentScale + ZOOM_STEP);
-      applyZoom();
-    }
-
-    function zoomOut() {
-      currentScale = Math.max(MIN_SCALE, currentScale - ZOOM_STEP);
-      applyZoom();
-    }
-
-    function zoomReset() {
-      currentScale = 1;
-      applyZoom();
-    }
-
-    // Attach click handlers to all diagram containers
-    document.querySelectorAll('.mermaid-diagram').forEach(container => {
-      const figure = container.closest('.mermaid-container');
-      const captionEl = figure?.querySelector('.mermaid-caption');
-      const captionText = captionEl?.textContent || '';
-
-      // Click on diagram or expand button
-      container.addEventListener('click', () => {
-        const svg = container.querySelector('svg');
-        if (svg) openOverlay(svg, captionText);
-      });
-
-      // Keyboard: Enter/Space to expand
-      container.addEventListener('keydown', (e: Event) => {
-        const ke = e as KeyboardEvent;
-        if (ke.key === 'Enter' || ke.key === ' ') {
-          ke.preventDefault();
-          const svg = container.querySelector('svg');
-          if (svg) openOverlay(svg, captionText);
+      // Inject styles for the overlay (global, not scoped)
+      const style = document.createElement('style');
+      style.textContent = `
+        #mermaid-fullscreen-overlay {
+          position: fixed;
+          inset: 0;
+          z-index: 9999;
+          display: none;
+          flex-direction: column;
         }
-      });
-    });
+        #mermaid-fullscreen-overlay.open {
+          display: flex;
+        }
+        .mmd-overlay-backdrop {
+          position: absolute;
+          inset: 0;
+          background: rgba(6, 54, 34, 0.88);
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
+        }
+        .mmd-overlay-content {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+        }
+        .mmd-overlay-toolbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.75rem 1.25rem;
+          background: rgba(6, 54, 34, 0.95);
+          border-bottom: 1px solid rgba(255,255,255,0.1);
+          flex-shrink: 0;
+        }
+        .mmd-overlay-caption {
+          font-family: var(--font-body, sans-serif);
+          font-size: 0.85rem;
+          color: rgba(255,255,255,0.7);
+          font-style: italic;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 55%;
+        }
+        .mmd-overlay-actions {
+          display: flex;
+          align-items: center;
+          gap: 0.25rem;
+        }
+        .mmd-overlay-btn {
+          background: none;
+          border: 1px solid rgba(255,255,255,0.15);
+          border-radius: 0.375rem;
+          padding: 0.4rem;
+          color: rgba(255,255,255,0.7);
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: color 0.15s, background-color 0.15s, border-color 0.15s;
+        }
+        .mmd-overlay-btn:hover {
+          color: #fff;
+          background: rgba(255,255,255,0.1);
+          border-color: rgba(255,255,255,0.3);
+        }
+        .mmd-overlay-close {
+          margin-left: 0.5rem;
+          border-color: rgba(255,183,77,0.3);
+          color: #FFDAB3;
+        }
+        .mmd-overlay-close:hover {
+          background: rgba(255,183,77,0.15);
+          border-color: #FFDAB3;
+          color: #FFDAB3;
+        }
+        .mmd-overlay-viewport {
+          flex: 1;
+          overflow: auto;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          padding: 2rem;
+        }
+        .mmd-overlay-viewport svg {
+          max-width: 90vw;
+          max-height: calc(100vh - 7rem);
+          width: auto;
+          height: auto;
+          filter: drop-shadow(0 4px 24px rgba(0,0,0,0.3));
+          transform-origin: center center;
+          transition: transform 0.15s ease;
+        }
+        html[data-theme="dark"] .mmd-overlay-backdrop {
+          background: rgba(9,26,18,0.92);
+        }
+        html[data-theme="dark"] .mmd-overlay-toolbar {
+          background: rgba(9,26,18,0.97);
+          border-bottom-color: rgba(255,255,255,0.05);
+        }
+      `;
+      document.head.appendChild(style);
 
-    // Close handlers
-    closeBtn?.addEventListener('click', closeOverlay);
-    backdrop?.addEventListener('click', closeOverlay);
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && overlay.classList.contains('open')) {
-        closeOverlay();
+      // State
+      const viewport = overlay.querySelector('.mmd-overlay-viewport') as HTMLElement;
+      const captionEl = overlay.querySelector('.mmd-overlay-caption') as HTMLElement;
+      let currentScale = 1;
+      const ZOOM_STEP = 0.25;
+      const MIN_SCALE = 0.3;
+      const MAX_SCALE = 4;
+
+      function openOverlay(svgEl: SVGElement, caption: string) {
+        const clone = svgEl.cloneNode(true) as SVGElement;
+
+        // Ensure the SVG has a viewBox for proper scaling.
+        // Mermaid sets width/height pixel attributes but often no viewBox.
+        if (!clone.getAttribute('viewBox')) {
+          const w = parseFloat(clone.getAttribute('width') || '800');
+          const h = parseFloat(clone.getAttribute('height') || '400');
+          clone.setAttribute('viewBox', `0 0 ${w} ${h}`);
+        }
+
+        // Remove fixed pixel dimensions — let CSS handle sizing
+        clone.removeAttribute('width');
+        clone.removeAttribute('height');
+        clone.removeAttribute('style');
+
+        viewport.innerHTML = '';
+        viewport.appendChild(clone);
+        captionEl.textContent = caption || '';
+        currentScale = 1;
+        applyZoom();
+        overlay.classList.add('open');
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
       }
-    });
 
-    // Zoom handlers
-    zoomInBtn?.addEventListener('click', zoomIn);
-    zoomOutBtn?.addEventListener('click', zoomOut);
-    zoomResetBtn?.addEventListener('click', zoomReset);
+      function closeOverlay() {
+        overlay.classList.remove('open');
+        overlay.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        viewport.innerHTML = '';
+      }
 
-    // Scroll-to-zoom inside viewport
-    viewport.addEventListener('wheel', (e) => {
-      if (!overlay.classList.contains('open')) return;
-      e.preventDefault();
-      if (e.deltaY < 0) zoomIn();
-      else zoomOut();
-    }, { passive: false });
-  }
+      function applyZoom() {
+        const svg = viewport.querySelector('svg');
+        if (svg) svg.style.transform = `scale(${currentScale})`;
+      }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initMermaid);
-  } else {
-    initMermaid();
+      function zoomIn() {
+        currentScale = Math.min(MAX_SCALE, currentScale + ZOOM_STEP);
+        applyZoom();
+      }
+
+      function zoomOut() {
+        currentScale = Math.max(MIN_SCALE, currentScale - ZOOM_STEP);
+        applyZoom();
+      }
+
+      // Toolbar button actions
+      overlay.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement).closest('[data-action]');
+        if (!btn) return;
+        const action = btn.getAttribute('data-action');
+        if (action === 'close') closeOverlay();
+        else if (action === 'zoom-in') zoomIn();
+        else if (action === 'zoom-out') zoomOut();
+        else if (action === 'zoom-reset') { currentScale = 1; applyZoom(); }
+      });
+
+      // Close on backdrop click
+      overlay.querySelector('.mmd-overlay-backdrop')?.addEventListener('click', closeOverlay);
+
+      // Close on ESC
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && overlay.classList.contains('open')) closeOverlay();
+      });
+
+      // Scroll-to-zoom inside viewport
+      viewport.addEventListener('wheel', (e) => {
+        if (!overlay.classList.contains('open')) return;
+        e.preventDefault();
+        if (e.deltaY < 0) zoomIn(); else zoomOut();
+      }, { passive: false });
+
+      // Attach click handlers to each diagram
+      document.querySelectorAll('.mermaid-diagram').forEach(container => {
+        const figure = container.closest('.mermaid-container');
+        const cap = figure?.querySelector('.mermaid-caption');
+        const capText = cap?.textContent || '';
+
+        // Add expand hint icon
+        const hint = document.createElement('button');
+        hint.className = 'mmd-expand-hint';
+        hint.setAttribute('aria-label', 'Expand diagram');
+        hint.setAttribute('type', 'button');
+        hint.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="5.5 1 1 1 1 5.5"/><polyline points="10.5 15 15 15 15 10.5"/>
+          <line x1="1" y1="1" x2="6" y2="6"/><line x1="15" y1="15" x2="10" y2="10"/>
+        </svg>`;
+        container.appendChild(hint);
+
+        // Inject hint styles once
+        if (!document.getElementById('mmd-hint-styles')) {
+          const hs = document.createElement('style');
+          hs.id = 'mmd-hint-styles';
+          hs.textContent = `
+            .mmd-expand-hint {
+              position: absolute;
+              top: 0.6rem;
+              right: 0.6rem;
+              background: var(--color-white, #fff);
+              border: 1px solid var(--color-pale-mint-dark, #B8E8C0);
+              border-radius: 0.375rem;
+              padding: 0.3rem;
+              color: var(--color-text-light, #7A7A7A);
+              cursor: zoom-in;
+              opacity: 0;
+              transition: opacity 0.2s, color 0.15s, background-color 0.15s;
+              z-index: 2;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+            }
+            .mermaid-diagram:hover .mmd-expand-hint,
+            .mermaid-diagram:focus-within .mmd-expand-hint {
+              opacity: 1;
+            }
+            .mmd-expand-hint:hover {
+              color: var(--color-racing-green, #063622);
+              background: var(--color-pale-mint, #DDF8E7);
+            }
+            html[data-theme="dark"] .mmd-expand-hint {
+              background: var(--color-night-elevated, #15301F);
+              border-color: var(--color-night-surface, #0E2518);
+              color: var(--color-night-text-muted, #9CB8A2);
+            }
+            html[data-theme="dark"] .mmd-expand-hint:hover {
+              color: var(--color-night-text, #DDF8E7);
+              background: var(--color-night-surface, #0E2518);
+            }
+          `;
+          document.head.appendChild(hs);
+        }
+
+        function handleExpand() {
+          const svg = container.querySelector(':scope > svg') as SVGElement;
+          if (svg) openOverlay(svg, capText);
+        }
+
+        container.addEventListener('click', (e) => {
+          // Don't trigger if clicking inside the SVG links or text selection
+          if ((e.target as HTMLElement).closest('a')) return;
+          handleExpand();
+        });
+
+        hint.addEventListener('click', (e) => {
+          e.stopPropagation();
+          handleExpand();
+        });
+
+        container.addEventListener('keydown', (e) => {
+          if ((e as KeyboardEvent).key === 'Enter' || (e as KeyboardEvent).key === ' ') {
+            e.preventDefault();
+            handleExpand();
+          }
+        });
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initMermaid);
+    } else {
+      initMermaid();
+    }
   }
 </script>

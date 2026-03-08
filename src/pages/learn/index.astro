@@ -77,8 +77,7 @@ const difficultyColors: Record<string, { bg: string; text: string; darkBg: strin
   <section class="lp-paths-section">
     <div class="lp-paths-grid">
       {learningPaths.map((path, pathIndex) => (
-        <a
-          href={`/topics/${path.steps[0].slug}`}
+        <div
           class="lp-card"
           style={`animation-delay: ${0.1 + pathIndex * 0.1}s;`}
           data-difficulty={path.difficulty}
@@ -109,7 +108,7 @@ const difficultyColors: Record<string, { bg: string; text: string; darkBg: strin
                   )}
                 </div>
                 <div class="lp-step-content">
-                  <span class="lp-step-title">{step.title}</span>
+                  <a href={`/topics/${step.slug}`} class="lp-step-title">{step.title}</a>
                   <span class="lp-step-time">{step.readingTime}</span>
                 </div>
               </li>
@@ -118,9 +117,9 @@ const difficultyColors: Record<string, { bg: string; text: string; darkBg: strin
 
           <div class="lp-card-footer">
             <span class="lp-card-total">~{path.estimatedMinutes} min total</span>
-            <span class="lp-card-start">Start path &rarr;</span>
+            <a href={`/topics/${path.steps[0].slug}`} class="lp-card-start">Start path &rarr;</a>
           </div>
-        </a>
+        </div>
       ))}
     </div>
   </section>
@@ -337,7 +336,6 @@ const difficultyColors: Record<string, { bg: string; text: string; darkBg: strin
     border: 1px solid var(--color-pale-mint-dark);
     border-radius: 0.75rem;
     padding: 2rem 1.75rem 1.5rem;
-    text-decoration: none;
     transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
     animation: lpFadeInUp 0.6s ease both;
   }
@@ -487,6 +485,12 @@ const difficultyColors: Record<string, { bg: string; text: string; darkBg: strin
     font-weight: 500;
     color: var(--color-racing-green);
     line-height: 1.4;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .lp-step-title:hover {
+    color: var(--color-peach-dark);
   }
 
   .lp-step-time {
@@ -520,10 +524,12 @@ const difficultyColors: Record<string, { bg: string; text: string; darkBg: strin
     font-size: 0.85rem;
     font-weight: 600;
     color: var(--color-peach-dark);
+    text-decoration: none;
     transition: transform 0.2s ease;
+    display: inline-block;
   }
 
-  .lp-card:hover .lp-card-start {
+  .lp-card-start:hover {
     transform: translateX(3px);
   }
 
@@ -674,6 +680,10 @@ const difficultyColors: Record<string, { bg: string; text: string; darkBg: strin
 
     .lp-step-title {
       color: var(--color-night-text);
+    }
+
+    .lp-step-title:hover {
+      color: var(--color-night-accent);
     }
 
     .lp-step-time {

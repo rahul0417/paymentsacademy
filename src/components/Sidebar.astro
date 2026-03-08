@@ -1,0 +1,205 @@
+---
+import { getCollection } from 'astro:content';
+
+interface Props {
+  currentSlug: string;
+}
+
+const { currentSlug } = Astro.props;
+
+const allTopics = await getCollection('topics');
+
+const themeOrder = [
+  'Foundations',
+  'Transaction Lifecycle',
+  'Card Ecosystem',
+  'Non-Card Payments',
+  'Moving Money',
+  'Products & Use Cases',
+  'Trust & Compliance',
+] as const;
+
+// Group topics by theme and sort by order within each theme
+const groupedTopics = themeOrder.map((theme) => {
+  const topics = allTopics
+    .filter((t) => t.data.theme === theme)
+    .sort((a, b) => a.data.order - b.data.order);
+  return { theme, topics };
+}).filter((group) => group.topics.length > 0);
+---
+
+<aside class="sidebar" id="topic-sidebar">
+  <nav class="sidebar-nav" aria-label="Topic navigation">
+    <div class="sidebar-header">
+      <h2 class="sidebar-title">Topics</h2>
+    </div>
+
+    {groupedTopics.map(({ theme, topics }) => {
+      const isCurrentTheme = topics.some((t) => t.id === currentSlug);
+      return (
+        <details class="sidebar-group" open={isCurrentTheme}>
+          <summary class="sidebar-group-label">
+            <svg class="sidebar-chevron" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4.5 2.5l3.5 3.5-3.5 3.5" />
+            </svg>
+            {theme}
+          </summary>
+          <ul class="sidebar-topic-list">
+            {topics.map((topic) => {
+              const isActive = topic.id === currentSlug;
+              return (
+                <li>
+                  <a
+                    href={`/topics/${topic.id}`}
+                    class:list={['sidebar-link', { active: isActive }]}
+                    aria-current={isActive ? 'page' : undefined}
+                  >
+                    {topic.data.title}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </details>
+      );
+    })}
+  </nav>
+</aside>
+
+<style>
+  .sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 5rem;
+    max-height: calc(100vh - 6rem);
+    overflow-y: auto;
+    padding-right: 1.5rem;
+    padding-bottom: 2rem;
+  }
+
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .sidebar-header {
+    margin-bottom: 0.75rem;
+  }
+
+  .sidebar-title {
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-stone-light);
+    margin: 0;
+  }
+
+  .sidebar-group {
+    border: none;
+    margin-bottom: 0.25rem;
+  }
+
+  .sidebar-group[open] .sidebar-chevron {
+    transform: rotate(90deg);
+  }
+
+  .sidebar-group-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-body);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-charcoal);
+    cursor: pointer;
+    padding: 0.4rem 0;
+    list-style: none;
+    user-select: none;
+  }
+
+  .sidebar-group-label::-webkit-details-marker {
+    display: none;
+  }
+
+  .sidebar-group-label::marker {
+    display: none;
+    content: '';
+  }
+
+  .sidebar-chevron {
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+    color: var(--color-stone-light);
+  }
+
+  .sidebar-topic-list {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0.25rem 0;
+  }
+
+  .sidebar-link {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--color-stone);
+    text-decoration: none;
+    padding: 0.3rem 0.75rem;
+    margin-left: 0.25rem;
+    border-left: 2px solid transparent;
+    border-radius: 0 0.25rem 0.25rem 0;
+    transition: all 0.15s ease;
+  }
+
+  .sidebar-link:hover {
+    color: var(--color-charcoal);
+    background-color: var(--color-cream-dark);
+    border-left-color: var(--color-parchment);
+  }
+
+  .sidebar-link.active {
+    color: var(--color-copper-dark);
+    background-color: var(--color-cream-dark);
+    border-left-color: var(--color-copper);
+    font-weight: 500;
+  }
+
+  @media (max-width: 1023px) {
+    .sidebar {
+      display: none;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .sidebar-title {
+      color: var(--color-night-text-muted);
+    }
+
+    .sidebar-group-label {
+      color: var(--color-night-text);
+    }
+
+    .sidebar-chevron {
+      color: var(--color-night-text-muted);
+    }
+
+    .sidebar-link {
+      color: var(--color-night-text-muted);
+    }
+
+    .sidebar-link:hover {
+      color: var(--color-night-text);
+      background-color: var(--color-night-surface);
+      border-left-color: var(--color-night-elevated);
+    }
+
+    .sidebar-link.active {
+      color: var(--color-night-copper);
+      background-color: var(--color-night-surface);
+      border-left-color: var(--color-night-copper);
+    }
+  }
+</style>

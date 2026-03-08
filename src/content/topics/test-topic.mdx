@@ -1,0 +1,54 @@
+---
+title: "Test Topic"
+description: "A test topic to verify all components work."
+theme: "Foundations"
+readingTime: "3 min read"
+order: 0
+relatedTopics: []
+glossaryTerms:
+  - term: "Authorization"
+    definition: "A hold placed on funds at the time of a card swipe, dip, or tap."
+  - term: "Settlement"
+    definition: "The actual transfer of funds between banks, typically the next business day."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## How a Card Transaction Works
+
+When you tap your card at a coffee shop, a surprisingly complex chain of events unfolds in milliseconds. The process begins with <GlossaryTerm term="Authorization" definition="A hold placed on funds at the time of a card swipe, dip, or tap." />, where the merchant's terminal sends a request through the card network to your issuing bank.
+
+If approved, the funds are held but not yet transferred. The actual movement of money happens during <GlossaryTerm term="Settlement" definition="The actual transfer of funds between banks, typically the next business day." />, which typically occurs the next business day.
+
+## The Flow
+
+Here is a simplified view of how a card transaction flows from the cardholder to the issuing bank and back:
+
+<MermaidDiagram
+  chart={`sequenceDiagram
+    participant C as Cardholder
+    participant M as Merchant
+    participant A as Acquirer
+    participant N as Card Network
+    participant I as Issuing Bank
+    C->>M: Tap / Swipe / Dip
+    M->>A: Authorization Request
+    A->>N: Route Transaction
+    N->>I: Approve or Decline?
+    I-->>N: Approved
+    N-->>A: Approved
+    A-->>M: Approved
+    M-->>C: Receipt`}
+  caption="Simplified card authorization flow"
+/>
+
+## Key Takeaways
+
+1. **Authorization is not settlement.** The money does not move immediately.
+2. **Multiple parties are involved.** Even a simple tap involves at least four entities.
+3. **Speed matters.** The entire authorization flow happens in under two seconds.
+
+---
+
+This is a test page to verify that the content collection, layout, sidebar, glossary tooltips, and Mermaid diagrams all render correctly.

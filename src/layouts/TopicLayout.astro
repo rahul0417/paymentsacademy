@@ -1,0 +1,347 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Sidebar from '../components/Sidebar.astro';
+import RelatedTopics from '../components/RelatedTopics.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  theme: string;
+  readingTime: string;
+  order: number;
+  relatedTopics?: string[];
+  glossaryTerms?: { term: string; definition: string }[];
+  slug: string;
+}
+
+const {
+  title,
+  description,
+  theme,
+  readingTime,
+  relatedTopics = [],
+  slug,
+} = Astro.props;
+
+const themeColors: Record<string, string> = {
+  'Foundations': 'var(--color-sage)',
+  'Transaction Lifecycle': 'var(--color-copper)',
+  'Card Ecosystem': 'var(--color-amber)',
+  'Non-Card Payments': 'var(--color-sage-light)',
+  'Moving Money': 'var(--color-copper-light)',
+  'Products & Use Cases': 'var(--color-amber-light)',
+  'Trust & Compliance': 'var(--color-stone)',
+};
+
+const badgeColor = themeColors[theme] || 'var(--color-stone)';
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="topic-page">
+    <Sidebar currentSlug={slug} />
+
+    <article class="topic-content">
+      <!-- Article header -->
+      <header class="topic-header">
+        <div class="topic-meta">
+          <span class="theme-badge" style={`color: ${badgeColor}`}>{theme}</span>
+          <span class="reading-time">{readingTime}</span>
+        </div>
+        <h1 class="topic-title">{title}</h1>
+        <div class="tldr-box">
+          <span class="tldr-label">TL;DR</span>
+          <p class="tldr-text">{description}</p>
+        </div>
+      </header>
+
+      <!-- Article body -->
+      <div class="prose prose-lg">
+        <slot />
+      </div>
+
+      <!-- Related topics -->
+      {relatedTopics.length > 0 && (
+        <RelatedTopics slugs={relatedTopics} />
+      )}
+    </article>
+  </div>
+
+  <!-- Mobile sidebar toggle -->
+  <button
+    type="button"
+    class="sidebar-mobile-toggle"
+    id="sidebar-toggle"
+    aria-label="Open topic navigation"
+  >
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+      <path d="M3 5h14M3 10h10M3 15h12" />
+    </svg>
+    <span>Topics</span>
+  </button>
+
+  <!-- Mobile sidebar overlay -->
+  <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+  <div class="sidebar-mobile" id="sidebar-mobile">
+    <div class="sidebar-mobile-header">
+      <span class="font-heading font-semibold">Navigate</span>
+      <button type="button" class="sidebar-close" id="sidebar-close" aria-label="Close navigation">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M4 4l10 10M14 4L4 14" />
+        </svg>
+      </button>
+    </div>
+    <Sidebar currentSlug={slug} />
+  </div>
+</BaseLayout>
+
+<style>
+  .topic-page {
+    max-width: 72rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    display: flex;
+    gap: 3rem;
+    align-items: flex-start;
+  }
+
+  .topic-content {
+    flex: 1;
+    min-width: 0;
+    max-width: 70ch;
+  }
+
+  .topic-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .topic-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .theme-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .reading-time {
+    font-size: 0.8rem;
+    color: var(--color-stone-light);
+  }
+
+  .topic-title {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    font-weight: 600;
+    line-height: 1.15;
+    color: var(--color-charcoal);
+    margin: 0 0 1.5rem 0;
+  }
+
+  .tldr-box {
+    background-color: var(--color-cream-dark);
+    border-left: 3px solid var(--color-copper);
+    border-radius: 0 0.5rem 0.5rem 0;
+    padding: 1rem 1.25rem;
+  }
+
+  .tldr-label {
+    display: inline-block;
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-copper);
+    margin-bottom: 0.25rem;
+  }
+
+  .tldr-text {
+    font-size: 0.95rem;
+    color: var(--color-charcoal-light);
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* Mobile sidebar toggle button */
+  .sidebar-mobile-toggle {
+    display: none;
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 40;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    background-color: var(--color-charcoal);
+    color: var(--color-cream);
+    border: none;
+    border-radius: 2rem;
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.2s ease;
+  }
+
+  .sidebar-mobile-toggle:hover {
+    background-color: var(--color-charcoal-light);
+  }
+
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.4);
+    z-index: 45;
+  }
+
+  .sidebar-overlay.open {
+    display: block;
+  }
+
+  .sidebar-mobile {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 300px;
+    z-index: 50;
+    background-color: var(--color-cream);
+    border-right: 1px solid var(--color-parchment);
+    padding: 1.25rem;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar-mobile.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-mobile-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--color-parchment);
+  }
+
+  .sidebar-close {
+    padding: 0.25rem;
+    background: none;
+    border: none;
+    color: var(--color-stone);
+    cursor: pointer;
+    border-radius: 0.25rem;
+    transition: color 0.2s ease;
+  }
+
+  .sidebar-close:hover {
+    color: var(--color-charcoal);
+  }
+
+  /* Force nested sidebar to show in mobile drawer */
+  .sidebar-mobile :global(.sidebar) {
+    display: block !important;
+    position: static;
+    width: 100%;
+    max-height: none;
+    padding-right: 0;
+  }
+
+  @media (max-width: 1023px) {
+    .sidebar-mobile-toggle {
+      display: flex;
+    }
+
+    .sidebar-mobile {
+      display: block;
+    }
+
+    .topic-page {
+      padding: 1.5rem 1rem;
+    }
+
+    .topic-title {
+      font-size: 2rem;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .topic-title {
+      color: var(--color-night-text);
+    }
+
+    .reading-time {
+      color: var(--color-night-text-muted);
+    }
+
+    .tldr-box {
+      background-color: var(--color-night-surface);
+      border-left-color: var(--color-night-copper);
+    }
+
+    .tldr-label {
+      color: var(--color-night-copper);
+    }
+
+    .tldr-text {
+      color: var(--color-night-text-muted);
+    }
+
+    .sidebar-mobile-toggle {
+      background-color: var(--color-night-elevated);
+      color: var(--color-night-text);
+    }
+
+    .sidebar-mobile-toggle:hover {
+      background-color: var(--color-night-surface);
+    }
+
+    .sidebar-mobile {
+      background-color: var(--color-night);
+      border-right-color: var(--color-night-elevated);
+    }
+
+    .sidebar-mobile-header {
+      border-bottom-color: var(--color-night-elevated);
+    }
+
+    .sidebar-close {
+      color: var(--color-night-text-muted);
+    }
+
+    .sidebar-close:hover {
+      color: var(--color-night-text);
+    }
+  }
+</style>
+
+<script>
+  const toggle = document.getElementById('sidebar-toggle');
+  const overlay = document.getElementById('sidebar-overlay');
+  const mobile = document.getElementById('sidebar-mobile');
+  const close = document.getElementById('sidebar-close');
+
+  function openSidebar() {
+    overlay?.classList.add('open');
+    mobile?.classList.add('open');
+  }
+
+  function closeSidebar() {
+    overlay?.classList.remove('open');
+    mobile?.classList.remove('open');
+  }
+
+  toggle?.addEventListener('click', openSidebar);
+  overlay?.addEventListener('click', closeSidebar);
+  close?.addEventListener('click', closeSidebar);
+</script>

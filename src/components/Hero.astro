@@ -1,0 +1,248 @@
+---
+// Hero section for the FintechAcademy homepage
+---
+
+<section class="hero">
+  <div class="hero-inner">
+    <!-- Decorative ornament -->
+    <div class="hero-ornament" aria-hidden="true">
+      <svg width="48" height="6" viewBox="0 0 48 6" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="3" cy="3" r="3" fill="currentColor" opacity="0.3" />
+        <line x1="12" y1="3" x2="36" y2="3" stroke="currentColor" stroke-width="1.5" opacity="0.2" />
+        <circle cx="45" cy="3" r="3" fill="currentColor" opacity="0.3" />
+      </svg>
+    </div>
+
+    <h1 class="hero-heading">
+      Understand How<br />
+      <span class="hero-heading-accent">Money Moves</span>
+    </h1>
+
+    <p class="hero-subtitle">
+      A free, open knowledge base that explains the payments ecosystem
+      &mdash; from card swipes to cross-border settlements &mdash;
+      in plain language.
+    </p>
+
+    <div class="hero-actions">
+      <a href="/topics/anatomy-of-a-swipe" class="hero-cta-primary">
+        Start Here: Anatomy of a Swipe
+        <span class="hero-cta-arrow" aria-hidden="true">&rarr;</span>
+      </a>
+      <a href="#topics" class="hero-cta-secondary">
+        Or browse all topics below
+      </a>
+    </div>
+
+    <!-- Bottom decorative line -->
+    <div class="hero-rule" aria-hidden="true">
+      <div class="hero-rule-line"></div>
+      <div class="hero-rule-diamond"></div>
+      <div class="hero-rule-line"></div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding: 5rem 1.5rem 3.5rem;
+    text-align: center;
+    position: relative;
+  }
+
+  .hero-inner {
+    max-width: 44rem;
+    margin: 0 auto;
+  }
+
+  .hero-ornament {
+    color: var(--color-copper);
+    margin-bottom: 2rem;
+    animation: fadeInDown 0.6s ease both;
+  }
+
+  .hero-heading {
+    font-family: var(--font-heading);
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    color: var(--color-charcoal);
+    margin-bottom: 1.5rem;
+    animation: fadeInUp 0.7s ease both;
+    animation-delay: 0.1s;
+  }
+
+  .hero-heading-accent {
+    color: var(--color-copper);
+    font-style: italic;
+  }
+
+  .hero-subtitle {
+    font-family: var(--font-body);
+    font-size: clamp(1.05rem, 2.2vw, 1.25rem);
+    line-height: 1.7;
+    color: var(--color-stone);
+    max-width: 36rem;
+    margin: 0 auto 2.5rem;
+    animation: fadeInUp 0.7s ease both;
+    animation-delay: 0.25s;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    animation: fadeInUp 0.7s ease both;
+    animation-delay: 0.4s;
+  }
+
+  .hero-cta-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--color-ivory);
+    background-color: var(--color-copper);
+    padding: 0.875rem 2rem;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: background-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 2px 12px rgba(184, 115, 51, 0.15);
+  }
+
+  .hero-cta-primary:hover {
+    background-color: var(--color-copper-dark);
+    color: var(--color-ivory);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(184, 115, 51, 0.25);
+  }
+
+  .hero-cta-arrow {
+    transition: transform 0.2s ease;
+  }
+
+  .hero-cta-primary:hover .hero-cta-arrow {
+    transform: translateX(3px);
+  }
+
+  .hero-cta-secondary {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--color-stone-light);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+
+  .hero-cta-secondary:hover {
+    color: var(--color-copper);
+    border-bottom-color: var(--color-copper-light);
+  }
+
+  .hero-rule {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 3.5rem;
+    animation: fadeIn 0.8s ease both;
+    animation-delay: 0.6s;
+  }
+
+  .hero-rule-line {
+    width: 3rem;
+    height: 1px;
+    background-color: var(--color-parchment);
+  }
+
+  .hero-rule-diamond {
+    width: 6px;
+    height: 6px;
+    background-color: var(--color-copper-light);
+    transform: rotate(45deg);
+    opacity: 0.5;
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* Dark mode */
+  @media (prefers-color-scheme: dark) {
+    .hero-heading {
+      color: var(--color-night-text);
+    }
+
+    .hero-heading-accent {
+      color: var(--color-night-copper);
+    }
+
+    .hero-subtitle {
+      color: var(--color-night-text-muted);
+    }
+
+    .hero-cta-primary {
+      background-color: var(--color-night-copper);
+      color: var(--color-night);
+      box-shadow: 0 2px 12px rgba(212, 149, 90, 0.2);
+    }
+
+    .hero-cta-primary:hover {
+      background-color: var(--color-amber-light);
+      color: var(--color-night);
+      box-shadow: 0 4px 20px rgba(212, 149, 90, 0.3);
+    }
+
+    .hero-cta-secondary {
+      color: var(--color-night-text-muted);
+    }
+
+    .hero-cta-secondary:hover {
+      color: var(--color-night-copper);
+      border-bottom-color: var(--color-night-copper);
+    }
+
+    .hero-rule-line {
+      background-color: var(--color-night-elevated);
+    }
+
+    .hero-rule-diamond {
+      background-color: var(--color-night-copper);
+    }
+  }
+
+  /* Responsive */
+  @media (min-width: 768px) {
+    .hero {
+      padding: 7rem 2rem 4rem;
+    }
+  }
+</style>

@@ -1,0 +1,171 @@
+---
+title: "Anatomy of a Swipe"
+description: "What really happens in the few seconds between tapping your card and seeing 'Approved'? Follow a payment from swipe to settlement."
+theme: "Foundations"
+readingTime: "8 min read"
+order: 1
+relatedTopics: ["payments-ecosystem-overview", "authorization", "card-networks"]
+glossaryTerms:
+  - term: "Authorization"
+    definition: "A hold placed on funds at the time of a card swipe, dip, or tap. No money moves yet."
+  - term: "Clearing"
+    definition: "The end-of-day process where merchants confirm transaction details and submit them for settlement."
+  - term: "Settlement"
+    definition: "The actual transfer of funds between banks, typically the next business day via systems like Fedwire."
+  - term: "BIN"
+    definition: "Bank Identification Number — the first six digits of a card number that identify the issuing bank."
+  - term: "Issuer"
+    definition: "The bank that issued the card to the consumer and approves or declines transactions."
+  - term: "Acquirer"
+    definition: "The bank or processor that handles card payments on behalf of the merchant."
+  - term: "Card Network"
+    definition: "The rails (like Visa or Mastercard) that connect issuers and acquirers and route transactions."
+  - term: "Interchange"
+    definition: "A fee paid by the merchant's bank to the cardholder's bank on each card transaction."
+  - term: "ISO 8583"
+    definition: "The international standard messaging format used for card transaction communications."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## Two Seconds, Six Entities, One Cup of Coffee
+
+You walk into a coffee shop, order a $5 latte, and tap your card on the terminal. There's a brief pause — maybe a second, maybe two — and then the screen reads **"Approved."** You grab your coffee and leave.
+
+That felt simple. But in those two seconds, your payment request traveled through at least six different entities, crossed the country, underwent a fraud check, triggered a funds hold at your bank, and returned with an answer — all before you finished putting your card back in your wallet.
+
+Understanding what happened in those two seconds is the single most useful thing you can learn about payments. Every chargeback, every fee structure, every fintech product — they all trace back to this fundamental flow. Let's break it open.
+
+## The Players
+
+Before we trace the journey, let's meet the cast. Every card transaction involves at least five key players, connected in what the industry calls the **four-party model** (four parties plus the network in the middle).
+
+- **You, the Cardholder.** You hold a card issued by your bank.
+- **The Merchant.** The coffee shop — or more precisely, their point-of-sale terminal.
+- **The <GlossaryTerm term="Acquirer" definition="The bank or processor that handles card payments on behalf of the merchant." />.** This is the merchant's bank or payment processor. They're the merchant's gateway into the card network. Companies like Chase Paymentech, Worldpay, or Stripe sit in this role.
+- **The <GlossaryTerm term="Card Network" definition="The rails (like Visa or Mastercard) that connect issuers and acquirers and route transactions." />.** Visa, Mastercard, American Express, Discover. Think of them as the postal service of payments — they don't hold your money, but they make sure messages get to the right place.
+- **The <GlossaryTerm term="Issuer" definition="The bank that issued the card to the consumer and approves or declines transactions." />.** Your bank — the one that gave you the card. Chase, Bank of America, Capital One. They're the ones who actually say yes or no.
+
+Here's how these players connect:
+
+<MermaidDiagram
+  chart={`graph LR
+    A[Cardholder] -->|Pays| B[Merchant]
+    B -->|Routes via| C[Acquirer]
+    C <-->|Transaction| D[Card Network]
+    D <-->|Approves| E[Issuer]`}
+  caption="The four-party model: how card payments flow between the key players"
+/>
+
+Notice that the Cardholder and Merchant are on the edges. They never talk directly to the card network. Everything is mediated through the acquirer and issuer, with the network acting as the switchboard in the middle.
+
+Now that we know who's involved, let's follow your $5 latte through the system. The journey happens in three acts: **Authorization**, **Clearing**, and **Settlement**. Most people think of a card payment as one event. It's actually three, spread over two to three days.
+
+## Act 1: Authorization — The Ask
+
+**When it happens:** Right now, at the terminal. Two seconds.
+
+You tap your card. Here's what unfolds.
+
+**The terminal reads your card.** Whether you tap (NFC), dip (chip/EMV), or swipe (magnetic stripe), the terminal captures your card data — your card number, expiration date, and a cryptographic token if you're using a chip or tap. Chip and tap transactions generate a one-time code that makes each transaction unique, which is a big reason they're more secure than swipes.
+
+**The acquirer receives the request.** The merchant's terminal sends the transaction to the <GlossaryTerm term="Acquirer" definition="The bank or processor that handles card payments on behalf of the merchant." /> — the merchant's payment processor. This message includes the card number, the amount ($5.00), the merchant's identity, and a timestamp. It's formatted in a standard called <GlossaryTerm term="ISO 8583" definition="The international standard messaging format used for card transaction communications." />, which is the lingua franca of card payments worldwide. Every authorization request, every response, every reversal — they all speak ISO 8583.
+
+**The network routes it.** The acquirer forwards the request to the <GlossaryTerm term="Card Network" definition="The rails (like Visa or Mastercard) that connect issuers and acquirers and route transactions." />. How does Visa know where to send it? The answer is the <GlossaryTerm term="BIN" definition="Bank Identification Number — the first six digits of a card number that identify the issuing bank." /> — the Bank Identification Number. The first six digits of your card number identify your issuing bank. Visa maintains a routing table that maps every BIN to a specific issuer. Your card starts with 4147? That's Chase. The network looks it up and forwards the request.
+
+**The issuer decides.** Your bank — the <GlossaryTerm term="Issuer" definition="The bank that issued the card to the consumer and approves or declines transactions." /> — now has the request. In milliseconds, it runs a gauntlet of checks:
+
+- **Is this card valid?** Not expired, not reported stolen, not frozen.
+- **Are there sufficient funds?** For a debit card, is the checking account balance enough? For credit, is there available credit?
+- **Does this look like fraud?** The issuer's fraud engine evaluates the transaction. Are you buying coffee in New York when your last purchase was in London an hour ago? Is the amount unusual? Does it match your spending patterns?
+
+If everything checks out, the issuer sends back an approval code. If not, it sends a decline — and a reason code that tells the merchant (in very general terms) why.
+
+**The response travels back.** The approval flows back the exact same path — issuer to network, network to acquirer, acquirer to terminal. The screen lights up: **"Approved."**
+
+<MermaidDiagram
+  chart={`sequenceDiagram
+    participant C as Cardholder
+    participant M as Merchant Terminal
+    participant A as Acquirer
+    participant N as Card Network
+    participant I as Issuer
+    C->>M: Tap / Dip / Swipe
+    M->>A: Authorization request
+    A->>N: Route via BIN
+    N->>I: Approve or decline?
+    I->>I: Check funds, fraud, card status
+    I-->>N: Approved ✓
+    N-->>A: Approved ✓
+    A-->>M: Approved ✓
+    M-->>C: "Approved" on screen`}
+  caption="The authorization flow: a round trip in under two seconds"
+/>
+
+Here's the critical insight that trips up most people new to payments: **<GlossaryTerm term="Authorization" definition="A hold placed on funds at the time of a card swipe, dip, or tap. No money moves yet." /> is just a hold. No money has moved.**
+
+Your bank has ring-fenced $5.00 in your account — you'll see it as a "pending" charge — but not a single cent has left your bank. The coffee shop hasn't been paid yet. Authorization is a promise, not a payment.
+
+So when does the money actually move? That takes two more acts.
+
+## Act 2: Clearing — The Confirmation
+
+**When it happens:** End of the business day.
+
+Hours after you've finished your latte, the coffee shop's terminal (or their payment software) does something called **batching**. It bundles every approved transaction from the day into a <GlossaryTerm term="Clearing" definition="The end-of-day process where merchants confirm transaction details and submit them for settlement." /> file and sends it to the acquirer.
+
+This is the merchant officially saying: *"Here are all today's transactions. These are final. Please pay me."*
+
+Why is this a separate step? Why not just settle immediately at authorization? Because things can change between authorization and clearing.
+
+Think about a restaurant. You authorize $50 for your dinner, but then you add a $10 tip on the receipt. The clearing amount is $60, not $50. Or consider a hotel: they authorize $500 when you check in, but your final bill is $387. The clearing amount reflects the actual charge.
+
+The clearing file may also include transactions that the merchant wants to **void** — perhaps a customer returned an item before the batch closed, or the cashier rang up the wrong amount.
+
+The acquirer collects these clearing files and forwards the finalized transaction data to the card network, which then passes it to the issuer. At this point, the "pending" charge in your bank account gets replaced with a posted transaction — the final amount.
+
+## Act 3: Settlement — The Money Moves
+
+**When it happens:** The next business day (usually).
+
+Now the money actually changes hands. This is <GlossaryTerm term="Settlement" definition="The actual transfer of funds between banks, typically the next business day via systems like Fedwire." />, and it's where the economics of the card industry come alive.
+
+The card network calculates the net amounts owed between all the issuers and acquirers in its system. Rather than settling each transaction individually (there are billions), the network nets everything out: "Chase owes Bank of America $4.2 million today, and Bank of America owes Chase $3.8 million, so let's just move the $400,000 difference."
+
+These net transfers happen through systems like **Fedwire** (the Federal Reserve's real-time settlement system) or similar infrastructure.
+
+But the merchant doesn't receive the full $5.00 from your latte. This is where fees enter the picture.
+
+### Who Takes a Cut
+
+On your $5.00 coffee, the fee breakdown looks roughly like this:
+
+- **<GlossaryTerm term="Interchange" definition="A fee paid by the merchant's bank to the cardholder's bank on each card transaction." />** — about $0.10 + 1.8% = ~$0.19. This goes from the acquirer to the issuer. It's the biggest component, and it's what funds your credit card rewards. Every time you earn cashback, it's largely funded by interchange.
+- **Network assessment fee** — about 0.14% = ~$0.007. This goes to Visa or Mastercard for operating the network.
+- **Acquirer markup** — varies, but maybe another 0.3% = ~$0.015. This is the acquirer's fee for processing the transaction.
+
+Total fees on that $5.00 coffee: roughly **$0.12 to $0.15**. The merchant nets about **$4.85 to $4.88**.
+
+On a $100 purchase, fees typically run **$2.00 to $3.00**, with interchange being the largest component. This is why merchants care so deeply about interchange rates, and why there's a constant tug-of-war between merchants, networks, and issuers over these fees.
+
+The merchant's acquirer deposits the net amount (the transaction total minus fees) into the merchant's bank account. For most small merchants, this hits their account one to two business days after the original sale.
+
+## The Big Picture
+
+Every single card transaction — whether it's a $5 coffee, a $5,000 TV, or a $0.99 app purchase — follows this same three-act structure:
+
+1. **Authorization** — "Can this person pay?" (real-time)
+2. **Clearing** — "Here's what they actually owe." (end of day)
+3. **Settlement** — "Move the money." (next business day)
+
+This is the heartbeat of the card payments industry. Once you internalize this flow, everything else in payments starts to make sense:
+
+- **Chargebacks?** A dispute that reverses the settlement and sends money back through the same chain.
+- **Refunds?** A new transaction that flows in the opposite direction.
+- **Pending charges that disappear?** An authorization that was never followed by clearing — the hold simply expires.
+- **Why your debit card shows different "available" and "actual" balances?** Authorizations that haven't cleared yet.
+
+You tapped your card for a $5 latte. In two seconds, a message crossed six entities, survived a fraud check, and came back approved. Over the next two days, the merchant confirmed the charge, the banks settled up, and everyone took their cut. The whole system processed it for about twelve cents.
+
+That's the anatomy of a swipe. And now that you understand it, you're ready to go deeper — into how card networks actually work, why interchange is the most fought-over fee in finance, and what happens when a customer calls their bank and says, "I didn't make that purchase."

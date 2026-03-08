@@ -1,0 +1,265 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+  theme: string;
+  readingTime?: string;
+  href?: string;
+}
+
+const { title, description, theme, readingTime, href } = Astro.props;
+
+const isComingSoon = !href;
+
+// Theme color mapping for badges
+const themeColors: Record<string, { bg: string; text: string; darkBg: string; darkText: string }> = {
+  'Foundations': {
+    bg: 'rgba(184, 115, 51, 0.1)',
+    text: 'var(--color-copper)',
+    darkBg: 'rgba(212, 149, 90, 0.15)',
+    darkText: 'var(--color-night-copper)',
+  },
+  'Transaction Lifecycle': {
+    bg: 'rgba(122, 139, 111, 0.12)',
+    text: 'var(--color-sage)',
+    darkBg: 'rgba(163, 179, 150, 0.15)',
+    darkText: 'var(--color-sage-light)',
+  },
+  'Card Ecosystem': {
+    bg: 'rgba(212, 160, 69, 0.1)',
+    text: 'var(--color-amber)',
+    darkBg: 'rgba(232, 196, 120, 0.15)',
+    darkText: 'var(--color-amber-light)',
+  },
+  'Non-Card Payments': {
+    bg: 'rgba(107, 101, 96, 0.1)',
+    text: 'var(--color-stone)',
+    darkBg: 'rgba(168, 158, 148, 0.12)',
+    darkText: 'var(--color-night-text-muted)',
+  },
+  'Moving Money': {
+    bg: 'rgba(154, 95, 40, 0.1)',
+    text: 'var(--color-copper-dark)',
+    darkBg: 'rgba(184, 115, 51, 0.15)',
+    darkText: 'var(--color-copper-light)',
+  },
+  'Products & Use Cases': {
+    bg: 'rgba(122, 139, 111, 0.1)',
+    text: '#5E7A52',
+    darkBg: 'rgba(122, 139, 111, 0.15)',
+    darkText: 'var(--color-sage-light)',
+  },
+  'Trust & Compliance': {
+    bg: 'rgba(74, 69, 64, 0.08)',
+    text: 'var(--color-charcoal-light)',
+    darkBg: 'rgba(168, 158, 148, 0.1)',
+    darkText: 'var(--color-night-text-muted)',
+  },
+};
+
+const colors = themeColors[theme] || themeColors['Foundations'];
+---
+
+{isComingSoon ? (
+  <div class="card card--coming-soon">
+    <div class="card-badge-row">
+      <span
+        class="card-theme"
+        style={`background-color: ${colors.bg}; color: ${colors.text};`}
+        data-dark-bg={colors.darkBg}
+        data-dark-text={colors.darkText}
+      >
+        {theme}
+      </span>
+      <span class="card-coming-soon-badge">Coming Soon</span>
+    </div>
+    <h3 class="card-title card-title--muted">{title}</h3>
+    {description && (
+      <p class="card-description card-description--muted">{description}</p>
+    )}
+  </div>
+) : (
+  <a href={href} class="card card--active group">
+    <div class="card-badge-row">
+      <span
+        class="card-theme"
+        style={`background-color: ${colors.bg}; color: ${colors.text};`}
+        data-dark-bg={colors.darkBg}
+        data-dark-text={colors.darkText}
+      >
+        {theme}
+      </span>
+    </div>
+    <h3 class="card-title">{title}</h3>
+    {description && (
+      <p class="card-description">{description}</p>
+    )}
+    {readingTime && (
+      <span class="card-reading-time">{readingTime}</span>
+    )}
+  </a>
+)}
+
+<style>
+  .card {
+    display: block;
+    padding: 1.5rem;
+    border: 1px solid var(--color-parchment);
+    border-radius: 0.75rem;
+    background-color: var(--color-ivory);
+    text-decoration: none;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .card--active:hover {
+    border-color: var(--color-copper-light);
+    box-shadow: 0 4px 24px rgba(184, 115, 51, 0.08);
+    transform: translateY(-3px);
+  }
+
+  .card--coming-soon {
+    opacity: 0.55;
+    background-color: var(--color-cream-dark);
+    border-color: transparent;
+    cursor: default;
+  }
+
+  .card-badge-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .card-theme {
+    display: inline-block;
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 0.2rem 0.55rem;
+    border-radius: 9999px;
+    line-height: 1.4;
+  }
+
+  .card-coming-soon-badge {
+    font-family: var(--font-body);
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-stone-light);
+    background-color: var(--color-parchment);
+    padding: 0.15rem 0.5rem;
+    border-radius: 9999px;
+    line-height: 1.4;
+  }
+
+  .card-title {
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    font-weight: 500;
+    color: var(--color-charcoal);
+    margin-bottom: 0.4rem;
+    line-height: 1.3;
+    transition: color 0.2s ease;
+  }
+
+  .card--active:hover .card-title {
+    color: var(--color-copper);
+  }
+
+  .card-title--muted {
+    color: var(--color-stone);
+  }
+
+  .card-description {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--color-stone);
+    margin-bottom: 0.5rem;
+  }
+
+  .card-description--muted {
+    color: var(--color-stone-light);
+  }
+
+  .card-reading-time {
+    display: inline-block;
+    font-size: 0.75rem;
+    color: var(--color-stone-light);
+    font-weight: 500;
+    margin-top: 0.25rem;
+  }
+
+  /* Dark mode */
+  @media (prefers-color-scheme: dark) {
+    .card {
+      background-color: var(--color-night-surface);
+      border-color: var(--color-night-elevated);
+    }
+
+    .card--active:hover {
+      border-color: var(--color-night-copper);
+      box-shadow: 0 4px 24px rgba(212, 149, 90, 0.1);
+    }
+
+    .card--coming-soon {
+      background-color: var(--color-night);
+      border-color: transparent;
+      opacity: 0.45;
+    }
+
+    .card-title {
+      color: var(--color-night-text);
+    }
+
+    .card--active:hover .card-title {
+      color: var(--color-night-copper);
+    }
+
+    .card-title--muted {
+      color: var(--color-night-text-muted);
+    }
+
+    .card-description {
+      color: var(--color-night-text-muted);
+    }
+
+    .card-description--muted {
+      color: var(--color-night-text-muted);
+    }
+
+    .card-coming-soon-badge {
+      background-color: var(--color-night-elevated);
+      color: var(--color-night-text-muted);
+    }
+
+    .card-reading-time {
+      color: var(--color-night-text-muted);
+    }
+
+    /* Apply dark theme colors to badges */
+    .card-theme {
+      /* Dark mode badge colors handled via data attributes in JS below */
+    }
+  }
+</style>
+
+<script>
+  // Apply dark mode colors to theme badges
+  function applyDarkModeColors() {
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.querySelectorAll('.card-theme[data-dark-bg]').forEach((el) => {
+      const badge = el as HTMLElement;
+      if (isDark) {
+        badge.style.backgroundColor = badge.dataset.darkBg || '';
+        badge.style.color = badge.dataset.darkText || '';
+      }
+    });
+  }
+  applyDarkModeColors();
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyDarkModeColors);
+</script>

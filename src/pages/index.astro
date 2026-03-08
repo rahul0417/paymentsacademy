@@ -1,135 +1,274 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import TopicCard from '../components/TopicCard.astro';
+import { getCollection } from 'astro:content';
+
+// Fetch published topics
+const allTopics = await getCollection('topics');
+
+// Define theme order and placeholder topics for coming-soon themes
+const themes = [
+  {
+    name: 'Foundations',
+    description: 'Core concepts that underpin the entire payments ecosystem.',
+  },
+  {
+    name: 'Transaction Lifecycle',
+    description: 'Follow a payment from initiation to final settlement.',
+    placeholders: [
+      'Authorization',
+      'Clearing & Settlement',
+      'Chargebacks & Disputes',
+    ],
+  },
+  {
+    name: 'Card Ecosystem',
+    description: 'The networks, banks, and economics behind every card payment.',
+    placeholders: [
+      'Card Networks',
+      'Issuing vs Acquiring Banks',
+      'Credit vs Debit Cards',
+      'Interchange Fees',
+      'Acceptance Environments',
+    ],
+  },
+  {
+    name: 'Non-Card Payments',
+    description: 'Payment methods beyond plastic — from bank transfers to crypto.',
+    placeholders: [
+      'Bank-Based Payments',
+      'Digital Wallets',
+      'Buy Now Pay Later',
+      'Cash & ATM',
+      'Crypto & DeFi',
+    ],
+  },
+  {
+    name: 'Moving Money',
+    description: 'How funds travel across borders, banks, and networks.',
+    placeholders: [
+      'Cross-Border Payments',
+      'Push-to-Card',
+      'Real-Time Payments',
+    ],
+  },
+  {
+    name: 'Products & Use Cases',
+    description: 'Real-world applications built on payments infrastructure.',
+    placeholders: [
+      'Virtual Cards',
+      'Expense Management',
+      'Subscriptions & Recurring',
+      'Marketplaces',
+      'B2B Payments',
+    ],
+  },
+  {
+    name: 'Trust & Compliance',
+    description: 'The rules, risks, and safeguards that keep payments secure.',
+    placeholders: [
+      'KYC & Identity',
+      'Compliance & Regulation',
+      'Fraud & Risk',
+      'Liability',
+    ],
+  },
+];
+
+// Group published topics by theme
+const topicsByTheme = new Map<string, typeof allTopics>();
+for (const topic of allTopics) {
+  const theme = topic.data.theme;
+  if (!topicsByTheme.has(theme)) {
+    topicsByTheme.set(theme, []);
+  }
+  topicsByTheme.get(theme)!.push(topic);
+}
+
+// Sort topics within each theme by order
+for (const [, topics] of topicsByTheme) {
+  topics.sort((a, b) => a.data.order - b.data.order);
+}
 ---
 
-<BaseLayout title="FintechAcademy" description="A knowledge base for understanding how money moves.">
-  <!-- Hero Section -->
-  <section class="max-w-6xl mx-auto px-6 pt-20 pb-16">
-    <div class="max-w-3xl">
-      <p class="text-sm font-medium uppercase tracking-widest mb-4" style="color: var(--color-copper);">
-        A Payments Knowledge Base
-      </p>
-      <h1 class="text-4xl md:text-5xl lg:text-6xl font-heading font-semibold leading-tight mb-6" style="letter-spacing: -0.02em;">
-        Understand how<br />
-        <span style="color: var(--color-copper);">money moves.</span>
-      </h1>
-      <p class="text-lg md:text-xl leading-relaxed max-w-2xl" style="color: var(--color-stone);">
-        FintechAcademy is a free, open knowledge base that explains the systems
-        behind every payment &mdash; from the moment you tap your card to the
-        settlement between banks.
-      </p>
-    </div>
-  </section>
+<BaseLayout
+  title="FintechAcademy"
+  description="A free, open knowledge base that explains the payments ecosystem — from card swipes to cross-border settlements — in plain language."
+>
+  <Hero />
 
-  <!-- Divider -->
-  <div class="max-w-6xl mx-auto px-6">
-    <hr style="border-color: var(--color-parchment); margin: 0;" />
-  </div>
-
-  <!-- Featured Topics Preview -->
-  <section class="max-w-6xl mx-auto px-6 py-16">
-    <h2 class="font-heading text-sm font-semibold uppercase tracking-widest mb-8" style="color: var(--color-stone-light);">
-      Start Exploring
-    </h2>
-    <div class="grid md:grid-cols-3 gap-8">
-      <!-- Card 1 -->
-      <a href="/topics" class="topic-card group">
-        <span class="topic-number">01</span>
-        <h3 class="font-heading text-xl font-medium mb-2 group-hover:text-[var(--color-copper)] transition-colors">
-          Card Networks
-        </h3>
-        <p class="text-sm leading-relaxed" style="color: var(--color-stone);">
-          How Visa, Mastercard, and others route billions of transactions every day.
+  <!-- Topics Grid Section -->
+  <section id="topics" class="topics-section">
+    <div class="topics-container">
+      <div class="topics-header">
+        <h2 class="topics-heading">Topics</h2>
+        <p class="topics-intro">
+          Explore the payments ecosystem, one concept at a time. Each topic is a
+          self-contained guide written in plain language.
         </p>
-      </a>
+      </div>
 
-      <!-- Card 2 -->
-      <a href="/topics" class="topic-card group">
-        <span class="topic-number">02</span>
-        <h3 class="font-heading text-xl font-medium mb-2 group-hover:text-[var(--color-copper)] transition-colors">
-          Payment Rails
-        </h3>
-        <p class="text-sm leading-relaxed" style="color: var(--color-stone);">
-          ACH, wire transfers, SWIFT &mdash; the infrastructure that moves money between accounts.
-        </p>
-      </a>
+      {themes.map((theme, themeIndex) => {
+        const publishedTopics = topicsByTheme.get(theme.name) || [];
+        const placeholders = theme.placeholders || [];
+        const hasPublished = publishedTopics.length > 0;
 
-      <!-- Card 3 -->
-      <a href="/topics" class="topic-card group">
-        <span class="topic-number">03</span>
-        <h3 class="font-heading text-xl font-medium mb-2 group-hover:text-[var(--color-copper)] transition-colors">
-          Digital Wallets
-        </h3>
-        <p class="text-sm leading-relaxed" style="color: var(--color-stone);">
-          Apple Pay, Google Pay, and the tokenization technology that powers them.
-        </p>
-      </a>
-    </div>
-  </section>
+        return (
+          <div
+            class="theme-group"
+            style={`animation-delay: ${0.1 + themeIndex * 0.08}s;`}
+          >
+            <div class="theme-header">
+              <h3 class="theme-name">{theme.name}</h3>
+              <p class="theme-description">{theme.description}</p>
+            </div>
 
-  <!-- Sample prose section to test typography -->
-  <section class="max-w-6xl mx-auto px-6 py-16">
-    <div class="max-w-none prose prose-lg mx-auto" style="max-width: 70ch;">
-      <h2>What happens when you tap your card?</h2>
-      <p>
-        In the fraction of a second between tapping your card and seeing
-        "Approved" on the terminal, a remarkable chain of events unfolds.
-        Your payment traverses multiple networks, passes through several
-        institutions, and triggers a series of risk checks &mdash; all before
-        you've even put your wallet away.
-      </p>
-      <blockquote>
-        <p>
-          "The payments industry moves trillions of dollars daily through
-          infrastructure most people never think about."
-        </p>
-      </blockquote>
-      <p>
-        Understanding these systems isn't just for engineers or bankers.
-        Whether you're building a fintech product, running a business that
-        accepts payments, or simply curious about the financial plumbing of
-        modern commerce &mdash; this knowledge matters.
-      </p>
+            <div class="topic-grid">
+              {/* Published topics */}
+              {publishedTopics.map((topic) => (
+                <TopicCard
+                  title={topic.data.title}
+                  description={topic.data.description}
+                  theme={topic.data.theme}
+                  readingTime={topic.data.readingTime}
+                  href={`/topics/${topic.id}`}
+                />
+              ))}
+
+              {/* Placeholder coming-soon topics */}
+              {placeholders.map((title) => (
+                <TopicCard
+                  title={title}
+                  theme={theme.name}
+                />
+              ))}
+            </div>
+          </div>
+        );
+      })}
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .topic-card {
-    display: block;
-    padding: 2rem;
-    border: 1px solid var(--color-parchment);
-    border-radius: 0.75rem;
-    background-color: var(--color-ivory);
-    text-decoration: none;
-    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+  /* Topics Section */
+  .topics-section {
+    padding: 2rem 1.5rem 5rem;
   }
 
-  .topic-card:hover {
-    border-color: var(--color-copper-light);
-    box-shadow: 0 4px 24px rgba(184, 115, 51, 0.06);
-    transform: translateY(-2px);
+  .topics-container {
+    max-width: 72rem;
+    margin: 0 auto;
   }
 
-  .topic-number {
-    display: inline-block;
+  .topics-header {
+    text-align: center;
+    margin-bottom: 3.5rem;
+    animation: fadeInUp 0.6s ease both;
+  }
+
+  .topics-heading {
     font-family: var(--font-heading);
-    font-size: 0.75rem;
+    font-size: 2.25rem;
     font-weight: 600;
-    color: var(--color-copper);
+    color: var(--color-charcoal);
     margin-bottom: 0.75rem;
-    letter-spacing: 0.05em;
+    letter-spacing: -0.02em;
   }
 
+  .topics-intro {
+    font-size: 1.05rem;
+    color: var(--color-stone);
+    max-width: 32rem;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* Theme Groups */
+  .theme-group {
+    margin-bottom: 3rem;
+    animation: fadeInUp 0.6s ease both;
+  }
+
+  .theme-header {
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--color-parchment);
+  }
+
+  .theme-name {
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--color-charcoal);
+    margin-bottom: 0.25rem;
+  }
+
+  .theme-description {
+    font-size: 0.9rem;
+    color: var(--color-stone-light);
+    margin-bottom: 0;
+  }
+
+  /* Topic Grid */
+  .topic-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .topic-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .topic-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Dark mode */
   @media (prefers-color-scheme: dark) {
-    .topic-card {
-      background-color: var(--color-night-surface);
-      border-color: var(--color-night-elevated);
+    .topics-heading {
+      color: var(--color-night-text);
     }
 
-    .topic-card:hover {
-      border-color: var(--color-night-copper);
-      box-shadow: 0 4px 24px rgba(212, 149, 90, 0.08);
+    .topics-intro {
+      color: var(--color-night-text-muted);
+    }
+
+    .theme-name {
+      color: var(--color-night-text);
+    }
+
+    .theme-description {
+      color: var(--color-night-text-muted);
+    }
+
+    .theme-header {
+      border-bottom-color: var(--color-night-elevated);
+    }
+  }
+
+  /* Responsive */
+  @media (min-width: 768px) {
+    .topics-section {
+      padding: 3rem 2rem 6rem;
     }
   }
 </style>

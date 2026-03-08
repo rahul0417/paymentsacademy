@@ -24,6 +24,10 @@ glossaryTerms:
     definition: "A fee paid by the merchant's bank to the cardholder's bank on each card transaction."
   - term: "ISO 8583"
     definition: "The international standard messaging format used for card transaction communications."
+  - term: "Issuer Processor"
+    definition: "A technology company that handles transaction authorization, card management, and settlement on behalf of the issuing bank."
+  - term: "Acquirer Processor"
+    definition: "A technology platform that routes transaction data from merchants through card networks for authorization and settlement."
 ---
 
 import GlossaryTerm from '../../components/GlossaryTerm.astro';
@@ -39,13 +43,15 @@ Understanding what happened in those two seconds is the single most useful thing
 
 ## The Players
 
-Before we trace the journey, let's meet the cast. Every card transaction involves at least five key players, connected in what the industry calls the **four-party model** (four parties plus the network in the middle).
+Before we trace the journey, let's meet the cast. Every card transaction involves at least five key players, connected in what the industry calls the **four-party model** (four parties plus the network in the middle). In practice, two more players sit behind the scenes — the processors that do the heavy lifting.
 
 - **You, the Cardholder.** You hold a card issued by your bank.
 - **The Merchant.** The coffee shop — or more precisely, their point-of-sale terminal.
 - **The <GlossaryTerm term="Acquirer" definition="The bank or processor that handles card payments on behalf of the merchant." />.** This is the merchant's bank or payment processor. They're the merchant's gateway into the card network. Companies like Chase Paymentech, Worldpay, or Stripe sit in this role.
+- **The <GlossaryTerm term="Acquirer Processor" definition="A technology platform that routes transaction data from merchants through card networks for authorization and settlement." />.** The technology company that actually routes the merchant's transaction data to the card network. The acquiring bank may hold the merchant relationship, but the acquirer processor (like Fiserv/First Data or Global Payments) runs the tech that formats, routes, and transmits the message.
 - **The <GlossaryTerm term="Card Network" definition="The rails (like Visa or Mastercard) that connect issuers and acquirers and route transactions." />.** Visa, Mastercard, American Express, Discover. Think of them as the postal service of payments — they don't hold your money, but they make sure messages get to the right place.
-- **The <GlossaryTerm term="Issuer" definition="The bank that issued the card to the consumer and approves or declines transactions." />.** Your bank — the one that gave you the card. Chase, Bank of America, Capital One. They're the ones who actually say yes or no.
+- **The <GlossaryTerm term="Issuer Processor" definition="A technology company that handles transaction authorization, card management, and settlement on behalf of the issuing bank." />.** The technology company that connects your issuing bank to the card network. It receives incoming authorization requests via dedicated hardware (Visa's VIP system or Mastercard's MIP hardware), runs the bank's authorization logic, and sends back the approve/decline decision. Companies like TSYS, Marqeta, and Galileo play this role.
+- **The <GlossaryTerm term="Issuer" definition="The bank that issued the card to the consumer and approves or declines transactions." />.** Your bank — the one that gave you the card. Chase, Bank of America, Capital One. They set the rules, but the issuer processor often executes them.
 
 Here's how these players connect:
 
@@ -53,12 +59,14 @@ Here's how these players connect:
   chart={`graph LR
     A[Cardholder] -->|Pays| B[Merchant]
     B -->|Routes via| C[Acquirer]
-    C <-->|Transaction| D[Card Network]
-    D <-->|Approves| E[Issuer]`}
-  caption="The four-party model: how card payments flow between the key players"
+    C -->|Tech| D[Acquirer Processor]
+    D <-->|Transaction| E[Card Network]
+    E <-->|Tech| F[Issuer Processor]
+    F <-->|Approves| G[Issuer]`}
+  caption="The four-party model with processors: the technology layer between banks and networks"
 />
 
-Notice that the Cardholder and Merchant are on the edges. They never talk directly to the card network. Everything is mediated through the acquirer and issuer, with the network acting as the switchboard in the middle.
+Notice that the Cardholder and Merchant are on the edges. They never talk directly to the card network. Everything is mediated through the acquirer and issuer — and in practice, through the **processors** that handle the actual technology. Most acquiring banks and issuing banks don't connect directly to Visa or Mastercard themselves. Instead, they rely on processor partners who maintain the hardware connections, run the authorization logic, and handle the message formatting. The processors are the invisible infrastructure that makes the whole system work.
 
 Now that we know who's involved, let's follow your $5 latte through the system. The journey happens in three acts: **Authorization**, **Clearing**, and **Settlement**. Most people think of a card payment as one event. It's actually three, spread over two to three days.
 
@@ -88,19 +96,21 @@ If everything checks out, the issuer sends back an approval code. If not, it sen
   chart={`sequenceDiagram
     participant C as Cardholder
     participant M as Merchant Terminal
-    participant A as Acquirer
+    participant AP as Acquirer Processor
     participant N as Card Network
-    participant I as Issuer
+    participant IP as Issuer Processor
+    participant I as Issuing Bank
     C->>M: Tap / Dip / Swipe
-    M->>A: Authorization request
-    A->>N: Route via BIN
-    N->>I: Approve or decline?
-    I->>I: Check funds, fraud, card status
-    I-->>N: Approved ✓
-    N-->>A: Approved ✓
-    A-->>M: Approved ✓
+    M->>AP: Authorization request
+    AP->>N: Route via BIN
+    N->>IP: Forward to issuer
+    IP->>I: Authorize?
+    I->>IP: Check funds, fraud, card status
+    IP-->>N: Approved
+    N-->>AP: Approved
+    AP-->>M: Approved
     M-->>C: "Approved" on screen`}
-  caption="The authorization flow: a round trip in under two seconds"
+  caption="The authorization flow: processors handle the technology on both sides of the network"
 />
 
 Here's the critical insight that trips up most people new to payments: **<GlossaryTerm term="Authorization" definition="A hold placed on funds at the time of a card swipe, dip, or tap. No money moves yet." /> is just a hold. No money has moved.**

@@ -1,0 +1,112 @@
+---
+title: "Acquirer Processors"
+description: "The technology backbone on the merchant side — routing transactions, managing terminals, and handling settlement for businesses that accept card payments."
+theme: "Card Ecosystem"
+readingTime: "7 min read"
+order: 7
+relatedTopics: ["anatomy-of-a-swipe", "issuer-processors"]
+glossaryTerms:
+  - term: "Acquirer Processor"
+    definition: "A technology platform that routes transaction data from merchants through card networks for authorization and settlement."
+  - term: "Payment Gateway"
+    definition: "Software that captures card data from merchants (especially online) and passes it to the acquirer processor."
+  - term: "PayFac"
+    definition: "Payment Facilitator — a company that aggregates sub-merchants under its own merchant ID for fast onboarding."
+  - term: "ISO"
+    definition: "Independent Sales Organization — a licensed reseller of merchant acquiring services."
+  - term: "Interchange Plus"
+    definition: "A transparent pricing model where merchants pay the actual interchange fee plus a fixed processor markup."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## The Merchant's Side of the Wire
+
+In the [Anatomy of a Swipe](/topics/anatomy-of-a-swipe), we traced a payment from your card all the way to the issuing bank and back. But we glossed over a crucial step on the merchant's side: who actually takes the transaction from the coffee shop's terminal and gets it onto the Visa or Mastercard network?
+
+That's the job of the <GlossaryTerm term="Acquirer Processor" definition="A technology platform that routes transaction data from merchants through card networks for authorization and settlement." />. It's the technology platform that sits between the merchant and the card network, handling the heavy lifting of transaction routing, terminal management, and settlement.
+
+## Acquirer vs. Acquirer Processor: What's the Difference?
+
+This distinction trips up a lot of people. The **acquirer** (or "acquiring bank") is the financial institution that holds the merchant's account and takes on the financial risk of processing card payments. The **acquirer processor** is the technology company that actually runs the infrastructure — formatting ISO 8583 messages, routing them to the correct network, managing terminal software, and processing settlement files.
+
+Sometimes these are the same company. Chase Paymentech, for example, is both the acquiring bank (Chase) and the processor (Paymentech). But often they're separate. A small community bank might serve as the acquiring bank for local merchants while outsourcing all the technology to Fiserv's First Data platform.
+
+Think of it this way: the acquiring bank owns the merchant relationship and the financial risk. The acquirer processor owns the technology and the network connections.
+
+## What Does an Acquirer Processor Do?
+
+**Transaction routing.** When a merchant's terminal sends an authorization request, the acquirer processor formats the message, determines which card network to route it to (Visa, Mastercard, Amex, Discover), and transmits it. For debit cards, the routing decision is more complex — the processor may need to choose between multiple debit networks (Pulse, Star, NYCE) based on cost and merchant preference, as required by the Durbin Amendment.
+
+**Terminal management.** The processor provides and manages the software running on point-of-sale terminals — the devices merchants use to accept payments. This includes deploying encryption keys, pushing software updates, certifying terminals for EMV chip and contactless payments, and troubleshooting when things go wrong. For a processor managing millions of terminals across thousands of merchants, this is a massive operational undertaking.
+
+**Authorization facilitation.** The processor receives the authorization response from the card network (approved, declined, or referred) and routes it back to the terminal. It also handles edge cases — partial authorizations, stand-in processing when the issuer is unreachable, and timeout handling.
+
+**Settlement and clearing.** At the end of each business day, the processor collects all authorized transactions into batch files, submits them to the card networks for clearing, and calculates the net settlement amounts. It then initiates the funds transfer — depositing the merchant's proceeds (minus fees) into their bank account.
+
+**Chargeback management.** When a cardholder disputes a transaction, the chargeback flows back through the acquirer processor. The processor manages the dispute lifecycle — receiving the chargeback notification, alerting the merchant, collecting representment documents, and tracking deadlines. This is a surprisingly complex workflow with strict network-mandated timelines.
+
+## How the Transaction Flows
+
+Here's what happens when you tap your card at a merchant that uses an acquirer processor:
+
+<MermaidDiagram
+  chart={`sequenceDiagram
+    participant M as Merchant Terminal
+    participant PG as Payment Gateway
+    participant AP as Acquirer Processor
+    participant N as Card Network
+    M->>PG: Card data + amount
+    PG->>AP: Authorization request
+    AP->>N: Route to correct network
+    N-->>AP: Approved / Declined
+    AP-->>PG: Response
+    PG-->>M: Display result`}
+  caption="Transaction flow on the acquiring side: from terminal to network and back"
+/>
+
+For in-store transactions, the terminal may connect directly to the acquirer processor, bypassing the payment gateway. For e-commerce, a <GlossaryTerm term="Payment Gateway" definition="Software that captures card data from merchants (especially online) and passes it to the acquirer processor." /> is always involved — it captures the card data from the merchant's website or app and passes it securely to the processor.
+
+## The Major Acquirer Processors
+
+The acquiring processing market is dominated by a handful of large players:
+
+- **Fiserv / First Data** — The largest acquirer processor in the world. First Data (acquired by Fiserv in 2019 for $22 billion) processes roughly 12,000 transactions per second globally. If you've ever used a Clover terminal, that's First Data.
+- **Chase Paymentech** — JPMorgan's acquiring arm. Processes payments for major retailers, airlines, and e-commerce platforms. One of the few vertically integrated players (bank + processor).
+- **Worldpay / Global Payments** — Another heavyweight, especially strong in international acquiring. Worldpay merged with FIS and then was spun back out; Global Payments merged with TSYS. The acquiring side of these businesses handles enormous transaction volumes.
+- **Elavon** — Owned by US Bancorp, strong in hospitality and healthcare verticals.
+
+## What About Stripe and Square?
+
+Here's a common misconception: **Stripe, Square, and PayPal are not acquirer processors.** They're <GlossaryTerm term="PayFac" definition="Payment Facilitator — a company that aggregates sub-merchants under its own merchant ID for fast onboarding." />s — Payment Facilitators.
+
+The difference is important. A traditional acquirer processor gives each merchant its own merchant ID (MID) and a direct relationship with an acquiring bank. This process involves underwriting, credit checks, and can take days or weeks.
+
+A PayFac, by contrast, aggregates many sub-merchants under its own master merchant ID. When you sign up for Stripe, you don't get your own MID — you're a sub-merchant under Stripe's MID. This is why Stripe can onboard you in minutes instead of weeks. The trade-off is that Stripe takes on more risk and charges higher fees for the convenience.
+
+And here's the key point: **PayFacs still use acquirer processors underneath.** Stripe routes the majority of its US transactions through Fiserv's First Data platform. Square uses Chase Paymentech. They're a layer on top of the processor, not a replacement for it.
+
+The difference matters for merchants at scale. A coffee shop doing $50,000 a month in card volume is well-served by a PayFac. A retailer doing $50 million a month typically works directly with an acquirer processor for lower fees and more control.
+
+## The Business Model
+
+Acquirer processors make money through a combination of fees:
+
+**Per-transaction markup.** The most common model is <GlossaryTerm term="Interchange Plus" definition="A transparent pricing model where merchants pay the actual interchange fee plus a fixed processor markup." /> pricing: the merchant pays the actual interchange fee (set by the card network) plus a fixed markup from the processor. That markup might be 0.10% + $0.05 per transaction. On a $100 purchase with a 1.80% interchange rate, the merchant would pay 1.90% + $0.05 — or $1.95 total. The processor keeps the $0.15 markup.
+
+**Terminal and equipment fees.** Monthly rental fees for POS terminals, pin pads, and related hardware. These can range from $20 to $100+ per month per device.
+
+**PCI compliance fees.** Annual fees for helping merchants meet Payment Card Industry Data Security Standards — typically $80 to $200 per year.
+
+**Chargeback fees.** A fee charged each time a merchant receives a chargeback — typically $15 to $25 per dispute, regardless of outcome.
+
+**Monthly minimums and statement fees.** Small fixed monthly charges that ensure the processor earns a minimum even from low-volume merchants.
+
+For <GlossaryTerm term="ISO" definition="Independent Sales Organization — a licensed reseller of merchant acquiring services." />s (Independent Sales Organizations) — the licensed resellers who sign up merchants on behalf of acquirer processors — the economics work differently. ISOs earn a cut of the per-transaction markup, creating a layered sales model that extends the processor's reach to small and medium businesses nationwide.
+
+## The Acquiring Side Matters
+
+Acquirer processing doesn't get the same attention as the issuer side — there's no equivalent of the "JIT Funding" innovation that made Marqeta famous. But the acquirer processor is no less critical. Every time a terminal reads a card, the acquirer processor is the first technology touchpoint. It determines whether the transaction routes correctly, whether the merchant gets paid on time, and whether the entire experience feels instantaneous to the cardholder.
+
+If the [issuer processor](/topics/issuer-processors) is the brain that decides "yes or no," the acquirer processor is the nervous system that gets the question there in the first place.

@@ -1,0 +1,151 @@
+---
+title: "Issuer Processors"
+description: "The technology companies that connect issuing banks to card networks, handling authorization, card management, and settlement behind the scenes."
+theme: "Card Ecosystem"
+readingTime: "10 min read"
+order: 6
+relatedTopics: ["anatomy-of-a-swipe", "acquirer-processors"]
+glossaryTerms:
+  - term: "Issuer Processor"
+    definition: "A technology company that handles transaction authorization, card management, and settlement on behalf of the issuing bank."
+  - term: "MIP"
+    definition: "Mastercard Interface Processor — dedicated hardware connecting a processor to the Mastercard network (Banknet)."
+  - term: "VIP"
+    definition: "VisaNet Integrated Payment — Visa's connection infrastructure for processor integration."
+  - term: "JIT Funding"
+    definition: "Just-in-Time Funding — a model where cards hold $0 balance until a transaction occurs, funded in real-time."
+  - term: "BaaS"
+    definition: "Banking as a Service — the infrastructure stack that lets fintechs launch card programs without being banks."
+  - term: "Program Manager"
+    definition: "The entity that manages day-to-day operations of a card program — compliance, customer service, vendor coordination."
+  - term: "Sponsor Bank"
+    definition: "A chartered bank that provides its banking license and BIN to enable fintechs to issue cards on card networks."
+---
+
+import GlossaryTerm from '../../components/GlossaryTerm.astro';
+import MermaidDiagram from '../../components/MermaidDiagram.astro';
+
+## The Invisible Engine Behind Every Card
+
+When you tap your Chime debit card at a grocery store, the screen says "Approved" in about two seconds. You probably assume Chime's bank made that decision. In reality, a company you've likely never heard of — Galileo — received the authorization request, checked your balance, ran fraud rules, and sent back the approval. The bank was barely involved.
+
+That company is an <GlossaryTerm term="Issuer Processor" definition="A technology company that handles transaction authorization, card management, and settlement on behalf of the issuing bank." />. It's the technology layer that sits between the issuing bank and the card network, doing the actual work of running a card program. If the issuing bank is the legal entity on the card, the issuer processor is the brain.
+
+## What Does an Issuer Processor Actually Do?
+
+An issuer processor handles everything that needs to happen in real time when a card is used — and most of what happens afterward. Here are the core functions:
+
+**Transaction authorization.** This is the big one. When a Visa or Mastercard transaction arrives, the issuer processor receives the ISO 8583 message, evaluates it against the bank's rules, and sends back an approve or decline decision — all within milliseconds. It checks available balance, spending limits, card status, merchant category restrictions, and velocity rules (e.g., "more than 5 transactions in 10 minutes? Decline.").
+
+**Card management.** The processor handles the full lifecycle of a card — issuing new card numbers, setting PINs, activating cards, handling replacements, managing expiration and reissuance, and tokenizing card numbers for Apple Pay and Google Pay.
+
+**Fraud screening.** While the bank sets the fraud policies, the processor executes them in real time. This includes rules-based screening (block transactions over $5,000, decline international transactions for domestic-only cards) and increasingly, machine-learning models that score each transaction for risk.
+
+**Ledger management.** The processor maintains the real-time balance for every card. When you spend $50, the processor immediately decrements your available balance by $50 — even before the transaction clears and settles. This is how your bank app shows you an updated balance within seconds of a purchase.
+
+**Clearing and settlement.** At the end of each day, the processor reconciles all authorized transactions against the clearing files received from the card network, calculates net settlement amounts, and initiates the funds transfer between the bank and the network.
+
+## The Hardware Connection: MIP and VIP
+
+Here's something that surprises most people: connecting to Visa or Mastercard isn't a matter of calling an API. The card networks require processors to install and maintain **dedicated hardware** in certified data centers.
+
+For Mastercard, this hardware is called a <GlossaryTerm term="MIP" definition="Mastercard Interface Processor — dedicated hardware connecting a processor to the Mastercard network (Banknet)." /> — Mastercard Interface Processor. It's a physical appliance that sits in the processor's data center and connects directly to Mastercard's Banknet network. Every authorization request for a Mastercard card flows through this hardware.
+
+For Visa, the equivalent is <GlossaryTerm term="VIP" definition="VisaNet Integrated Payment — Visa's connection infrastructure for processor integration." /> — VisaNet Integrated Payment. Same idea: dedicated hardware connecting the processor to VisaNet.
+
+This hardware requirement is one of the key reasons most banks don't process transactions themselves. The cost of maintaining MIP and VIP infrastructure — including the redundancy, certifications, and 24/7 operations required — runs into tens of millions of dollars. It only makes economic sense if you're processing billions of transactions a year across many clients.
+
+## The Processor Landscape: Legacy vs. Modern
+
+The issuer processing market splits cleanly into two camps.
+
+### Legacy Processors
+
+Companies like **TSYS** (now part of Global Payments), **FIS** (which owns NYCE and various processing platforms), and **Fiserv** (which owns First Data) have been running card programs for decades. They process the vast majority of card transactions in the United States. If you have a credit card from a major bank — Chase, Citi, Wells Fargo — chances are one of these three companies is processing your transactions behind the scenes.
+
+These platforms were built in an era of mainframes and batch processing. They're extraordinarily reliable (they have to be — a processing outage means millions of cards stop working). But they're also notoriously difficult to integrate with. Getting a new card program live on a legacy processor can take 12 to 18 months. Configuration changes often require the processor's engineers to modify code on your behalf. Data access is limited — you might get batch files at the end of the day instead of real-time webhooks.
+
+### Modern API-First Processors
+
+Starting in the 2010s, a new generation of processors emerged, built from the ground up on modern cloud infrastructure with developer-friendly APIs. The big names:
+
+- **Marqeta** — Pioneer of JIT Funding (more on that below). Powers DoorDash, Square Cash App, Uber, and Instacart's card programs.
+- **Galileo** (owned by SoFi) — Powers Chime, Robinhood, Revolut US, and MoneyLion. Processes over 100 million accounts.
+- **i2c** — Powers Flywire, Green Dot, and numerous international programs. Known for configurability.
+- **Lithic** — Developer-focused processor for startups building card products. Extremely fast integration.
+- **Highnote** — Newer entrant focused on modern card issuing with flexible program management.
+
+| | Legacy Processors | Modern Processors |
+|---|---|---|
+| **Architecture** | Mainframe-based, batch-oriented | Cloud-native, real-time APIs |
+| **Launch time** | 12–18 months | 4–12 weeks |
+| **Data access** | End-of-day batch files | Real-time webhooks and APIs |
+| **Integration** | Custom file formats, FTP transfers | RESTful APIs, SDKs |
+| **Customization** | Processor-managed configurations | Self-service, programmable rules |
+| **Scale** | Billions of transactions/year | Growing rapidly, millions to billions |
+| **Typical clients** | Major banks, established programs | Fintechs, neobanks, embedded finance |
+
+## The JIT Funding Innovation
+
+One of the most important innovations in modern issuer processing is <GlossaryTerm term="JIT Funding" definition="Just-in-Time Funding — a model where cards hold $0 balance until a transaction occurs, funded in real-time." /> — Just-in-Time Funding, pioneered by Marqeta.
+
+In the traditional model, a prepaid or debit card holds a balance. When you load $500 onto your card, those funds sit with the processor or the bank, waiting to be spent. This creates a problem for fintechs: they need to pre-fund pools of money that sit idle until customers spend it.
+
+JIT Funding flips this model. The card holds a **$0 balance**. When a transaction comes in, the processor sends a real-time webhook to the fintech's system: "Your customer is trying to spend $47.50 at Target. Do you approve?" The fintech's system checks its own ledger, decides whether to approve, and if yes, funds the transaction in real time. The card's balance goes from $0 to $47.50 to $0 again, all in milliseconds.
+
+This creates two variants:
+
+- **Gateway JIT:** The processor sends every transaction to the fintech for a real-time decision. The fintech has full control — it can apply custom business logic, check its own balance systems, and approve or decline based on its own rules. DoorDash uses this for its Dasher pay cards, applying custom rules about when drivers can access earnings.
+- **Managed JIT:** The processor handles the authorization decision based on pre-configured rules, but still funds just-in-time from the fintech's pooled account. Simpler to implement, less custom control.
+
+JIT Funding is what makes modern fintech card products possible. It's why Chime can offer fee-free overdraft (SpotMe), why Cash App can give you instant access to deposits, and why corporate expense cards can enforce per-merchant spending limits in real time.
+
+## The BaaS Stack: How Fintechs Launch Card Programs
+
+If you're a fintech that wants to issue cards — say you're building an expense management tool and want to give each employee a virtual Visa card — you can't just call up Visa and ask for cards. You need an entire stack of partners. This is the <GlossaryTerm term="BaaS" definition="Banking as a Service — the infrastructure stack that lets fintechs launch card programs without being banks." /> (Banking as a Service) stack:
+
+<MermaidDiagram
+  chart={`graph TD
+    A[Fintech App] -->|Uses| B[Program Manager]
+    B -->|Coordinates| C[Issuer Processor]
+    B -->|Partners with| D[Sponsor Bank]
+    B -->|Integrates| E[KYC / Identity Provider]
+    C -->|Connects to| F[Card Networks]
+    D -->|Provides| G[Banking License & BIN]`}
+  caption="The BaaS stack: the partners behind every fintech card program"
+/>
+
+- **<GlossaryTerm term="Sponsor Bank" definition="A chartered bank that provides its banking license and BIN to enable fintechs to issue cards on card networks." />** — A chartered bank (like Sutton Bank, Celtic Bank, or Bancorp Bank) that provides its banking license and BIN (Bank Identification Number). Legally, they're the issuer. In practice, they're providing regulatory cover.
+- **Issuer Processor** — The technology platform (Marqeta, Galileo, etc.) that handles authorization, card management, and settlement.
+- **<GlossaryTerm term="Program Manager" definition="The entity that manages day-to-day operations of a card program — compliance, customer service, vendor coordination." />** — The entity that manages the day-to-day operations: compliance monitoring, customer service, vendor coordination, regulatory reporting. Sometimes the fintech itself acts as program manager; sometimes a third party like Deserve or Highnote fills this role.
+- **KYC / Identity Provider** — Handles customer identity verification (Alloy, Socure, Persona).
+
+This is why fintech card programs list a bank name in the fine print that you've never heard of. When your Chime card says "Bancorp Bank" on it, that's the sponsor bank. Chime is the brand. Galileo is the processor. They all work together, but the processor is the central nervous system.
+
+## The Business Model
+
+How do issuer processors make money? Several ways:
+
+**Per-transaction fees.** The processor charges a small fee — typically $0.03 to $0.10 — for each authorization, whether approved or declined. At scale, this adds up fast. A processor handling 10 billion transactions per year at $0.05 each generates $500 million in transaction fees alone.
+
+**Platform fees.** Monthly per-account fees for card management, typically $0.50 to $2.00 per active account.
+
+**Interchange sharing.** Some modern processors negotiate a share of the interchange fee that the issuing bank earns. This is especially common in fintech programs where the processor's technology is central to the program's value.
+
+**Card manufacturing and fulfillment.** Physical card production, personalization, and mailing.
+
+## Why Do Banks Outsource This?
+
+Given how central processing is, you might wonder: why don't banks just do it themselves? The largest banks — like JPMorgan Chase — do run their own processing for some products. But the vast majority of banks and all fintechs outsource, for compelling reasons:
+
+**Infrastructure cost.** Maintaining MIP/VIP hardware, redundant data centers, and 24/7 operations is enormously expensive. It only makes sense at massive scale.
+
+**Compliance burden.** Processors must maintain PCI DSS Level 1 certification, pass network audits, and meet stringent uptime requirements. This is a specialized competency.
+
+**Speed to market.** A bank launching a new card product on its own infrastructure might take two years. Using a modern processor, it can launch in weeks.
+
+**Innovation.** Modern processors invest hundreds of millions in R&D — real-time webhooks, tokenization, virtual card issuance, JIT Funding. Most banks can't match this pace of innovation on their own.
+
+**Scalability.** Processors are built to handle dramatic swings in volume — Black Friday, tax refund season, stimulus payments. This elasticity is hard to build in-house.
+
+The issuer processor might be the most important company in the payments ecosystem that most people have never heard of. Every card in your wallet, every fintech app on your phone, every "Approved" on a terminal screen — there's a processor making it happen.

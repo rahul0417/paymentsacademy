@@ -2,7 +2,7 @@
 title: "Issuer Processors"
 description: "The technology companies that connect issuing banks to card networks, handling authorization, card management, and settlement behind the scenes."
 theme: "Card Ecosystem"
-readingTime: "10 min read"
+readingTime: "12 min read"
 order: 6
 relatedTopics: ["anatomy-of-a-swipe", "acquirer-processors"]
 glossaryTerms:
@@ -20,6 +20,10 @@ glossaryTerms:
     definition: "The entity that manages day-to-day operations of a card program — compliance, customer service, vendor coordination."
   - term: "Sponsor Bank"
     definition: "A chartered bank that provides its banking license and BIN to enable fintechs to issue cards on card networks."
+  - term: "Card-as-a-Service"
+    definition: "A model where processors provide the full stack for issuing cards — from BIN sponsorship to processing — as a managed service."
+  - term: "Composable Building Blocks"
+    definition: "Pre-coded, modular components that can be assembled to create custom card programs without writing code from scratch."
 ---
 
 import GlossaryTerm from '../../components/GlossaryTerm.astro';
@@ -30,6 +34,8 @@ import MermaidDiagram from '../../components/MermaidDiagram.astro';
 When you tap your Chime debit card at a grocery store, the screen says "Approved" in about two seconds. You probably assume Chime's bank made that decision. In reality, a company you've likely never heard of — Galileo — received the authorization request, checked your balance, ran fraud rules, and sent back the approval. The bank was barely involved.
 
 That company is an <GlossaryTerm term="Issuer Processor" definition="A technology company that handles transaction authorization, card management, and settlement on behalf of the issuing bank." />. It's the technology layer that sits between the issuing bank and the card network, doing the actual work of running a card program. If the issuing bank is the legal entity on the card, the issuer processor is the brain.
+
+The US issuer processor market alone is worth roughly $8 billion as of 2025, projected to reach $15 billion by 2034. And the balance of power is shifting: modern platform revenue is on track to exceed traditional providers within that decade. Understanding who these processors are — and how they differ — is essential to understanding how cards actually work.
 
 ## What Does an Issuer Processor Actually Do?
 
@@ -57,33 +63,87 @@ This hardware requirement is one of the key reasons most banks don't process tra
 
 ## The Processor Landscape: Legacy vs. Modern
 
-The issuer processing market splits cleanly into two camps.
+The issuer processing market splits into two distinct camps — and understanding both is critical because legacy systems still handle roughly **87% of all credit card transactions globally**. About $8 trillion flows through mainframes every single year.
 
 ### Legacy Processors
 
-Companies like **TSYS** (now part of Global Payments), **FIS** (which owns NYCE and various processing platforms), and **Fiserv** (which owns First Data) have been running card programs for decades. They process the vast majority of card transactions in the United States. If you have a credit card from a major bank — Chase, Citi, Wells Fargo — chances are one of these three companies is processing your transactions behind the scenes.
+The three giants of legacy processing have been consolidating:
 
-These platforms were built in an era of mainframes and batch processing. They're extraordinarily reliable (they have to be — a processing outage means millions of cards stop working). But they're also notoriously difficult to integrate with. Getting a new card program live on a legacy processor can take 12 to 18 months. Configuration changes often require the processor's engineers to modify code on your behalf. Data access is limited — you might get batch files at the end of the day instead of real-time webhooks.
+**TSYS (now FIS Total Issuing Solutions)** — Founded in 1959, TSYS was the largest third-party issuer processor in the world before its acquisition. It processed 35 billion transactions per year across 875 million accounts, commanding roughly 40% of North American market share. FIS acquired TSYS for $13.5 billion in January 2026, creating a combined processing powerhouse under the FIS Total Issuing Solutions brand.
+
+**FIS** — Now owns TSYS and is going all-in on issuer processing. With the TSYS acquisition, FIS holds one of the largest card processing portfolios in the world. If you have a credit card from a top-10 US bank, there's a strong chance FIS is behind it.
+
+**Fiserv** — The other legacy giant, serving thousands of bank clients across the US. Fiserv acquired First Data in 2019, combining issuing and acquiring processing under one roof. Fiserv's strength is its deep integration with community banks and regional institutions.
+
+These platforms were built in an era of mainframes and batch processing. They're extraordinarily reliable — they have to be, because a processing outage means millions of cards stop working. But they're also notoriously difficult to integrate with. Getting a new card program live on a legacy processor can take 12 to 18 months. Configuration changes often require the processor's engineers to modify code on your behalf. Data access is limited — you might get batch files at the end of the day instead of real-time webhooks.
 
 ### Modern API-First Processors
 
-Starting in the 2010s, a new generation of processors emerged, built from the ground up on modern cloud infrastructure with developer-friendly APIs. The big names:
+Starting in the 2010s, a new generation of processors emerged, built from the ground up on modern cloud infrastructure with developer-friendly APIs. The landscape has expanded significantly, delivering what the industry calls <GlossaryTerm term="Card-as-a-Service" definition="A model where processors provide the full stack for issuing cards — from BIN sponsorship to processing — as a managed service." /> — the full stack for issuing cards as a managed, API-driven platform.
 
-- **Marqeta** — Pioneer of JIT Funding (more on that below). Powers DoorDash, Square Cash App, Uber, and Instacart's card programs.
-- **Galileo** (owned by SoFi) — Powers Chime, Robinhood, Revolut US, and MoneyLion. Processes over 100 million accounts.
-- **i2c** — Powers Flywire, Green Dot, and numerous international programs. Known for configurability.
-- **Lithic** — Developer-focused processor for startups building card products. Extremely fast integration.
-- **Highnote** — Newer entrant focused on modern card issuing with flexible program management.
+**Marqeta** — The pioneer of <GlossaryTerm term="JIT Funding" definition="Just-in-Time Funding — a model where cards hold $0 balance until a transaction occurs, funded in real-time." /> (more on that below). Marqeta processed over $383 billion in total volume through 2025 and powers Cash App, DoorDash, Instacart, and Klarna's card programs. Its open API approach made it the default choice for high-profile fintech launches.
+
+**Galileo (SoFi)** — Acquired by SoFi for $1.2 billion in 2020, Galileo now manages over 168 million accounts. It powers Chime, Robinhood, Monzo US, and MoneyLion. Its deep account management capabilities make it the go-to for neobanks that need full banking infrastructure, not just card issuing.
+
+**Lithic** — Born from the Privacy.com team, Lithic is laser-focused on developer experience. It offers a 1-week launch timeline — unheard of in the industry. Lithic is also one of the rare processors that connects to Visa, Mastercard, **and** American Express, which is unusual since Amex typically controls its own issuing. Powers Mercury, Novo, and numerous startups building embedded card products.
+
+**Highnote** — The only modern processor offering unified issuing and acquiring on a single API. Uniquely, Highnote uses GraphQL rather than REST — a deliberate choice for more flexible, efficient data querying. Built entirely on Google Cloud. Named to the Forbes Fintech 50.
+
+**i2c** — Offers over 100,000 <GlossaryTerm term="Composable Building Blocks" definition="Pre-coded, modular components that can be assembled to create custom card programs without writing code from scratch." /> — pre-coded, modular components that clients assemble to create custom card programs without writing code from scratch. Maintains 99.999% uptime (five nines). Notably, i2c runs on proprietary infrastructure — deliberately avoiding public cloud — giving it full control over its processing stack. Powers programs for Flywire, Green Dot, and numerous international clients.
+
+**Paymentology** — Operating in 60+ countries, Paymentology is the go-to modern processor for emerging markets including Latin America, Africa, Southeast Asia, and the Middle East. It powers M-PESA cards (the dominant mobile money platform in Africa), Agoda, and Orange. Its cloud-native, multi-region architecture is purpose-built for markets where banking infrastructure is fragmented.
+
+**Thredd** — Strong in the UK and Europe, Thredd offers a 200-millisecond issue-and-load time for virtual cards. It powers Curve, Nium, and a growing roster of European fintech programs. Thredd's European licensing and local compliance expertise make it a natural choice for companies launching in the EU and UK.
+
+**Enfuce** — A Finnish processor that became the first PCI-DSS certified processor running entirely in public cloud. Its 8-week onboarding timeline has made it popular with fast-moving European fintechs. Powers Pleo, the corporate expense platform.
+
+**DECTA** — With 20+ years of processing experience, DECTA handles over 1 billion transactions per year. It holds licensed EMI (Electronic Money Institution) status in the UK, Cyprus, and Ireland — meaning it can act as both processor and issuer in certain configurations.
+
+**BPC** — Runs the SmartVista platform, processing $52 billion across 140 countries. BPC is particularly strong in emerging markets where its modular platform lets banks and fintechs assemble payment solutions piece by piece.
+
+### Legacy vs. Modern: A Detailed Comparison
 
 | | Legacy Processors | Modern Processors |
 |---|---|---|
 | **Architecture** | Mainframe-based, batch-oriented | Cloud-native, real-time APIs |
-| **Launch time** | 12–18 months | 4–12 weeks |
+| **Launch time** | 12–18 months | 4–12 weeks (some as fast as 1 week) |
 | **Data access** | End-of-day batch files | Real-time webhooks and APIs |
-| **Integration** | Custom file formats, FTP transfers | RESTful APIs, SDKs |
+| **Integration** | Custom file formats, FTP transfers | RESTful APIs, SDKs, sandboxes |
 | **Customization** | Processor-managed configurations | Self-service, programmable rules |
+| **Uptime** | Proven but rigid infrastructure | 99.99–99.999% with elastic scaling |
+| **Developer experience** | Minimal docs, relationship-driven | Developer portals, sandboxes, SDKs |
+| **Cost structure** | High fixed costs, vendor lock-in | Usage-based pricing, transparent |
+| **Innovation cycle** | Annual or quarterly releases | Continuous deployment |
 | **Scale** | Billions of transactions/year | Growing rapidly, millions to billions |
 | **Typical clients** | Major banks, established programs | Fintechs, neobanks, embedded finance |
+
+Despite every advantage listed in the right column, the legacy systems still process the overwhelming majority of global card transactions. TSYS alone handled 35 billion transactions per year before the FIS acquisition. The modern processors are growing fast — but the incumbents' installed base is enormous.
+
+## Geographic Coverage: Where Processors Dominate
+
+Processor choice often depends as much on geography as on technology. The market breaks down regionally:
+
+**US-dominated:** Marqeta, Galileo, Lithic, Highnote, and TSYS/FIS are strongest in North America. If you're launching a card program in the US, these are your primary options.
+
+**Europe-focused:** Thredd, Enfuce, and DECTA are built for the European regulatory landscape — PSD2 compliance, Strong Customer Authentication, and multi-currency support across the Eurozone and UK.
+
+**Emerging markets:** Paymentology and BPC specialize in regions where banking infrastructure is less mature — Latin America, Africa, Southeast Asia, and the Middle East. Their platforms are designed for markets with fragmented banking systems and high mobile-money adoption.
+
+**Global reach:** i2c and Fiserv operate across multiple continents, making them natural choices for programs that need to launch in multiple geographies simultaneously.
+
+If you're a fintech planning to issue cards in the UK and then expand to Nigeria, you'd likely work with Paymentology or Thredd rather than Marqeta — not because of technology quality, but because of licensing, network certifications, and local compliance expertise.
+
+## API Design Philosophy
+
+How a processor exposes its capabilities matters more than most fintechs realize when evaluating partners.
+
+**REST APIs** are the standard for most modern processors. Marqeta, Galileo, Lithic, and Paymentology all offer RESTful endpoints for card creation, transaction management, and account operations. REST is well-understood, widely supported, and easy to integrate with.
+
+**GraphQL** is the outlier approach, used by Highnote. GraphQL lets clients request exactly the data they need in a single query — no over-fetching, no under-fetching. For card programs that need complex, nested data (a cardholder's transactions, grouped by merchant category, filtered by date range, with dispute status), GraphQL can be significantly more efficient than multiple REST calls.
+
+**Legacy protocols** are still the backbone of traditional processing. ISO 8583 message formats, batch files delivered via SFTP, and proprietary data formats remain the standard for TSYS/FIS, Fiserv, and their bank clients. These protocols are battle-tested but require specialized knowledge to implement and maintain.
+
+**Webhooks and event streaming** are increasingly critical. Modern processors push real-time events — transaction authorized, card activated, dispute filed — to the fintech's systems via webhooks. This is what makes features like instant transaction notifications and real-time spending analytics possible. Legacy processors typically deliver this data hours later in batch files.
 
 ## The JIT Funding Innovation
 
@@ -148,4 +208,4 @@ Given how central processing is, you might wonder: why don't banks just do it th
 
 **Scalability.** Processors are built to handle dramatic swings in volume — Black Friday, tax refund season, stimulus payments. This elasticity is hard to build in-house.
 
-The issuer processor might be the most important company in the payments ecosystem that most people have never heard of. Every card in your wallet, every fintech app on your phone, every "Approved" on a terminal screen — there's a processor making it happen.
+The issuer processor might be the most important company in the payments ecosystem that most people have never heard of. Every card in your wallet, every fintech app on your phone, every "Approved" on a terminal screen — there's a processor making it happen. And as the market shifts from legacy mainframes to modern APIs, the companies that power the next generation of card programs will shape how billions of people interact with money.

@@ -248,10 +248,13 @@ const diagramId = `mermaid-${Math.random().toString(36).slice(2, 9)}`;
   }
 
   .mermaid-overlay-viewport :global(svg) {
-    max-width: none;
-    max-height: none;
+    max-width: 90vw;
+    max-height: calc(100vh - 8rem);
+    width: auto;
+    height: auto;
     transition: transform 0.15s ease;
     filter: drop-shadow(0 4px 24px rgba(0, 0, 0, 0.3));
+    transform-origin: center center;
   }
 
   /* ── Dark mode ── */
@@ -376,11 +379,20 @@ const diagramId = `mermaid-${Math.random().toString(36).slice(2, 9)}`;
 
     function openOverlay(svgEl: SVGElement, caption: string) {
       const clone = svgEl.cloneNode(true) as SVGElement;
+
+      // Ensure the SVG has a viewBox so it scales properly.
+      // Mermaid often sets width/height attributes but no viewBox.
+      if (!clone.getAttribute('viewBox')) {
+        const w = clone.getAttribute('width') || clone.getBoundingClientRect?.()?.width || 800;
+        const h = clone.getAttribute('height') || clone.getBoundingClientRect?.()?.height || 400;
+        clone.setAttribute('viewBox', `0 0 ${parseFloat(String(w))} ${parseFloat(String(h))}`);
+      }
+
+      // Remove fixed dimensions so CSS can control sizing
+      clone.removeAttribute('width');
+      clone.removeAttribute('height');
       clone.removeAttribute('style');
-      clone.style.width = '100%';
-      clone.style.maxWidth = 'none';
-      clone.style.height = 'auto';
-      clone.style.maxHeight = '80vh';
+
       viewport.innerHTML = '';
       viewport.appendChild(clone);
       if (captionEl) captionEl.textContent = caption || '';

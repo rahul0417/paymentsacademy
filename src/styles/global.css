@@ -1,2 +1,310 @@
+/* --- Google Fonts (must be first) --- */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400;1,9..144,500&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&display=swap');
+
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+
+/* ============================================================
+   FintechAcademy Design System
+   Editorial/Magazine meets Warm Academic
+   ============================================================ */
+
+/* --- Color System (CSS Custom Properties) --- */
+@theme {
+  /* Warm earth tone palette */
+  --color-cream: #FAF6F1;
+  --color-cream-dark: #F0EAE0;
+  --color-parchment: #EDE7DC;
+  --color-ivory: #FFFEF9;
+
+  --color-charcoal: #2C2825;
+  --color-charcoal-light: #4A4540;
+  --color-stone: #6B6560;
+  --color-stone-light: #9B9590;
+
+  --color-copper: #B87333;
+  --color-copper-dark: #9A5F28;
+  --color-copper-light: #D4955A;
+  --color-amber: #D4A045;
+  --color-amber-light: #E8C478;
+
+  --color-sage: #7A8B6F;
+  --color-sage-light: #A3B396;
+
+  /* Dark mode palette */
+  --color-night: #1A1816;
+  --color-night-surface: #242120;
+  --color-night-elevated: #2E2B28;
+  --color-night-text: #E8E0D6;
+  --color-night-text-muted: #A89E94;
+  --color-night-copper: #D4955A;
+
+  /* Font families */
+  --font-heading: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-body: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
+}
+
+/* --- Base Styles --- */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-charcoal);
+  background-color: var(--color-cream);
+  line-height: 1.7;
+  font-size: 17px;
+  position: relative;
+}
+
+/* Subtle paper grain texture via CSS noise */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}
+
+/* --- Typography --- */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  color: var(--color-charcoal);
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  font-optical-sizing: auto;
+}
+
+h1 {
+  font-size: 2.75rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: 2rem;
+  font-weight: 500;
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+p {
+  margin-bottom: 1.25rem;
+  color: var(--color-charcoal-light);
+}
+
+/* --- Links --- */
+a {
+  color: var(--color-copper);
+  text-decoration: none;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+a:hover {
+  color: var(--color-copper-dark);
+}
+
+/* --- Selection --- */
+::selection {
+  background-color: var(--color-amber-light);
+  color: var(--color-charcoal);
+}
+
+/* --- Prose / Article Content --- */
+.prose {
+  --tw-prose-body: var(--color-charcoal-light);
+  --tw-prose-headings: var(--color-charcoal);
+  --tw-prose-links: var(--color-copper);
+  --tw-prose-bold: var(--color-charcoal);
+  --tw-prose-counters: var(--color-stone);
+  --tw-prose-bullets: var(--color-copper-light);
+  --tw-prose-quotes: var(--color-charcoal-light);
+  --tw-prose-quote-borders: var(--color-copper-light);
+  --tw-prose-code: var(--color-charcoal);
+  --tw-prose-pre-bg: var(--color-night);
+  --tw-prose-pre-code: var(--color-night-text);
+  --tw-prose-th-borders: var(--color-parchment);
+  --tw-prose-td-borders: var(--color-cream-dark);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  max-width: 70ch;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  font-family: var(--font-heading);
+  font-optical-sizing: auto;
+}
+
+.prose a {
+  color: var(--color-copper);
+  text-decoration: underline;
+  text-decoration-color: var(--color-copper-light);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  transition: text-decoration-color 0.2s ease, color 0.2s ease;
+}
+
+.prose a:hover {
+  color: var(--color-copper-dark);
+  text-decoration-color: var(--color-copper-dark);
+}
+
+.prose blockquote {
+  font-style: italic;
+  border-left-color: var(--color-copper-light);
+  background-color: var(--color-cream-dark);
+  padding: 1rem 1.5rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.prose code:not(pre code) {
+  background-color: var(--color-cream-dark);
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.9em;
+  font-weight: 500;
+}
+
+.prose hr {
+  border-color: var(--color-parchment);
+  margin: 3rem 0;
+}
+
+.prose img {
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 16px rgba(44, 40, 37, 0.08);
+}
+
+/* --- Scrollbar --- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-stone-light);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-stone);
+}
+
+/* --- Dark Mode --- */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: var(--color-night);
+    color: var(--color-night-text);
+  }
+
+  body::before {
+    opacity: 0.04;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--color-night-text);
+  }
+
+  p {
+    color: var(--color-night-text-muted);
+  }
+
+  a {
+    color: var(--color-night-copper);
+  }
+
+  a:hover {
+    color: var(--color-amber-light);
+  }
+
+  ::selection {
+    background-color: var(--color-copper-dark);
+    color: var(--color-night-text);
+  }
+
+  .prose {
+    --tw-prose-body: var(--color-night-text-muted);
+    --tw-prose-headings: var(--color-night-text);
+    --tw-prose-links: var(--color-night-copper);
+    --tw-prose-bold: var(--color-night-text);
+    --tw-prose-counters: var(--color-night-text-muted);
+    --tw-prose-bullets: var(--color-night-copper);
+    --tw-prose-quotes: var(--color-night-text-muted);
+    --tw-prose-quote-borders: var(--color-night-copper);
+    --tw-prose-code: var(--color-night-text);
+    --tw-prose-pre-bg: var(--color-night-elevated);
+    --tw-prose-pre-code: var(--color-night-text);
+    --tw-prose-th-borders: var(--color-night-elevated);
+    --tw-prose-td-borders: var(--color-night-surface);
+  }
+
+  .prose blockquote {
+    background-color: var(--color-night-surface);
+  }
+
+  .prose code:not(pre code) {
+    background-color: var(--color-night-elevated);
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-night);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-night-elevated);
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-stone);
+  }
+}
+
+/* --- Utility classes --- */
+.font-heading {
+  font-family: var(--font-heading);
+}
+
+.font-body {
+  font-family: var(--font-body);
+}
+
+.text-copper {
+  color: var(--color-copper);
+}
+
+.bg-parchment {
+  background-color: var(--color-parchment);
+}
+
+/* --- Transitions --- */
+.transition-default {
+  transition: all 0.2s ease;
+}
+
+/* --- Focus styles --- */
+:focus-visible {
+  outline: 2px solid var(--color-copper);
+  outline-offset: 2px;
+  border-radius: 2px;
+}

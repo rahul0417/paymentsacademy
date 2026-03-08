@@ -1,0 +1,246 @@
+---
+const navItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Topics', href: '/topics' },
+  { label: 'Glossary', href: '/glossary' },
+];
+---
+
+<header
+  id="site-header"
+  class="sticky top-0 z-50 transition-all duration-300"
+>
+  <div class="header-inner">
+    <nav class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <!-- Wordmark -->
+      <a href="/" class="group flex items-center gap-2 no-underline">
+        <span class="wordmark-icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="2" width="24" height="24" rx="6" stroke="currentColor" stroke-width="1.5" fill="none" />
+            <path d="M8 10h12M8 14h8M8 18h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          </svg>
+        </span>
+        <span class="font-heading text-xl font-semibold tracking-tight">
+          Fintech<span class="text-copper">Academy</span>
+        </span>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <div class="hidden md:flex items-center gap-8">
+        <ul class="flex items-center gap-6 list-none m-0 p-0">
+          {navItems.map(({ label, href }) => (
+            <li>
+              <a
+                href={href}
+                class="nav-link text-sm font-medium uppercase tracking-wide"
+              >
+                {label}
+              </a>
+            </li>
+          ))}
+        </ul>
+
+        <!-- Search placeholder -->
+        <button
+          type="button"
+          class="search-trigger"
+          aria-label="Search"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <circle cx="7" cy="7" r="5" />
+            <path d="M11 11l3.5 3.5" />
+          </svg>
+          <span class="search-text">Search</span>
+          <kbd class="search-kbd">
+            <span class="text-xs">/</span>
+          </kbd>
+        </button>
+      </div>
+
+      <!-- Mobile menu button -->
+      <button
+        type="button"
+        id="mobile-menu-btn"
+        class="md:hidden p-2 -mr-2 rounded-lg hover:bg-[var(--color-parchment)] transition-colors"
+        aria-label="Toggle menu"
+        aria-expanded="false"
+      >
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M4 7h14M4 11h14M4 15h14" class="menu-open" />
+        </svg>
+      </button>
+    </nav>
+
+    <!-- Mobile Navigation -->
+    <div id="mobile-menu" class="md:hidden hidden border-t border-[var(--color-parchment)]">
+      <div class="max-w-6xl mx-auto px-6 py-4 flex flex-col gap-3">
+        {navItems.map(({ label, href }) => (
+          <a
+            href={href}
+            class="nav-link text-base font-medium py-2"
+          >
+            {label}
+          </a>
+        ))}
+        <button
+          type="button"
+          class="search-trigger mt-2 w-full justify-center"
+          aria-label="Search"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+            <circle cx="7" cy="7" r="5" />
+            <path d="M11 11l3.5 3.5" />
+          </svg>
+          <span class="search-text">Search</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  .header-inner {
+    background-color: color-mix(in srgb, var(--color-cream) 85%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s ease, background-color 0.3s ease;
+  }
+
+  .header-scrolled .header-inner {
+    border-bottom-color: var(--color-parchment);
+    background-color: color-mix(in srgb, var(--color-cream) 92%, transparent);
+  }
+
+  .wordmark-icon {
+    color: var(--color-copper);
+    transition: transform 0.3s ease;
+  }
+
+  .group:hover .wordmark-icon {
+    transform: rotate(-3deg) scale(1.05);
+  }
+
+  .nav-link {
+    color: var(--color-stone);
+    text-decoration: none;
+    position: relative;
+    transition: color 0.2s ease;
+  }
+
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1.5px;
+    background-color: var(--color-copper);
+    transition: width 0.25s ease;
+  }
+
+  .nav-link:hover {
+    color: var(--color-charcoal);
+  }
+
+  .nav-link:hover::after {
+    width: 100%;
+  }
+
+  .search-trigger {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid var(--color-parchment);
+    border-radius: 0.5rem;
+    background-color: var(--color-ivory);
+    color: var(--color-stone-light);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .search-trigger:hover {
+    border-color: var(--color-copper-light);
+    box-shadow: 0 1px 4px rgba(184, 115, 51, 0.08);
+  }
+
+  .search-kbd {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    padding: 0 0.3rem;
+    background: var(--color-cream-dark);
+    border: 1px solid var(--color-parchment);
+    border-radius: 0.25rem;
+    font-family: var(--font-body);
+    color: var(--color-stone);
+    line-height: 1;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .header-inner {
+      background-color: color-mix(in srgb, var(--color-night) 85%, transparent);
+    }
+
+    .header-scrolled .header-inner {
+      border-bottom-color: var(--color-night-elevated);
+      background-color: color-mix(in srgb, var(--color-night) 92%, transparent);
+    }
+
+    .nav-link {
+      color: var(--color-night-text-muted);
+    }
+
+    .nav-link:hover {
+      color: var(--color-night-text);
+    }
+
+    .search-trigger {
+      background-color: var(--color-night-surface);
+      border-color: var(--color-night-elevated);
+      color: var(--color-night-text-muted);
+    }
+
+    .search-trigger:hover {
+      border-color: var(--color-night-copper);
+    }
+
+    .search-kbd {
+      background: var(--color-night-elevated);
+      border-color: var(--color-night-surface);
+      color: var(--color-night-text-muted);
+    }
+  }
+</style>
+
+<script>
+  // Sticky header scroll effect
+  const header = document.getElementById('site-header');
+  if (header) {
+    let lastScroll = 0;
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      if (scrollY > 10) {
+        header.classList.add('header-scrolled');
+      } else {
+        header.classList.remove('header-scrolled');
+      }
+      lastScroll = scrollY;
+    }, { passive: true });
+  }
+
+  // Mobile menu toggle
+  const menuBtn = document.getElementById('mobile-menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  if (menuBtn && mobileMenu) {
+    menuBtn.addEventListener('click', () => {
+      const expanded = menuBtn.getAttribute('aria-expanded') === 'true';
+      menuBtn.setAttribute('aria-expanded', String(!expanded));
+      mobileMenu.classList.toggle('hidden');
+    });
+  }
+</script>

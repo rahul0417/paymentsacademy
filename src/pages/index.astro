@@ -1,17 +1,135 @@
 ---
-import '../styles/global.css';
+import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Fintech Academy</title>
-	</head>
-	<body class="bg-white text-gray-900">
-		<h1 class="text-4xl font-bold p-8">Fintech Academy</h1>
-	</body>
-</html>
+<BaseLayout title="FintechAcademy" description="A knowledge base for understanding how money moves.">
+  <!-- Hero Section -->
+  <section class="max-w-6xl mx-auto px-6 pt-20 pb-16">
+    <div class="max-w-3xl">
+      <p class="text-sm font-medium uppercase tracking-widest mb-4" style="color: var(--color-copper);">
+        A Payments Knowledge Base
+      </p>
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-heading font-semibold leading-tight mb-6" style="letter-spacing: -0.02em;">
+        Understand how<br />
+        <span style="color: var(--color-copper);">money moves.</span>
+      </h1>
+      <p class="text-lg md:text-xl leading-relaxed max-w-2xl" style="color: var(--color-stone);">
+        FintechAcademy is a free, open knowledge base that explains the systems
+        behind every payment &mdash; from the moment you tap your card to the
+        settlement between banks.
+      </p>
+    </div>
+  </section>
+
+  <!-- Divider -->
+  <div class="max-w-6xl mx-auto px-6">
+    <hr style="border-color: var(--color-parchment); margin: 0;" />
+  </div>
+
+  <!-- Featured Topics Preview -->
+  <section class="max-w-6xl mx-auto px-6 py-16">
+    <h2 class="font-heading text-sm font-semibold uppercase tracking-widest mb-8" style="color: var(--color-stone-light);">
+      Start Exploring
+    </h2>
+    <div class="grid md:grid-cols-3 gap-8">
+      <!-- Card 1 -->
+      <a href="/topics" class="topic-card group">
+        <span class="topic-number">01</span>
+        <h3 class="font-heading text-xl font-medium mb-2 group-hover:text-[var(--color-copper)] transition-colors">
+          Card Networks
+        </h3>
+        <p class="text-sm leading-relaxed" style="color: var(--color-stone);">
+          How Visa, Mastercard, and others route billions of transactions every day.
+        </p>
+      </a>
+
+      <!-- Card 2 -->
+      <a href="/topics" class="topic-card group">
+        <span class="topic-number">02</span>
+        <h3 class="font-heading text-xl font-medium mb-2 group-hover:text-[var(--color-copper)] transition-colors">
+          Payment Rails
+        </h3>
+        <p class="text-sm leading-relaxed" style="color: var(--color-stone);">
+          ACH, wire transfers, SWIFT &mdash; the infrastructure that moves money between accounts.
+        </p>
+      </a>
+
+      <!-- Card 3 -->
+      <a href="/topics" class="topic-card group">
+        <span class="topic-number">03</span>
+        <h3 class="font-heading text-xl font-medium mb-2 group-hover:text-[var(--color-copper)] transition-colors">
+          Digital Wallets
+        </h3>
+        <p class="text-sm leading-relaxed" style="color: var(--color-stone);">
+          Apple Pay, Google Pay, and the tokenization technology that powers them.
+        </p>
+      </a>
+    </div>
+  </section>
+
+  <!-- Sample prose section to test typography -->
+  <section class="max-w-6xl mx-auto px-6 py-16">
+    <div class="max-w-none prose prose-lg mx-auto" style="max-width: 70ch;">
+      <h2>What happens when you tap your card?</h2>
+      <p>
+        In the fraction of a second between tapping your card and seeing
+        "Approved" on the terminal, a remarkable chain of events unfolds.
+        Your payment traverses multiple networks, passes through several
+        institutions, and triggers a series of risk checks &mdash; all before
+        you've even put your wallet away.
+      </p>
+      <blockquote>
+        <p>
+          "The payments industry moves trillions of dollars daily through
+          infrastructure most people never think about."
+        </p>
+      </blockquote>
+      <p>
+        Understanding these systems isn't just for engineers or bankers.
+        Whether you're building a fintech product, running a business that
+        accepts payments, or simply curious about the financial plumbing of
+        modern commerce &mdash; this knowledge matters.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .topic-card {
+    display: block;
+    padding: 2rem;
+    border: 1px solid var(--color-parchment);
+    border-radius: 0.75rem;
+    background-color: var(--color-ivory);
+    text-decoration: none;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+  }
+
+  .topic-card:hover {
+    border-color: var(--color-copper-light);
+    box-shadow: 0 4px 24px rgba(184, 115, 51, 0.06);
+    transform: translateY(-2px);
+  }
+
+  .topic-number {
+    display: inline-block;
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-copper);
+    margin-bottom: 0.75rem;
+    letter-spacing: 0.05em;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .topic-card {
+      background-color: var(--color-night-surface);
+      border-color: var(--color-night-elevated);
+    }
+
+    .topic-card:hover {
+      border-color: var(--color-night-copper);
+      box-shadow: 0 4px 24px rgba(212, 149, 90, 0.08);
+    }
+  }
+</style>

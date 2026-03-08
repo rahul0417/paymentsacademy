@@ -1,0 +1,124 @@
+---
+const currentYear = new Date().getFullYear();
+
+const sections = [
+  {
+    title: 'Learn',
+    links: [
+      { label: 'Topics', href: '/topics' },
+      { label: 'Glossary', href: '/glossary' },
+    ],
+  },
+  {
+    title: 'About',
+    links: [
+      { label: 'About FintechAcademy', href: '/about' },
+      { label: 'Contributing', href: '/contributing' },
+    ],
+  },
+];
+---
+
+<footer class="footer-wrapper mt-auto">
+  <div class="footer-separator" aria-hidden="true"></div>
+
+  <div class="max-w-6xl mx-auto px-6 py-16">
+    <!-- Tagline -->
+    <div class="mb-12">
+      <p class="font-heading text-lg md:text-xl font-medium italic leading-relaxed max-w-md" style="color: var(--color-charcoal-light);">
+        Built to help you understand<br />how money moves.
+      </p>
+    </div>
+
+    <!-- Links grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-8 mb-12">
+      {sections.map(({ title, links }) => (
+        <div>
+          <h4 class="footer-heading">{title}</h4>
+          <ul class="list-none m-0 p-0 flex flex-col gap-2">
+            {links.map(({ label, href }) => (
+              <li>
+                <a href={href} class="footer-link">{label}</a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+
+      <!-- Home link column -->
+      <div>
+        <h4 class="footer-heading">Site</h4>
+        <ul class="list-none m-0 p-0 flex flex-col gap-2">
+          <li><a href="/" class="footer-link">Home</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom bar -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pt-8 border-t" style="border-color: var(--color-parchment);">
+      <div class="flex items-center gap-2">
+        <span class="font-heading text-sm font-semibold tracking-tight">
+          Fintech<span class="text-copper">Academy</span>
+        </span>
+      </div>
+      <p class="text-xs" style="color: var(--color-stone-light);">
+        &copy; {currentYear} FintechAcademy. Open knowledge for the curious.
+      </p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer-wrapper {
+    background-color: var(--color-cream-dark);
+  }
+
+  .footer-separator {
+    max-width: 72rem;
+    margin: 0 auto;
+    border-top: 1px solid var(--color-parchment);
+  }
+
+  .footer-heading {
+    font-family: var(--font-body);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-stone-light);
+    margin-bottom: 0.75rem;
+  }
+
+  .footer-link {
+    font-size: 0.9rem;
+    color: var(--color-stone);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .footer-link:hover {
+    color: var(--color-copper);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .footer-wrapper {
+      background-color: var(--color-night-surface);
+    }
+
+    .footer-separator {
+      border-top-color: var(--color-night-elevated);
+    }
+
+    .footer-heading {
+      color: var(--color-night-text-muted);
+    }
+
+    .footer-link {
+      color: var(--color-night-text-muted);
+    }
+
+    .footer-link:hover {
+      color: var(--color-night-copper);
+    }
+  }
+</style>

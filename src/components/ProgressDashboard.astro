@@ -1,14 +1,11 @@
 ---
 import { themes, getTopicsByTheme } from '../data/themes';
 import { getAllQuizSlugs } from '../data/quizzes';
-import { getAllFlashcardSlugs } from '../data/flashcards';
 
 const { topicsByTheme, allTopics } = await getTopicsByTheme();
 const quizSlugs = getAllQuizSlugs();
-const flashcardSlugs = getAllFlashcardSlugs();
 const totalTopics = allTopics.length;
 const totalQuizzes = quizSlugs.length;
-const totalFlashcardDecks = flashcardSlugs.length;
 
 // Build theme data for client-side rendering
 const themeData = themes.map((theme) => {
@@ -18,14 +15,12 @@ const themeData = themes.map((theme) => {
     topics: topics.map((t) => ({
       slug: t.id,
       title: t.data.title,
-      hasQuiz: quizSlugs.includes(t.id),
-      hasFlashcards: flashcardSlugs.includes(t.id),
     })),
   };
 });
 ---
 
-<div class="progress-dashboard" data-themes={JSON.stringify(themeData)} data-total-topics={totalTopics} data-total-quizzes={totalQuizzes} data-total-flashcards={totalFlashcardDecks}>
+<div class="progress-dashboard" data-themes={JSON.stringify(themeData)} data-total-topics={totalTopics} data-total-quizzes={totalQuizzes}>
   <!-- Stats row -->
   <div class="progress-stats">
     <div class="stat-card">
@@ -37,11 +32,6 @@ const themeData = themes.map((theme) => {
       <span class="stat-number" id="stat-quizzes">0</span>
       <span class="stat-label">Quizzes Passed</span>
       <span class="stat-detail" id="stat-quizzes-detail">of {totalQuizzes}</span>
-    </div>
-    <div class="stat-card">
-      <span class="stat-number" id="stat-flashcards">0</span>
-      <span class="stat-label">Decks Reviewed</span>
-      <span class="stat-detail" id="stat-flashcards-detail">of {totalFlashcardDecks}</span>
     </div>
     <div class="stat-card stat-streak">
       <span class="stat-number" id="stat-streak">0</span>
@@ -81,7 +71,7 @@ const themeData = themes.map((theme) => {
 
   @media (min-width: 640px) {
     .progress-stats {
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr);
     }
   }
 
@@ -348,8 +338,7 @@ const themeData = themes.map((theme) => {
     const totalTopics = parseInt(dashboard.dataset.totalTopics || '0');
     const totalQuizzes = parseInt(dashboard.dataset.totalQuizzes || '0');
 
-    const totalFlashcards = parseInt(dashboard.dataset.totalFlashcards || '0');
-    let state = { topicsRead: {} as Record<string, number>, quizResults: {} as Record<string, any>, microLessonsCompleted: {} as Record<string, number>, flashcardsReviewed: {} as Record<string, any>, streak: { currentStreak: 0, longestStreak: 0, lastVisitDate: '' } };
+    let state = { topicsRead: {} as Record<string, number>, quizResults: {} as Record<string, any>, streak: { currentStreak: 0, longestStreak: 0, lastVisitDate: '' } };
     try {
       const raw = localStorage.getItem('fa-progress');
       if (raw) {
@@ -362,11 +351,8 @@ const themeData = themes.map((theme) => {
     const topicsReadCount = Object.keys(state.topicsRead).length;
     const quizResults = state.quizResults;
     const passedQuizzes = Object.values(quizResults).filter((r: any) => r.passed).length;
-    const flashcardsReviewedCount = Object.keys(state.flashcardsReviewed || {}).length;
-
     (document.getElementById('stat-topics-read') as HTMLElement).textContent = String(topicsReadCount);
     (document.getElementById('stat-quizzes') as HTMLElement).textContent = String(passedQuizzes);
-    (document.getElementById('stat-flashcards') as HTMLElement).textContent = String(flashcardsReviewedCount);
     (document.getElementById('stat-streak') as HTMLElement).textContent = String(state.streak.currentStreak);
     (document.getElementById('stat-streak-detail') as HTMLElement).textContent = `longest: ${state.streak.longestStreak}`;
 
@@ -391,23 +377,13 @@ const themeData = themes.map((theme) => {
         if (quizResult) {
           const qPct = Math.round((quizResult.score / quizResult.total) * 100);
           quizBadge = `<span class="topic-quiz-score ${quizResult.passed ? 'passed' : 'failed'}">${qPct}%</span>`;
-        } else if (topic.hasQuiz) {
-          quizBadge = `<a href="/micro/quiz/${topic.slug}" class="topic-quiz-score" style="background: var(--color-pale-mint); color: var(--color-text-light); text-decoration: none;">Quiz</a>`;
-        }
-
-        const fcResult = (state.flashcardsReviewed || {})[topic.slug];
-        let fcBadge = '';
-        if (fcResult) {
-          fcBadge = `<span class="topic-quiz-score passed" title="${fcResult.cardsGotIt}/${fcResult.cardsTotal} got it">&#10003;</span>`;
-        } else if (topic.hasFlashcards) {
-          fcBadge = `<a href="/micro/review/${topic.slug}" class="topic-quiz-score" style="background: var(--color-pale-mint); color: var(--color-text-light); text-decoration: none;">Review</a>`;
         }
 
         topicListHtml += `
           <div class="theme-topic-item">
             <span class="topic-status-icon ${isRead ? 'read' : 'unread'}">${isRead ? '&#10003;' : '&#9675;'}</span>
             <a href="/topics/${topic.slug}">${topic.title}</a>
-            ${fcBadge}${quizBadge}
+            ${quizBadge}
           </div>
         `;
       }

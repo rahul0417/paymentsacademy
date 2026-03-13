@@ -1,7 +1,7 @@
 ---
 import { themeNames, getTopicsByTheme } from '../data/themes';
 import { getAllQuizSlugs } from '../data/quizzes';
-import { getAllFlashcardSlugs } from '../data/flashcards';
+import { getAllMicroLessonSlugs } from '../data/microlearning';
 
 interface Props {
   currentSlug: string;
@@ -11,7 +11,7 @@ const { currentSlug } = Astro.props;
 
 const { topicsByTheme } = await getTopicsByTheme();
 const quizSlugs = getAllQuizSlugs();
-const flashcardSlugs = getAllFlashcardSlugs();
+const microLessonSlugs = getAllMicroLessonSlugs();
 
 const groupedTopics = themeNames
   .map((theme) => ({ theme, topics: topicsByTheme.get(theme) || [] }))
@@ -38,7 +38,7 @@ const groupedTopics = themeNames
             {topics.map((topic) => {
               const isActive = topic.id === currentSlug;
               const hasQuiz = quizSlugs.includes(topic.id);
-              const hasFlashcards = flashcardSlugs.includes(topic.id);
+              const hasMicroLesson = microLessonSlugs.includes(topic.id);
               return (
                 <li>
                   <div class="sidebar-link-row">
@@ -59,11 +59,11 @@ const groupedTopics = themeNames
                           </svg>
                         </a>
                       )}
-                      {hasFlashcards && (
-                        <a href={`/micro/review/${topic.id}`} class="sidebar-icon-link" title="Quick review" aria-label={`Review: ${topic.data.title}`}>
+                      {hasMicroLesson && (
+                        <a href={`/micro/review/${topic.id}`} class="sidebar-icon-link" title="Micro Learning" aria-label={`Micro Learning: ${topic.data.title}`}>
                           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
-                            <rect x="1" y="3" width="8" height="6" rx="1" />
-                            <rect x="3" y="1" width="8" height="6" rx="1" />
+                            <rect x="1" y="2" width="10" height="8" rx="1" />
+                            <path d="M4 5h4M4 7h3" />
                           </svg>
                         </a>
                       )}

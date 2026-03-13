@@ -10,18 +10,17 @@ export interface QuizResult {
   passed: boolean;
 }
 
-export interface FlashcardResult {
+export interface MicroLearningResult {
   completedAt: number;
-  cardsTotal: number;
-  cardsGotIt: number;
+  quizScore: number;
+  quizTotal: number;
 }
 
 export interface ProgressState {
   version: 1;
   topicsRead: Record<string, number>;
   quizResults: Record<string, QuizResult>;
-  microLessonsCompleted: Record<string, number>;
-  flashcardsReviewed: Record<string, FlashcardResult>;
+  microLearningCompleted: Record<string, MicroLearningResult>;
   streak: {
     currentStreak: number;
     longestStreak: number;
@@ -34,8 +33,7 @@ function defaultProgress(): ProgressState {
     version: 1,
     topicsRead: {},
     quizResults: {},
-    microLessonsCompleted: {},
-    flashcardsReviewed: {},
+    microLearningCompleted: {},
     streak: {
       currentStreak: 0,
       longestStreak: 0,
@@ -118,21 +116,12 @@ export function saveQuizResult(slug: string, score: number, total: number): void
   saveProgress(state);
 }
 
-export function markMicroLessonComplete(slug: string): void {
+export function saveMicroLearningResult(slug: string, quizScore: number, quizTotal: number): void {
   const state = loadProgress();
-  if (!state.microLessonsCompleted[slug]) {
-    state.microLessonsCompleted[slug] = Date.now();
-  }
-  updateStreak(state);
-  saveProgress(state);
-}
-
-export function saveFlashcardResult(slug: string, cardsTotal: number, cardsGotIt: number): void {
-  const state = loadProgress();
-  state.flashcardsReviewed[slug] = {
+  state.microLearningCompleted[slug] = {
     completedAt: Date.now(),
-    cardsTotal,
-    cardsGotIt,
+    quizScore,
+    quizTotal,
   };
   updateStreak(state);
   saveProgress(state);

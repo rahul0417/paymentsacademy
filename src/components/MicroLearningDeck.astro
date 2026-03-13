@@ -1,0 +1,1110 @@
+---
+interface Props {
+  topicSlug: string;
+  topicTitle: string;
+  slides: any[];
+  quizQuestions: any[];
+}
+
+const { topicSlug, topicTitle, slides, quizQuestions } = Astro.props;
+---
+
+<div class="mld-deck" data-topic-slug={topicSlug} data-topic-title={topicTitle} data-deck={JSON.stringify({ slides, quizQuestions })}>
+
+  <!-- Progress dots -->
+  <div class="mld-progress-bar">
+    <div class="mld-dots">
+      {slides.map((_, i) => <button class="mld-dot" data-dot={i} aria-label={`Go to slide ${i + 1}`} />)}
+    </div>
+  </div>
+
+  <!-- Slide counter -->
+  <div class="mld-counter">
+    <span class="mld-counter-text">Slide 1 of {slides.length}</span>
+  </div>
+
+  <!-- Slide content area -->
+  <div class="mld-slide-area"></div>
+
+  <!-- Navigation buttons -->
+  <div class="mld-nav">
+    <button class="mld-nav-btn mld-prev-btn" disabled>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4l-4 4 4 4" /></svg>
+      Previous
+    </button>
+    <button class="mld-nav-btn mld-next-btn">
+      Next
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4l4 4-4 4" /></svg>
+    </button>
+  </div>
+</div>
+
+<style>
+  .mld-deck {
+    max-width: 42rem;
+    margin: 0 auto;
+  }
+
+  /* Progress dots */
+  .mld-progress-bar {
+    margin-bottom: 0.75rem;
+  }
+
+  .mld-dots {
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .mld-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: none;
+    padding: 0;
+    background-color: var(--color-pale-mint-dark);
+    cursor: default;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+
+  .mld-dot.visited {
+    cursor: pointer;
+    background-color: var(--color-racing-green-light);
+  }
+
+  .mld-dot.active {
+    background-color: var(--color-racing-green);
+    transform: scale(1.25);
+  }
+
+  /* Counter */
+  .mld-counter {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .mld-counter-text {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-light);
+  }
+
+  /* Slide area */
+  .mld-slide-area {
+    min-height: 18rem;
+  }
+
+  /* Navigation */
+  .mld-nav {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+
+  .mld-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.75rem 1.75rem;
+    border-radius: 0.5rem;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+    text-decoration: none;
+    border: 1.5px solid var(--color-racing-green);
+    background-color: var(--color-racing-green);
+    color: var(--color-white);
+  }
+
+  .mld-nav-btn:hover:not(:disabled) {
+    background-color: var(--color-racing-green-light);
+    border-color: var(--color-racing-green-light);
+  }
+
+  .mld-nav-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .mld-prev-btn {
+    background-color: transparent;
+    color: var(--color-racing-green);
+  }
+
+  .mld-prev-btn:hover:not(:disabled) {
+    background-color: var(--color-racing-green);
+    color: var(--color-white);
+  }
+
+  /* Dark mode */
+  html[data-theme="dark"] {
+    .mld-dot {
+      background-color: var(--color-night-elevated);
+    }
+
+    .mld-dot.visited {
+      background-color: rgba(255, 218, 179, 0.5);
+    }
+
+    .mld-dot.active {
+      background-color: var(--color-night-accent);
+    }
+
+    .mld-counter-text {
+      color: var(--color-night-text-muted);
+    }
+
+    .mld-nav-btn {
+      background-color: var(--color-night-elevated);
+      color: var(--color-night-text);
+      border-color: var(--color-night-elevated);
+    }
+
+    .mld-nav-btn:hover:not(:disabled) {
+      background-color: var(--color-night-accent);
+      border-color: var(--color-night-accent);
+      color: var(--color-night);
+    }
+
+    .mld-prev-btn {
+      background-color: transparent;
+      color: var(--color-night-accent);
+      border-color: var(--color-night-accent);
+    }
+
+    .mld-prev-btn:hover:not(:disabled) {
+      background-color: var(--color-night-elevated);
+      color: var(--color-night-text);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .mld-nav-btn {
+      padding: 0.85rem 1.25rem;
+      font-size: 1rem;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .mld-slide-area {
+      min-height: 14rem;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Slide card */
+  .mld-slide-card {
+    background-color: var(--color-white);
+    border: 1.5px solid var(--color-pale-mint-dark);
+    border-radius: 0.75rem;
+    padding: 2rem 1.75rem;
+    box-shadow: 0 2px 12px rgba(6, 54, 34, 0.06);
+  }
+
+  .mld-slide-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-light);
+    margin-bottom: 0.5rem;
+  }
+
+  .mld-slide-title {
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--color-racing-green);
+    margin: 0 0 1rem;
+    line-height: 1.35;
+  }
+
+  .mld-slide-description {
+    font-size: 0.95rem;
+    color: var(--color-text-medium);
+    line-height: 1.65;
+    margin: 0 0 1.25rem;
+  }
+
+  /* Intro slide: objectives box */
+  .mld-objectives {
+    background-color: var(--color-pale-mint);
+    border-left: 3px solid var(--color-peach);
+    border-radius: 0 0.75rem 0.75rem 0;
+    padding: 1.25rem 1.5rem;
+  }
+
+  .mld-objectives-heading {
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-racing-green);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 0.75rem;
+  }
+
+  .mld-objectives-list {
+    margin: 0;
+    padding: 0 0 0 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .mld-objectives-list li {
+    font-size: 0.9rem;
+    color: var(--color-text-medium);
+    line-height: 1.55;
+  }
+
+  /* Concept slide: content */
+  .mld-concept-content {
+    font-size: 0.95rem;
+    color: var(--color-text-medium);
+    line-height: 1.7;
+  }
+
+  .mld-concept-content p {
+    margin: 0 0 0.75rem;
+  }
+
+  .mld-concept-content p:last-child {
+    margin-bottom: 0;
+  }
+
+  .mld-concept-content ul,
+  .mld-concept-content ol {
+    margin: 0.5rem 0 0.75rem 1.25rem;
+    padding: 0;
+  }
+
+  .mld-concept-content li {
+    margin-bottom: 0.3rem;
+  }
+
+  .mld-concept-content strong {
+    color: var(--color-racing-green);
+    font-weight: 600;
+  }
+
+  /* Callout box */
+  .slide-callout {
+    background-color: var(--color-pale-mint);
+    border-left: 3px solid var(--color-peach);
+    border-radius: 0 0.5rem 0.5rem 0;
+    padding: 1rem 1.25rem;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+    color: var(--color-text-medium);
+    line-height: 1.6;
+  }
+
+  /* Diagram slide */
+  .mld-diagram-container {
+    background-color: var(--color-pale-mint);
+    border: 1px solid var(--color-pale-mint-dark);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    overflow-x: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    margin-bottom: 0.75rem;
+  }
+
+  .mld-diagram-container svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .mld-diagram-caption {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--color-text-medium);
+    font-style: italic;
+    font-family: var(--font-body);
+  }
+
+  .mld-diagram-loading {
+    color: var(--color-text-light);
+    font-size: 0.85rem;
+    font-style: italic;
+  }
+
+  /* Terms slide */
+  .mld-terms-heading {
+    font-family: var(--font-heading);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--color-racing-green);
+    margin: 0 0 1rem;
+  }
+
+  .mld-terms-grid {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .mld-term-card {
+    border: 1.5px solid var(--color-pale-mint-dark);
+    border-radius: 0.5rem;
+    padding: 1rem 1.25rem;
+    background-color: var(--color-white);
+  }
+
+  .mld-term-name {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--color-racing-green);
+    margin: 0 0 0.35rem;
+  }
+
+  .mld-term-def {
+    font-size: 0.9rem;
+    color: var(--color-text-medium);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  /* Quiz slide */
+  .mld-quiz-question {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    margin: 0 0 1rem;
+    line-height: 1.5;
+  }
+
+  .mld-quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .mld-quiz-option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.85rem 1rem;
+    border: 1.5px solid var(--color-pale-mint-dark);
+    border-radius: 0.5rem;
+    background-color: var(--color-white);
+    color: var(--color-text-dark);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+    line-height: 1.5;
+  }
+
+  .mld-quiz-option:hover:not(.mld-disabled) {
+    border-color: var(--color-racing-green);
+    background-color: var(--color-pale-mint);
+  }
+
+  .mld-quiz-option.mld-correct {
+    border-color: var(--color-racing-green);
+    background-color: var(--color-pale-mint);
+    color: var(--color-racing-green);
+    font-weight: 500;
+  }
+
+  .mld-quiz-option.mld-wrong {
+    border-color: var(--color-peach-dark);
+    background-color: var(--color-peach-light);
+    color: var(--color-text-dark);
+  }
+
+  .mld-quiz-option.mld-disabled {
+    cursor: default;
+    opacity: 0.85;
+  }
+
+  .mld-quiz-feedback {
+    margin-top: 1rem;
+    padding: 0.85rem 1rem;
+    background-color: var(--color-pale-mint);
+    border-left: 3px solid var(--color-racing-green);
+    border-radius: 0 0.5rem 0.5rem 0;
+    font-size: 0.9rem;
+    color: var(--color-text-medium);
+    line-height: 1.6;
+  }
+
+  .mld-quiz-feedback p {
+    margin: 0;
+  }
+
+  /* Score screen */
+  .mld-score {
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+
+  .mld-score-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .mld-score.passed .mld-score-icon {
+    color: var(--color-racing-green);
+  }
+
+  .mld-score.not-passed .mld-score-icon {
+    color: var(--color-peach-dark);
+  }
+
+  .mld-score-value {
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-racing-green);
+    margin: 0;
+  }
+
+  .mld-score-pct {
+    font-size: 1rem;
+    color: var(--color-text-light);
+    margin: 0.25rem 0 0.5rem;
+  }
+
+  .mld-score-msg {
+    font-size: 0.95rem;
+    color: var(--color-text-medium);
+    margin: 0 0 1.5rem;
+  }
+
+  .mld-score-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .mld-score-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.7rem 1.5rem;
+    border-radius: 0.5rem;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+    text-decoration: none;
+    border: 1.5px solid transparent;
+  }
+
+  .mld-score-btn-primary {
+    background-color: var(--color-racing-green);
+    color: var(--color-white);
+    border-color: var(--color-racing-green);
+  }
+
+  .mld-score-btn-primary:hover {
+    background-color: var(--color-racing-green-light);
+    border-color: var(--color-racing-green-light);
+  }
+
+  .mld-score-btn-outline {
+    background-color: transparent;
+    color: var(--color-racing-green);
+    border-color: var(--color-racing-green);
+  }
+
+  .mld-score-btn-outline:hover {
+    background-color: var(--color-racing-green);
+    color: var(--color-white);
+  }
+
+  /* Dark mode for slide content */
+  html[data-theme="dark"] {
+    .mld-slide-card {
+      background-color: var(--color-night-surface);
+      border-color: var(--color-night-elevated);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    .mld-slide-label {
+      color: var(--color-night-text-muted);
+    }
+
+    .mld-slide-title {
+      color: var(--color-night-text);
+    }
+
+    .mld-slide-description {
+      color: var(--color-night-text-muted);
+    }
+
+    .mld-objectives {
+      background-color: var(--color-night-elevated);
+      border-left-color: var(--color-night-accent);
+    }
+
+    .mld-objectives-heading {
+      color: var(--color-night-text);
+    }
+
+    .mld-objectives-list li {
+      color: var(--color-night-text-muted);
+    }
+
+    .mld-concept-content {
+      color: var(--color-night-text-muted);
+    }
+
+    .mld-concept-content strong {
+      color: var(--color-night-text);
+    }
+
+    .slide-callout {
+      background-color: var(--color-night-elevated);
+      border-left-color: var(--color-night-accent);
+      color: var(--color-night-text-muted);
+    }
+
+    .mld-diagram-container {
+      background-color: var(--color-night-surface);
+      border-color: var(--color-night-elevated);
+    }
+
+    .mld-diagram-loading {
+      color: var(--color-night-text-muted);
+    }
+
+    .mld-diagram-caption {
+      color: var(--color-night-text-muted);
+    }
+
+    .mld-terms-heading {
+      color: var(--color-night-text);
+    }
+
+    .mld-term-card {
+      border-color: var(--color-night-elevated);
+      background-color: var(--color-night-surface);
+    }
+
+    .mld-term-name {
+      color: var(--color-night-accent);
+    }
+
+    .mld-term-def {
+      color: var(--color-night-text-muted);
+    }
+
+    .mld-quiz-question {
+      color: var(--color-night-text);
+    }
+
+    .mld-quiz-option {
+      border-color: var(--color-night-elevated);
+      background-color: var(--color-night-surface);
+      color: var(--color-night-text);
+    }
+
+    .mld-quiz-option:hover:not(.mld-disabled) {
+      border-color: var(--color-night-accent);
+      background-color: var(--color-night-elevated);
+    }
+
+    .mld-quiz-option.mld-correct {
+      border-color: var(--color-pale-mint-dark);
+      background-color: rgba(184, 232, 192, 0.15);
+      color: var(--color-pale-mint);
+    }
+
+    .mld-quiz-option.mld-wrong {
+      border-color: var(--color-night-accent);
+      background-color: rgba(255, 183, 77, 0.15);
+      color: var(--color-night-text);
+    }
+
+    .mld-quiz-feedback {
+      background-color: var(--color-night-surface);
+      border-left-color: var(--color-night-accent);
+      color: var(--color-night-text-muted);
+    }
+
+    .mld-score-value {
+      color: var(--color-night-text);
+    }
+
+    .mld-score-pct {
+      color: var(--color-night-text-muted);
+    }
+
+    .mld-score-msg {
+      color: var(--color-night-text-muted);
+    }
+
+    .mld-score-btn-primary {
+      background-color: var(--color-night-elevated);
+      color: var(--color-night-text);
+      border-color: var(--color-night-elevated);
+    }
+
+    .mld-score-btn-primary:hover {
+      background-color: var(--color-night-accent);
+      border-color: var(--color-night-accent);
+      color: var(--color-night);
+    }
+
+    .mld-score-btn-outline {
+      color: var(--color-night-accent);
+      border-color: var(--color-night-accent);
+    }
+
+    .mld-score-btn-outline:hover {
+      background-color: var(--color-night-elevated);
+      color: var(--color-night-text);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .mld-slide-card {
+      padding: 1.5rem 1.25rem;
+    }
+
+    .mld-slide-title {
+      font-size: 1.15rem;
+    }
+
+    .mld-score-actions {
+      flex-direction: column;
+    }
+
+    .mld-score-btn {
+      justify-content: center;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll('.mld-deck').forEach((deckEl) => {
+    const el = deckEl as HTMLElement;
+    const topicSlug = el.dataset.topicSlug || '';
+    const topicTitle = el.dataset.topicTitle || '';
+
+    const deckData = el.dataset.deck;
+    if (!deckData) return;
+    const { slides, quizQuestions } = JSON.parse(deckData);
+    if (!slides || slides.length === 0) return;
+
+    const slideArea = el.querySelector('.mld-slide-area') as HTMLElement;
+    const counterText = el.querySelector('.mld-counter-text') as HTMLElement;
+    const dots = el.querySelectorAll('.mld-dot') as NodeListOf<HTMLButtonElement>;
+    const prevBtn = el.querySelector('.mld-prev-btn') as HTMLButtonElement;
+    const nextBtn = el.querySelector('.mld-next-btn') as HTMLButtonElement;
+
+    let currentSlide = 0;
+    const totalSlides = slides.length;
+    const visited = new Set<number>([0]);
+    const quizAnswers: Record<number, boolean> = {}; // slideIndex -> correct?
+    const diagramCache: Record<number, string> = {}; // slideIndex -> svg html
+    let mermaidInstance: any = null;
+    let showingScore = false;
+
+    // Find quiz slide indices for score tracking
+    const quizSlideIndices: number[] = [];
+    slides.forEach((s: any, i: number) => {
+      if (s.type === 'quiz') quizSlideIndices.push(i);
+    });
+    const lastQuizSlideIndex = quizSlideIndices.length > 0 ? quizSlideIndices[quizSlideIndices.length - 1] : -1;
+
+    function updateDots() {
+      dots.forEach((dot, i) => {
+        dot.classList.remove('active', 'visited');
+        if (i === currentSlide && !showingScore) {
+          dot.classList.add('active');
+        } else if (visited.has(i)) {
+          dot.classList.add('visited');
+        }
+      });
+      // If showing score, highlight the last dot as active
+      if (showingScore && dots.length > 0) {
+        dots[dots.length - 1].classList.add('active');
+      }
+    }
+
+    function updateCounter() {
+      if (showingScore) {
+        counterText.textContent = `Results`;
+      } else {
+        counterText.textContent = `Slide ${currentSlide + 1} of ${totalSlides}`;
+      }
+    }
+
+    function updateNav() {
+      prevBtn.disabled = currentSlide === 0 && !showingScore;
+
+      if (showingScore) {
+        nextBtn.style.display = 'none';
+      } else {
+        nextBtn.style.display = 'inline-flex';
+        const slide = slides[currentSlide];
+
+        // Block advancing past unanswered quiz
+        if (slide.type === 'quiz' && !(currentSlide in quizAnswers)) {
+          nextBtn.disabled = true;
+        } else if (currentSlide === totalSlides - 1 && currentSlide !== lastQuizSlideIndex) {
+          // Last slide but not a quiz — nothing after
+          nextBtn.disabled = true;
+        } else {
+          nextBtn.disabled = false;
+        }
+
+        // If on last quiz slide and answered, next shows score
+        if (currentSlide === lastQuizSlideIndex && currentSlide in quizAnswers) {
+          nextBtn.textContent = 'See Results';
+          nextBtn.disabled = false;
+        } else if (currentSlide >= totalSlides - 1) {
+          nextBtn.disabled = true;
+        }
+      }
+    }
+
+    function renderSlide() {
+      const slide = slides[currentSlide];
+      showingScore = false;
+      visited.add(currentSlide);
+
+      switch (slide.type) {
+        case 'intro':
+          renderIntro(slide);
+          break;
+        case 'concept':
+          renderConcept(slide);
+          break;
+        case 'diagram':
+          renderDiagram(slide);
+          break;
+        case 'terms':
+          renderTerms(slide);
+          break;
+        case 'quiz':
+          renderQuiz(slide);
+          break;
+        default:
+          slideArea.innerHTML = `<div class="mld-slide-card"><p>Unknown slide type.</p></div>`;
+      }
+
+      updateDots();
+      updateCounter();
+      updateNav();
+    }
+
+    function renderIntro(slide: any) {
+      const objectivesHtml = slide.objectives && slide.objectives.length > 0
+        ? `<div class="mld-objectives">
+            <p class="mld-objectives-heading">What you'll learn</p>
+            <ul class="mld-objectives-list">
+              ${slide.objectives.map((obj: string) => `<li>${escapeHtml(obj)}</li>`).join('')}
+            </ul>
+          </div>`
+        : '';
+
+      slideArea.innerHTML = `
+        <div class="mld-slide-card">
+          <h2 class="mld-slide-title">${escapeHtml(topicTitle)}</h2>
+          ${slide.description ? `<p class="mld-slide-description">${escapeHtml(slide.description)}</p>` : ''}
+          ${objectivesHtml}
+        </div>
+      `;
+    }
+
+    function renderConcept(slide: any) {
+      slideArea.innerHTML = `
+        <div class="mld-slide-card">
+          ${slide.label ? `<div class="mld-slide-label">${escapeHtml(slide.label)}</div>` : ''}
+          <h2 class="mld-slide-title">${escapeHtml(slide.title)}</h2>
+          <div class="mld-concept-content">${slide.content || ''}</div>
+        </div>
+      `;
+    }
+
+    function renderDiagram(slide: any) {
+      const containerId = `mld-diagram-${currentSlide}`;
+      slideArea.innerHTML = `
+        <div class="mld-slide-card">
+          ${slide.label ? `<div class="mld-slide-label">${escapeHtml(slide.label)}</div>` : ''}
+          ${slide.title ? `<h2 class="mld-slide-title">${escapeHtml(slide.title)}</h2>` : ''}
+          <div class="mld-diagram-container" id="${containerId}">
+            <span class="mld-diagram-loading">Loading diagram...</span>
+          </div>
+          ${slide.caption ? `<p class="mld-diagram-caption">${escapeHtml(slide.caption)}</p>` : ''}
+        </div>
+      `;
+
+      // Render mermaid
+      const container = el.querySelector(`#${containerId}`) as HTMLElement;
+      if (diagramCache[currentSlide]) {
+        container.innerHTML = diagramCache[currentSlide];
+      } else if (slide.mermaidCode) {
+        renderMermaidDiagram(container, slide.mermaidCode, currentSlide);
+      }
+    }
+
+    async function renderMermaidDiagram(container: HTMLElement, code: string, slideIndex: number) {
+      try {
+        if (!mermaidInstance) {
+          const m = await import('mermaid');
+          mermaidInstance = m.default;
+          mermaidInstance.initialize({
+            startOnLoad: false,
+            theme: 'neutral',
+          });
+        }
+
+        const id = `mermaid-slide-${slideIndex}`;
+        const { svg } = await mermaidInstance.render(id, code);
+        diagramCache[slideIndex] = svg;
+        // Only update if we're still on this slide
+        if (currentSlide === slideIndex) {
+          container.innerHTML = svg;
+        }
+      } catch (err) {
+        console.error('Mermaid render error:', err);
+        container.innerHTML = '<span style="color: var(--color-peach-dark);">Diagram could not be rendered.</span>';
+      }
+    }
+
+    function renderTerms(slide: any) {
+      const terms = slide.terms || [];
+      slideArea.innerHTML = `
+        <div class="mld-slide-card">
+          <h2 class="mld-terms-heading">Key Terms</h2>
+          <div class="mld-terms-grid">
+            ${terms.map((t: any) => `
+              <div class="mld-term-card">
+                <p class="mld-term-name">${escapeHtml(t.term || t.name || '')}</p>
+                <p class="mld-term-def">${escapeHtml(t.definition || '')}</p>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderQuiz(slide: any) {
+      const qIndex = slide.questionIndex;
+      const q = quizQuestions[qIndex];
+      if (!q) {
+        slideArea.innerHTML = `<div class="mld-slide-card"><p>Quiz question not found.</p></div>`;
+        return;
+      }
+
+      const alreadyAnswered = currentSlide in quizAnswers;
+
+      slideArea.innerHTML = `
+        <div class="mld-slide-card">
+          <div class="mld-slide-label">Quiz</div>
+          <p class="mld-quiz-question">${escapeHtml(q.question)}</p>
+          <div class="mld-quiz-options">
+            ${q.options.map((opt: string, i: number) => `
+              <button class="mld-quiz-option${alreadyAnswered ? ' mld-disabled' : ''}" data-index="${i}">${escapeHtml(opt)}</button>
+            `).join('')}
+          </div>
+          <div class="mld-quiz-feedback" style="display: none;"></div>
+        </div>
+      `;
+
+      const options = slideArea.querySelectorAll('.mld-quiz-option') as NodeListOf<HTMLButtonElement>;
+      const feedback = slideArea.querySelector('.mld-quiz-feedback') as HTMLElement;
+
+      // If already answered, show the result state
+      if (alreadyAnswered) {
+        options.forEach((btn, i) => {
+          if (i === q.correctIndex) btn.classList.add('mld-correct');
+        });
+        feedback.innerHTML = `<p>${q.explanation || ''}</p>`;
+        feedback.style.display = 'block';
+        return;
+      }
+
+      options.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if (currentSlide in quizAnswers) return;
+
+          const selected = parseInt(btn.dataset.index || '0');
+          const correct = q.correctIndex;
+
+          quizAnswers[currentSlide] = selected === correct;
+
+          if (selected === correct) {
+            btn.classList.add('mld-correct');
+          } else {
+            btn.classList.add('mld-wrong');
+            options[correct]?.classList.add('mld-correct');
+          }
+
+          options.forEach((b) => b.classList.add('mld-disabled'));
+
+          feedback.innerHTML = `<p>${q.explanation || ''}</p>`;
+          feedback.style.display = 'block';
+
+          // Update nav to allow advancing
+          updateNav();
+        });
+      });
+    }
+
+    function renderScore() {
+      showingScore = true;
+      const totalQuiz = quizSlideIndices.length;
+      let correctCount = 0;
+      quizSlideIndices.forEach((idx) => {
+        if (quizAnswers[idx]) correctCount++;
+      });
+      const pct = Math.round((correctCount / totalQuiz) * 100);
+      const passed = pct >= 60;
+
+      slideArea.innerHTML = `
+        <div class="mld-slide-card">
+          <div class="mld-score ${passed ? 'passed' : 'not-passed'}">
+            <div class="mld-score-icon">${passed ? '&#9733;' : '&#8635;'}</div>
+            <p class="mld-score-value">${correctCount} of ${totalQuiz} correct</p>
+            <p class="mld-score-pct">${pct}%</p>
+            <p class="mld-score-msg">${passed ? 'Great job! You passed this lesson.' : 'Keep learning! Review the slides and try again.'}</p>
+            <div class="mld-score-actions">
+              <button class="mld-score-btn mld-score-btn-outline mld-restart-btn">Restart</button>
+              <a href="/topics/${topicSlug}" class="mld-score-btn mld-score-btn-primary">Back to Article</a>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // Save to localStorage
+      try {
+        const STORAGE_KEY = 'fa-progress';
+        const raw = localStorage.getItem(STORAGE_KEY);
+        const state = raw
+          ? JSON.parse(raw)
+          : { version: 1, topicsRead: {}, quizResults: {}, microLearningCompleted: {}, streak: { currentStreak: 0, longestStreak: 0, lastVisitDate: '' } };
+
+        if (!state.microLearningCompleted) state.microLearningCompleted = {};
+        state.microLearningCompleted[topicSlug] = {
+          completedAt: Date.now(),
+          quizScore: correctCount,
+          quizTotal: totalQuiz,
+        };
+
+        // Update streak
+        const today = new Date();
+        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
+        if (state.streak.lastVisitDate !== todayStr) {
+          if (state.streak.lastVisitDate === yesterdayStr) {
+            state.streak.currentStreak += 1;
+          } else {
+            state.streak.currentStreak = 1;
+          }
+          if (state.streak.currentStreak > state.streak.longestStreak) {
+            state.streak.longestStreak = state.streak.currentStreak;
+          }
+          state.streak.lastVisitDate = todayStr;
+        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch {}
+
+      // Restart handler
+      const restartBtn = slideArea.querySelector('.mld-restart-btn');
+      restartBtn?.addEventListener('click', () => {
+        // Clear quiz answers
+        for (const key of Object.keys(quizAnswers)) {
+          delete quizAnswers[Number(key)];
+        }
+        visited.clear();
+        visited.add(0);
+        currentSlide = 0;
+        showingScore = false;
+        renderSlide();
+      });
+
+      updateDots();
+      updateCounter();
+      updateNav();
+    }
+
+    function goToSlide(index: number) {
+      if (index < 0 || index >= totalSlides) return;
+      currentSlide = index;
+      renderSlide();
+    }
+
+    function goNext() {
+      if (showingScore) return;
+
+      const slide = slides[currentSlide];
+      // Block if quiz unanswered
+      if (slide.type === 'quiz' && !(currentSlide in quizAnswers)) return;
+
+      // If on last quiz slide and answered, show score
+      if (currentSlide === lastQuizSlideIndex && currentSlide in quizAnswers) {
+        renderScore();
+        return;
+      }
+
+      if (currentSlide < totalSlides - 1) {
+        goToSlide(currentSlide + 1);
+      }
+    }
+
+    function goPrev() {
+      if (showingScore) {
+        showingScore = false;
+        goToSlide(lastQuizSlideIndex);
+        return;
+      }
+      if (currentSlide > 0) {
+        goToSlide(currentSlide - 1);
+      }
+    }
+
+    const _escDiv = document.createElement('div');
+    function escapeHtml(str: string): string {
+      _escDiv.textContent = str;
+      return _escDiv.innerHTML;
+    }
+
+    // Event listeners
+    prevBtn.addEventListener('click', goPrev);
+    nextBtn.addEventListener('click', goNext);
+
+    // Keyboard nav with cleanup support
+    const keydownController = new AbortController();
+    document.addEventListener('keydown', (e) => {
+      if (!el.offsetParent) return;
+      if (e.key === 'ArrowRight') goNext();
+      else if (e.key === 'ArrowLeft') goPrev();
+    }, { signal: keydownController.signal });
+
+    // Dot click to jump to visited slides
+    dots.forEach((dot, i) => {
+      dot.addEventListener('click', () => {
+        if (visited.has(i)) {
+          showingScore = false;
+          goToSlide(i);
+        }
+      });
+    });
+
+    // Initial render
+    renderSlide();
+  });
+</script>

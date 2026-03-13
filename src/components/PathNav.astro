@@ -10,7 +10,6 @@ interface Props {
 }
 
 const {
-  pathId,
   pathTitle,
   pathNumeral,
   currentIndex,
@@ -20,8 +19,6 @@ const {
 } = Astro.props;
 
 const progressPercent = ((currentIndex + 1) / totalSteps) * 100;
-const isFirst = currentIndex === 0;
-const isLast = currentIndex === totalSteps - 1;
 ---
 
 <nav class="path-nav" aria-label={`Learning path navigation: ${pathTitle}`}>

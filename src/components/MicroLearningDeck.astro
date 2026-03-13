@@ -319,6 +319,14 @@ const { topicSlug, topicTitle, slides, quizQuestions } = Astro.props;
     align-items: center;
     min-height: 200px;
     margin-bottom: 0.75rem;
+    position: relative;
+    cursor: zoom-in;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .mld-diagram-container:hover {
+    border-color: var(--color-peach-dark);
+    box-shadow: 0 2px 12px rgba(6, 54, 34, 0.08);
   }
 
   .mld-diagram-container svg {
@@ -332,6 +340,33 @@ const { topicSlug, topicTitle, slides, quizQuestions } = Astro.props;
     color: var(--color-text-medium);
     font-style: italic;
     font-family: var(--font-body);
+  }
+
+  :global(.mld-expand-hint) {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    background: var(--color-white);
+    border: 1px solid var(--color-pale-mint-dark);
+    border-radius: 0.375rem;
+    padding: 0.3rem;
+    color: var(--color-text-light);
+    cursor: zoom-in;
+    opacity: 0;
+    transition: opacity 0.2s, color 0.15s, background-color 0.15s;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .mld-diagram-container:hover :global(.mld-expand-hint) {
+    opacity: 1;
+  }
+
+  :global(.mld-expand-hint:hover) {
+    color: var(--color-racing-green);
+    background: var(--color-pale-mint);
   }
 
   .mld-diagram-loading {
@@ -581,6 +616,22 @@ const { topicSlug, topicTitle, slides, quizQuestions } = Astro.props;
       border-color: var(--color-night-elevated);
     }
 
+    .mld-diagram-container:hover {
+      border-color: var(--color-night-accent);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+    }
+
+    :global(.mld-expand-hint) {
+      background: var(--color-night-elevated);
+      border-color: var(--color-night-surface);
+      color: var(--color-night-text-muted);
+    }
+
+    :global(.mld-expand-hint:hover) {
+      color: var(--color-night-text);
+      background: var(--color-night-surface);
+    }
+
     .mld-diagram-loading {
       color: var(--color-night-text-muted);
     }
@@ -694,6 +745,8 @@ const { topicSlug, topicTitle, slides, quizQuestions } = Astro.props;
 </style>
 
 <script>
+  import { saveMicroLearningResult } from '../data/progress';
+
   document.querySelectorAll('.mld-deck').forEach((deckEl) => {
     const el = deckEl as HTMLElement;
     const topicSlug = el.dataset.topicSlug || '';
@@ -853,12 +906,13 @@ const { topicSlug, topicTitle, slides, quizQuestions } = Astro.props;
       const container = el.querySelector(`#${containerId}`) as HTMLElement;
       if (diagramCache[currentSlide]) {
         container.innerHTML = diagramCache[currentSlide];
+        attachDiagramExpand(container, slide.caption || '');
       } else if (slide.mermaidCode) {
-        renderMermaidDiagram(container, slide.mermaidCode, currentSlide);
+        renderMermaidDiagram(container, slide.mermaidCode, currentSlide, slide.caption || '');
       }
     }
 
-    async function renderMermaidDiagram(container: HTMLElement, code: string, slideIndex: number) {
+    async function renderMermaidDiagram(container: HTMLElement, code: string, slideIndex: number, caption: string) {
       try {
         if (!mermaidInstance) {
           const m = await import('mermaid');
@@ -875,11 +929,225 @@ const { topicSlug, topicTitle, slides, quizQuestions } = Astro.props;
         // Only update if we're still on this slide
         if (currentSlide === slideIndex) {
           container.innerHTML = svg;
+          attachDiagramExpand(container, caption);
         }
       } catch (err) {
         console.error('Mermaid render error:', err);
         container.innerHTML = '<span style="color: var(--color-peach-dark);">Diagram could not be rendered.</span>';
       }
+    }
+
+    // Fullscreen diagram overlay — reuses the article overlay if present, else creates one
+    function getOrCreateOverlay(): HTMLElement {
+      let overlay = document.getElementById('mermaid-fullscreen-overlay');
+      if (overlay) return overlay;
+
+      overlay = document.createElement('div');
+      overlay.id = 'mermaid-fullscreen-overlay';
+      overlay.setAttribute('aria-hidden', 'true');
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-label', 'Expanded diagram view');
+      overlay.innerHTML = `
+        <div class="mmd-overlay-backdrop"></div>
+        <div class="mmd-overlay-content">
+          <div class="mmd-overlay-toolbar">
+            <span class="mmd-overlay-caption"></span>
+            <div class="mmd-overlay-actions">
+              <button class="mmd-overlay-btn" data-action="zoom-out" aria-label="Zoom out" type="button">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                  <circle cx="8" cy="8" r="6"/><line x1="5" y1="8" x2="11" y2="8"/><line x1="13" y1="13" x2="17" y2="17"/>
+                </svg>
+              </button>
+              <button class="mmd-overlay-btn" data-action="zoom-reset" aria-label="Reset zoom" type="button">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                  <path d="M3 9h4M3 9l2-2M3 9l2 2"/><path d="M15 9h-4M15 9l-2-2M15 9l-2 2"/>
+                </svg>
+              </button>
+              <button class="mmd-overlay-btn" data-action="zoom-in" aria-label="Zoom in" type="button">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                  <circle cx="8" cy="8" r="6"/><line x1="8" y1="5" x2="8" y2="11"/><line x1="5" y1="8" x2="11" y2="8"/><line x1="13" y1="13" x2="17" y2="17"/>
+                </svg>
+              </button>
+              <button class="mmd-overlay-btn mmd-overlay-close" data-action="close" aria-label="Close" type="button">
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                  <line x1="4" y1="4" x2="14" y2="14"/><line x1="14" y1="4" x2="4" y2="14"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="mmd-overlay-viewport"></div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+
+      // Inject overlay styles if not already present
+      if (!document.getElementById('mld-overlay-styles')) {
+        const style = document.createElement('style');
+        style.id = 'mld-overlay-styles';
+        style.textContent = `
+          #mermaid-fullscreen-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            display: none; flex-direction: column;
+          }
+          #mermaid-fullscreen-overlay.open { display: flex; }
+          .mmd-overlay-backdrop {
+            position: absolute; inset: 0;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+          }
+          .mmd-overlay-content {
+            position: relative; z-index: 1;
+            display: flex; flex-direction: column; height: 100%;
+          }
+          .mmd-overlay-toolbar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0.75rem 1.25rem;
+            background: var(--color-racing-green, #063622);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            flex-shrink: 0;
+          }
+          .mmd-overlay-caption {
+            font-family: var(--font-body, sans-serif); font-size: 0.85rem;
+            color: rgba(255,255,255,0.8); font-style: italic;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 55%;
+          }
+          .mmd-overlay-actions { display: flex; align-items: center; gap: 0.25rem; }
+          .mmd-overlay-btn {
+            background: none; border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 0.375rem; padding: 0.4rem;
+            color: rgba(255,255,255,0.7); cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: color 0.15s, background-color 0.15s, border-color 0.15s;
+          }
+          .mmd-overlay-btn:hover {
+            color: #fff; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3);
+          }
+          .mmd-overlay-close {
+            margin-left: 0.5rem; border-color: rgba(255,183,77,0.3); color: #FFDAB3;
+          }
+          .mmd-overlay-close:hover {
+            background: rgba(255,183,77,0.15); border-color: #FFDAB3; color: #FFDAB3;
+          }
+          .mmd-overlay-viewport {
+            flex: 1; overflow: auto;
+            display: flex; justify-content: center; align-items: center; padding: 2rem;
+          }
+          .mmd-overlay-viewport svg {
+            max-width: 90vw; max-height: calc(100vh - 7rem);
+            width: auto; height: auto;
+            filter: drop-shadow(0 2px 16px rgba(0,0,0,0.1));
+            transform-origin: center center; transition: transform 0.15s ease;
+            background: var(--color-pale-mint, #DDF8E7);
+            border-radius: 0.5rem; padding: 1rem;
+          }
+          html[data-theme="dark"] .mmd-overlay-backdrop { background: rgba(9,26,18,0.95); }
+          html[data-theme="dark"] .mmd-overlay-toolbar {
+            background: rgba(9,26,18,0.97); border-bottom-color: rgba(255,255,255,0.05);
+          }
+          html[data-theme="dark"] .mmd-overlay-viewport svg {
+            background: var(--color-night-surface, #0E2518);
+            filter: drop-shadow(0 2px 16px rgba(0,0,0,0.4));
+          }
+        `;
+        document.head.appendChild(style);
+      }
+
+      // Wire up overlay interactions
+      const viewport = overlay.querySelector('.mmd-overlay-viewport') as HTMLElement;
+      let currentScale = 1;
+      const ZOOM_STEP = 0.25, MIN_SCALE = 0.3, MAX_SCALE = 4;
+
+      function applyZoom() {
+        const svg = viewport.querySelector('svg');
+        if (svg) svg.style.transform = `scale(${currentScale})`;
+      }
+
+      function closeOverlay() {
+        overlay!.classList.remove('open');
+        overlay!.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        viewport.innerHTML = '';
+      }
+
+      overlay.addEventListener('click', (e) => {
+        const btn = (e.target as HTMLElement).closest('[data-action]');
+        if (!btn) return;
+        const action = btn.getAttribute('data-action');
+        if (action === 'close') closeOverlay();
+        else if (action === 'zoom-in') { currentScale = Math.min(MAX_SCALE, currentScale + ZOOM_STEP); applyZoom(); }
+        else if (action === 'zoom-out') { currentScale = Math.max(MIN_SCALE, currentScale - ZOOM_STEP); applyZoom(); }
+        else if (action === 'zoom-reset') { currentScale = 1; applyZoom(); }
+      });
+
+      overlay.querySelector('.mmd-overlay-backdrop')?.addEventListener('click', closeOverlay);
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && overlay!.classList.contains('open')) closeOverlay();
+      });
+
+      viewport.addEventListener('wheel', (e) => {
+        if (!overlay!.classList.contains('open')) return;
+        e.preventDefault();
+        if (e.deltaY < 0) { currentScale = Math.min(MAX_SCALE, currentScale + ZOOM_STEP); }
+        else { currentScale = Math.max(MIN_SCALE, currentScale - ZOOM_STEP); }
+        applyZoom();
+      }, { passive: false });
+
+      // Store open function on the overlay element for reuse
+      (overlay as any).__openOverlay = function(svgEl: SVGElement, caption: string) {
+        const clone = svgEl.cloneNode(true) as SVGElement;
+        if (!clone.getAttribute('viewBox')) {
+          const w = parseFloat(clone.getAttribute('width') || '800');
+          const h = parseFloat(clone.getAttribute('height') || '400');
+          clone.setAttribute('viewBox', `0 0 ${w} ${h}`);
+        }
+        clone.removeAttribute('width');
+        clone.removeAttribute('height');
+        clone.removeAttribute('style');
+        viewport.innerHTML = '';
+        viewport.appendChild(clone);
+        (overlay!.querySelector('.mmd-overlay-caption') as HTMLElement).textContent = caption || '';
+        currentScale = 1;
+        applyZoom();
+        overlay!.classList.add('open');
+        overlay!.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      };
+
+      return overlay;
+    }
+
+    function attachDiagramExpand(container: HTMLElement, caption: string) {
+      // Add expand hint button
+      if (!container.querySelector('.mld-expand-hint')) {
+        const hint = document.createElement('button');
+        hint.className = 'mld-expand-hint';
+        hint.setAttribute('aria-label', 'Expand diagram');
+        hint.setAttribute('type', 'button');
+        hint.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="5.5 1 1 1 1 5.5"/><polyline points="10.5 15 15 15 15 10.5"/>
+          <line x1="1" y1="1" x2="6" y2="6"/><line x1="15" y1="15" x2="10" y2="10"/>
+        </svg>`;
+        container.appendChild(hint);
+
+        hint.addEventListener('click', (e) => {
+          e.stopPropagation();
+          expandDiagram(container, caption);
+        });
+      }
+
+      // Click on container to expand
+      container.onclick = (e) => {
+        if ((e.target as HTMLElement).closest('a')) return;
+        expandDiagram(container, caption);
+      };
+    }
+
+    function expandDiagram(container: HTMLElement, caption: string) {
+      const svg = container.querySelector('svg') as SVGElement;
+      if (!svg) return;
+      const overlay = getOrCreateOverlay();
+      (overlay as any).__openOverlay(svg, caption);
     }
 
     function renderTerms(slide: any) {
@@ -987,40 +1255,7 @@ const { topicSlug, topicTitle, slides, quizQuestions } = Astro.props;
         </div>
       `;
 
-      // Save to localStorage
-      try {
-        const STORAGE_KEY = 'fa-progress';
-        const raw = localStorage.getItem(STORAGE_KEY);
-        const state = raw
-          ? JSON.parse(raw)
-          : { version: 1, topicsRead: {}, quizResults: {}, microLearningCompleted: {}, streak: { currentStreak: 0, longestStreak: 0, lastVisitDate: '' } };
-
-        if (!state.microLearningCompleted) state.microLearningCompleted = {};
-        state.microLearningCompleted[topicSlug] = {
-          completedAt: Date.now(),
-          quizScore: correctCount,
-          quizTotal: totalQuiz,
-        };
-
-        // Update streak
-        const today = new Date();
-        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-        const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
-        if (state.streak.lastVisitDate !== todayStr) {
-          if (state.streak.lastVisitDate === yesterdayStr) {
-            state.streak.currentStreak += 1;
-          } else {
-            state.streak.currentStreak = 1;
-          }
-          if (state.streak.currentStreak > state.streak.longestStreak) {
-            state.streak.longestStreak = state.streak.currentStreak;
-          }
-          state.streak.lastVisitDate = todayStr;
-        }
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } catch {}
+      saveMicroLearningResult(topicSlug, correctCount, totalQuiz);
 
       // Restart handler
       const restartBtn = slideArea.querySelector('.mld-restart-btn');

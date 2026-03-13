@@ -1,43 +1,72 @@
-# Astro Starter Kit: Minimal
+# FintechAcademy
 
-```sh
-npm create astro@latest -- --template minimal
-```
+FintechAcademy is an Astro-powered learning site for payments and fintech concepts. It combines long-form topic pages, quizzes, and micro-learning review decks to help readers build structured domain knowledge.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Stack
 
-## 🚀 Project Structure
+- Astro 5
+- MDX content collections
+- Tailwind CSS 4
+- Pagefind for client-side search
 
-Inside of your Astro project, you'll see the following folders and files:
+## Project layout
 
 ```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+src/
+  components/    UI building blocks
+  content/       MDX topic content
+  data/          Static datasets and client-side progress helpers
+  layouts/       Shared page shells
+  pages/         Route entrypoints
+scripts/
+  ingest.mjs     Source document extraction pipeline
+tests/
+  *.test.ts      Lightweight regression tests
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Getting started
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+```sh
+npm install
+npm run dev
+```
 
-Any static assets, like images, can be placed in the `public/` directory.
+## Validation
 
-## 🧞 Commands
+```sh
+npm run check
+npm run test
+npm run build
+```
 
-All commands are run from the root of the project, from a terminal:
+Or run the full validation sequence:
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+```sh
+npm run validate
+```
 
-## 👀 Want to learn more?
+## Content and search
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+- Topic content lives in `src/content/topics/*.mdx`.
+- Search is generated at build time by Pagefind during `postbuild`.
+- Quizzes and micro-learning decks are defined in `src/data/`.
+
+## Source ingestion
+
+The ingestion pipeline scans `Source/` for supported source documents and writes extracted text into `Source/extracted/`.
+
+```sh
+npm run ingest
+```
+
+Supported inputs:
+
+- `.pdf`
+- `.docx`
+- `.pptx`
+- `.epub`
+- `.txt`
+
+## Progress storage
+
+Reader progress is stored locally in the browser under the `fa-progress` key. The shared helpers for progress reads, writes, and migrations live in `src/data/progress.ts`.

@@ -15,6 +15,7 @@ const themeData = themes.map((theme) => {
     topics: topics.map((t) => ({
       slug: t.id,
       title: t.data.title,
+      hasQuiz: quizSlugs.includes(t.id),
     })),
   };
 });
@@ -332,20 +333,14 @@ const themeData = themes.map((theme) => {
 </style>
 
 <script>
+  import { loadProgress } from '../data/progress';
+
   const dashboard = document.querySelector('.progress-dashboard') as HTMLElement;
   if (dashboard) {
     const themeData = JSON.parse(dashboard.dataset.themes || '[]');
     const totalTopics = parseInt(dashboard.dataset.totalTopics || '0');
-    const totalQuizzes = parseInt(dashboard.dataset.totalQuizzes || '0');
 
-    let state = { topicsRead: {} as Record<string, number>, quizResults: {} as Record<string, any>, streak: { currentStreak: 0, longestStreak: 0, lastVisitDate: '' } };
-    try {
-      const raw = localStorage.getItem('fa-progress');
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed.version === 1) state = parsed;
-      }
-    } catch {}
+    const state = loadProgress();
 
     // Stats
     const topicsReadCount = Object.keys(state.topicsRead).length;
@@ -377,6 +372,8 @@ const themeData = themes.map((theme) => {
         if (quizResult) {
           const qPct = Math.round((quizResult.score / quizResult.total) * 100);
           quizBadge = `<span class="topic-quiz-score ${quizResult.passed ? 'passed' : 'failed'}">${qPct}%</span>`;
+        } else if (topic.hasQuiz) {
+          quizBadge = `<a href="/micro/quiz/${topic.slug}" class="topic-quiz-score" style="background: var(--color-pale-mint); color: var(--color-text-light); text-decoration: none;">Quiz</a>`;
         }
 
         topicListHtml += `

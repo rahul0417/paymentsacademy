@@ -269,31 +269,23 @@ const topicData = JSON.stringify(groupedTopics.flatMap((g) =>
 </style>
 
 <script>
+  import { loadProgress } from '../../data/progress';
+
   // Hydrate progress indicators from localStorage
   try {
-    const raw = localStorage.getItem('fa-progress');
-    if (raw) {
-      const state = JSON.parse(raw);
-      if (state.version === 1) {
-        // Micro learning status
-        if (state.microLearningCompleted) {
-          for (const [slug, result] of Object.entries(state.microLearningCompleted)) {
-            const dot = document.querySelector(`[data-ml-status="${slug}"]`) as HTMLElement;
-            if (dot) {
-              dot.classList.add('completed');
-            }
-          }
-        }
+    const state = loadProgress();
 
-        // Quiz status
-        if (state.quizResults) {
-          for (const [slug, result] of Object.entries(state.quizResults)) {
-            const dot = document.querySelector(`[data-quiz-status="${slug}"]`) as HTMLElement;
-            if (dot) {
-              dot.classList.add((result as any).passed ? 'completed' : 'attempted');
-            }
-          }
-        }
+    for (const slug of Object.keys(state.microLearningCompleted)) {
+      const dot = document.querySelector(`[data-ml-status="${slug}"]`) as HTMLElement;
+      if (dot) {
+        dot.classList.add('completed');
+      }
+    }
+
+    for (const [slug, result] of Object.entries(state.quizResults)) {
+      const dot = document.querySelector(`[data-quiz-status="${slug}"]`) as HTMLElement;
+      if (dot) {
+        dot.classList.add(result.passed ? 'completed' : 'attempted');
       }
     }
   } catch {}

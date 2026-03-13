@@ -1,0 +1,60 @@
+---
+// ProgressBadge: renders hidden, shown via client-side script when topic is read/quiz passed
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+---
+
+<span class="progress-badge" data-badge-slug={slug} style="display: none;">
+  <span class="badge-read" title="Read">&#10003;</span>
+  <span class="badge-quiz" title="Quiz passed" style="display: none;">&#9733;</span>
+</span>
+
+<style>
+  .progress-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: 0.35rem;
+  }
+
+  .badge-read {
+    font-size: 0.65rem;
+    color: var(--color-racing-green);
+    background-color: var(--color-pale-mint);
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  .badge-quiz {
+    font-size: 0.65rem;
+    color: var(--color-peach-dark);
+    background-color: var(--color-peach-light);
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  html[data-theme="dark"] {
+    .badge-read {
+      color: var(--color-night-text);
+      background-color: var(--color-night-elevated);
+    }
+
+    .badge-quiz {
+      color: var(--color-night-accent);
+      background-color: rgba(255, 183, 77, 0.2);
+    }
+  }
+</style>

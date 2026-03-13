@@ -7,6 +7,9 @@
     "build": "astro build",
     "postbuild": "npx pagefind --site dist",
     "preview": "astro preview",
+    "check": "astro check",
+    "test": "node --test --experimental-strip-types tests/**/*.test.ts",
+    "validate": "npm run check && npm run test && npm run build",
     "astro": "astro",
     "ingest": "node scripts/ingest.mjs"
   },
@@ -22,6 +25,9 @@
     "tailwindcss": "^4.2.1"
   },
   "devDependencies": {
-    "pagefind": "^1.4.0"
+    "@astrojs/check": "^0.9.7",
+    "@types/node": "^24.12.0",
+    "pagefind": "^1.4.0",
+    "typescript": "^5.9.3"
   }
 }

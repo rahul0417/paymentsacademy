@@ -1,0 +1,94 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import Quiz from '../../../components/Quiz.astro';
+import { getAllQuizzes } from '../../../data/quizzes';
+
+export function getStaticPaths() {
+  const quizzes = getAllQuizzes();
+  return quizzes.map((quiz) => ({
+    params: { slug: quiz.topicSlug },
+    props: { quiz },
+  }));
+}
+
+const { quiz } = Astro.props;
+---
+
+<BaseLayout title={`Quiz: ${quiz.topicTitle}`} description={`Test your knowledge of ${quiz.topicTitle} with ${quiz.questions.length} questions.`}>
+  <div class="quiz-page">
+    <div class="quiz-page-header">
+      <a href={`/topics/${quiz.topicSlug}`} class="quiz-back-link">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 4l-4 4 4 4" />
+        </svg>
+        Back to {quiz.topicTitle}
+      </a>
+      <span class="quiz-page-badge">{quiz.theme}</span>
+    </div>
+    <Quiz topicSlug={quiz.topicSlug} />
+  </div>
+</BaseLayout>
+
+<style>
+  .quiz-page {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 5rem;
+  }
+
+  .quiz-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .quiz-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    color: var(--color-text-light);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .quiz-back-link:hover {
+    color: var(--color-racing-green);
+  }
+
+  .quiz-page-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-racing-green);
+    background-color: var(--color-pale-mint);
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+  }
+
+  /* Remove top border since this is standalone */
+  .quiz-page :global(.quiz-section) {
+    border-top: none;
+    margin-top: 0;
+    padding-top: 0;
+  }
+
+  html[data-theme="dark"] {
+    .quiz-back-link {
+      color: var(--color-night-text-muted);
+    }
+
+    .quiz-back-link:hover {
+      color: var(--color-night-accent);
+    }
+
+    .quiz-page-badge {
+      color: var(--color-night-text);
+      background-color: var(--color-night-surface);
+    }
+  }
+</style>

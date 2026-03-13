@@ -1,0 +1,440 @@
+---
+import { getQuizBySlug } from '../data/quizzes';
+
+interface Props {
+  topicSlug: string;
+}
+
+const { topicSlug } = Astro.props;
+const quiz = getQuizBySlug(topicSlug);
+---
+
+{quiz && (
+  <section class="quiz-section" id="topic-quiz">
+    <div class="quiz-header">
+      <div class="quiz-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" />
+          <circle cx="12" cy="17" r="0.5" fill="currentColor" />
+        </svg>
+      </div>
+      <div>
+        <h2 class="quiz-title">Test Your Knowledge</h2>
+        <p class="quiz-subtitle">{quiz.questions.length} questions about {quiz.topicTitle}</p>
+      </div>
+    </div>
+
+    <div class="quiz-container" data-quiz={JSON.stringify(quiz)}>
+      <!-- Rendered by client-side script -->
+      <div class="quiz-question-area"></div>
+      <div class="quiz-summary-area" style="display: none;"></div>
+    </div>
+
+    <div class="quiz-standalone-link">
+      <a href={`/micro/quiz/${topicSlug}`}>Open quiz in full page &rarr;</a>
+    </div>
+  </section>
+)}
+
+<style>
+  .quiz-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--color-pale-mint-dark);
+  }
+
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .quiz-icon {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.75rem;
+    background-color: var(--color-pale-mint);
+    color: var(--color-racing-green);
+  }
+
+  .quiz-title {
+    font-family: var(--font-heading);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-racing-green);
+    margin: 0;
+  }
+
+  .quiz-subtitle {
+    font-size: 0.85rem;
+    color: var(--color-text-light);
+    margin: 0.15rem 0 0;
+  }
+
+  .quiz-container {
+    max-width: 100%;
+  }
+
+  .quiz-standalone-link {
+    margin-top: 1rem;
+    text-align: right;
+  }
+
+  .quiz-standalone-link a {
+    font-size: 0.85rem;
+    color: var(--color-text-light);
+    text-decoration: none;
+  }
+
+  .quiz-standalone-link a:hover {
+    color: var(--color-racing-green);
+  }
+
+  /* Dark mode */
+  html[data-theme="dark"] {
+    .quiz-section {
+      border-top-color: var(--color-night-elevated);
+    }
+
+    .quiz-icon {
+      background-color: var(--color-night-surface);
+      color: var(--color-night-accent);
+    }
+
+    .quiz-title {
+      color: var(--color-night-text);
+    }
+
+    .quiz-subtitle {
+      color: var(--color-night-text-muted);
+    }
+
+    .quiz-standalone-link a {
+      color: var(--color-night-text-muted);
+    }
+
+    .quiz-standalone-link a:hover {
+      color: var(--color-night-accent);
+    }
+  }
+</style>
+
+<script>
+  import { saveQuizResult } from '../data/progress';
+
+  function initQuiz(container: HTMLElement) {
+    const quizData = JSON.parse(container.dataset.quiz || '{}');
+    const questions = quizData.questions || [];
+    if (questions.length === 0) return;
+
+    const questionArea = container.querySelector('.quiz-question-area') as HTMLElement;
+    const summaryArea = container.querySelector('.quiz-summary-area') as HTMLElement;
+
+    let currentIndex = 0;
+    let score = 0;
+    let answered = false;
+
+    function renderQuestion() {
+      const q = questions[currentIndex];
+      answered = false;
+
+      questionArea.innerHTML = `
+        <div class="quiz-progress">Question ${currentIndex + 1} of ${questions.length}</div>
+        <p class="quiz-question-text">${q.question}</p>
+        <div class="quiz-options">
+          ${q.options.map((opt: string, i: number) => `
+            <button class="quiz-option" data-index="${i}">${opt}</button>
+          `).join('')}
+        </div>
+        <div class="quiz-feedback" style="display: none;"></div>
+        <div class="quiz-nav" style="display: none;">
+          <button class="quiz-next-btn">${currentIndex < questions.length - 1 ? 'Next Question' : 'See Results'}</button>
+        </div>
+      `;
+
+      const options = questionArea.querySelectorAll('.quiz-option');
+      options.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          if (answered) return;
+          answered = true;
+
+          const selected = parseInt((btn as HTMLElement).dataset.index || '0');
+          const correct = q.correctIndex;
+
+          if (selected === correct) {
+            score++;
+            btn.classList.add('correct');
+          } else {
+            btn.classList.add('wrong');
+            options[correct]?.classList.add('correct');
+          }
+
+          options.forEach((b) => b.classList.add('disabled'));
+
+          const feedback = questionArea.querySelector('.quiz-feedback') as HTMLElement;
+          feedback.innerHTML = `<p>${q.explanation}</p>`;
+          feedback.style.display = 'block';
+
+          const nav = questionArea.querySelector('.quiz-nav') as HTMLElement;
+          nav.style.display = 'flex';
+        });
+      });
+
+      const nextBtn = questionArea.querySelector('.quiz-next-btn');
+      nextBtn?.addEventListener('click', () => {
+        currentIndex++;
+        if (currentIndex < questions.length) {
+          renderQuestion();
+        } else {
+          showSummary();
+        }
+      });
+    }
+
+    function showSummary() {
+      questionArea.style.display = 'none';
+      summaryArea.style.display = 'block';
+
+      const passed = score / questions.length >= 0.6;
+      const pct = Math.round((score / questions.length) * 100);
+
+      summaryArea.innerHTML = `
+        <div class="quiz-summary ${passed ? 'passed' : 'not-passed'}">
+          <div class="quiz-summary-icon">${passed ? '&#9733;' : '&#8635;'}</div>
+          <div class="quiz-summary-score">${score} / ${questions.length}</div>
+          <div class="quiz-summary-pct">${pct}%</div>
+          <p class="quiz-summary-msg">${passed ? 'Great job! You passed this quiz.' : 'Keep learning! Try again to improve your score.'}</p>
+          <button class="quiz-retake-btn">Retake Quiz</button>
+        </div>
+      `;
+
+      saveQuizResult(quizData.topicSlug, score, questions.length);
+
+      summaryArea.querySelector('.quiz-retake-btn')?.addEventListener('click', () => {
+        currentIndex = 0;
+        score = 0;
+        questionArea.style.display = 'block';
+        summaryArea.style.display = 'none';
+        renderQuestion();
+      });
+    }
+
+    renderQuestion();
+  }
+
+  // Initialize all quiz containers on the page
+  document.querySelectorAll('.quiz-container[data-quiz]').forEach((el) => {
+    initQuiz(el as HTMLElement);
+  });
+</script>
+
+<style is:global>
+  .quiz-progress {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-light);
+    margin-bottom: 0.75rem;
+  }
+
+  .quiz-question-text {
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text-dark);
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+
+  .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .quiz-option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 0.85rem 1rem;
+    border: 1.5px solid var(--color-pale-mint-dark);
+    border-radius: 0.5rem;
+    background-color: var(--color-white);
+    color: var(--color-text-dark);
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: border-color 0.15s ease, background-color 0.15s ease;
+    line-height: 1.5;
+  }
+
+  .quiz-option:hover:not(.disabled) {
+    border-color: var(--color-racing-green);
+    background-color: var(--color-pale-mint);
+  }
+
+  .quiz-option.correct {
+    border-color: var(--color-racing-green);
+    background-color: var(--color-pale-mint);
+    color: var(--color-racing-green);
+    font-weight: 500;
+  }
+
+  .quiz-option.wrong {
+    border-color: var(--color-peach-dark);
+    background-color: var(--color-peach-light);
+    color: var(--color-text-dark);
+  }
+
+  .quiz-option.disabled {
+    cursor: default;
+    opacity: 0.85;
+  }
+
+  .quiz-feedback {
+    margin-top: 1rem;
+    padding: 0.85rem 1rem;
+    background-color: var(--color-pale-mint);
+    border-left: 3px solid var(--color-racing-green);
+    border-radius: 0 0.5rem 0.5rem 0;
+    font-size: 0.9rem;
+    color: var(--color-text-medium);
+    line-height: 1.6;
+  }
+
+  .quiz-feedback p {
+    margin: 0;
+  }
+
+  .quiz-nav {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+  }
+
+  .quiz-next-btn,
+  .quiz-retake-btn {
+    padding: 0.6rem 1.5rem;
+    background-color: var(--color-racing-green);
+    color: var(--color-white);
+    border: none;
+    border-radius: 0.5rem;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .quiz-next-btn:hover,
+  .quiz-retake-btn:hover {
+    background-color: var(--color-racing-green-light);
+  }
+
+  .quiz-summary {
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+
+  .quiz-summary-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .quiz-summary.passed .quiz-summary-icon {
+    color: var(--color-racing-green);
+  }
+
+  .quiz-summary.not-passed .quiz-summary-icon {
+    color: var(--color-peach-dark);
+  }
+
+  .quiz-summary-score {
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-racing-green);
+  }
+
+  .quiz-summary-pct {
+    font-size: 1rem;
+    color: var(--color-text-light);
+    margin-bottom: 0.5rem;
+  }
+
+  .quiz-summary-msg {
+    font-size: 0.95rem;
+    color: var(--color-text-medium);
+    margin-bottom: 1.25rem;
+  }
+
+  /* Dark mode for quiz */
+  html[data-theme="dark"] {
+    .quiz-progress {
+      color: var(--color-night-text-muted);
+    }
+
+    .quiz-question-text {
+      color: var(--color-night-text);
+    }
+
+    .quiz-option {
+      border-color: var(--color-night-elevated);
+      background-color: var(--color-night-surface);
+      color: var(--color-night-text);
+    }
+
+    .quiz-option:hover:not(.disabled) {
+      border-color: var(--color-night-accent);
+      background-color: var(--color-night-elevated);
+    }
+
+    .quiz-option.correct {
+      border-color: var(--color-pale-mint-dark);
+      background-color: rgba(184, 232, 192, 0.15);
+      color: var(--color-pale-mint);
+    }
+
+    .quiz-option.wrong {
+      border-color: var(--color-night-accent);
+      background-color: rgba(255, 183, 77, 0.15);
+      color: var(--color-night-text);
+    }
+
+    .quiz-feedback {
+      background-color: var(--color-night-surface);
+      border-left-color: var(--color-night-accent);
+      color: var(--color-night-text-muted);
+    }
+
+    .quiz-next-btn,
+    .quiz-retake-btn {
+      background-color: var(--color-night-elevated);
+      color: var(--color-night-text);
+    }
+
+    .quiz-next-btn:hover,
+    .quiz-retake-btn:hover {
+      background-color: var(--color-racing-green-light);
+    }
+
+    .quiz-summary-score {
+      color: var(--color-night-text);
+    }
+
+    .quiz-summary-pct {
+      color: var(--color-night-text-muted);
+    }
+
+    .quiz-summary-msg {
+      color: var(--color-night-text-muted);
+    }
+  }
+</style>

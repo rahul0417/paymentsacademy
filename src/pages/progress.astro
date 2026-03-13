@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProgressDashboard from '../components/ProgressDashboard.astro';
+---
+
+<BaseLayout title="Your Progress" description="Track your learning progress across the payments ecosystem.">
+  <div class="progress-page">
+    <header class="progress-page-header">
+      <h1 class="progress-page-title">Your Progress</h1>
+      <p class="progress-page-desc">Track what you've read, quizzes you've taken, and your learning streak. All progress is saved locally in your browser.</p>
+    </header>
+    <ProgressDashboard />
+  </div>
+</BaseLayout>
+
+<style>
+  .progress-page {
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 5rem;
+  }
+
+  .progress-page-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .progress-page-title {
+    font-family: var(--font-heading);
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--color-racing-green);
+    margin: 0 0 0.5rem;
+  }
+
+  .progress-page-desc {
+    font-size: 0.95rem;
+    color: var(--color-text-medium);
+    max-width: 30rem;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  html[data-theme="dark"] {
+    .progress-page-title {
+      color: var(--color-night-text);
+    }
+
+    .progress-page-desc {
+      color: var(--color-night-text-muted);
+    }
+  }
+</style>

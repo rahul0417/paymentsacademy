@@ -1,6 +1,3 @@
-// localStorage-based progress tracking for Fintech Academy
-// All reads/writes are wrapped in try/catch (follows ThemeToggle pattern)
-
 const STORAGE_KEY = 'fa-progress';
 
 export interface QuizResult {
@@ -28,7 +25,7 @@ export interface ProgressState {
   };
 }
 
-function defaultProgress(): ProgressState {
+export function createDefaultProgress(): ProgressState {
   return {
     version: 1,
     topicsRead: {},
@@ -42,30 +39,68 @@ function defaultProgress(): ProgressState {
   };
 }
 
+export function formatDayKey(date: Date): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+}
+
 function todayString(): string {
   const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  return formatDayKey(d);
 }
 
 function yesterdayString(): string {
   const d = new Date();
   d.setDate(d.getDate() - 1);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  return formatDayKey(d);
+}
+
+function migrateProgress(raw: unknown): ProgressState {
+  if (!raw || typeof raw !== 'object') {
+    return createDefaultProgress();
+  }
+
+  const parsed = raw as Partial<ProgressState> & {
+    microLessonsCompleted?: Record<string, number>;
+  };
+
+  if (parsed.version !== 1) {
+    return createDefaultProgress();
+  }
+
+  const state = createDefaultProgress();
+  state.topicsRead = parsed.topicsRead ?? {};
+  state.quizResults = parsed.quizResults ?? {};
+  state.streak = {
+    currentStreak: parsed.streak?.currentStreak ?? 0,
+    longestStreak: parsed.streak?.longestStreak ?? 0,
+    lastVisitDate: parsed.streak?.lastVisitDate ?? '',
+  };
+
+  if (parsed.microLearningCompleted) {
+    state.microLearningCompleted = parsed.microLearningCompleted;
+  } else if (parsed.microLessonsCompleted) {
+    state.microLearningCompleted = Object.fromEntries(
+      Object.entries(parsed.microLessonsCompleted).map(([slug, completedAt]) => [
+        slug,
+        { completedAt, quizScore: 0, quizTotal: 0 },
+      ]),
+    );
+  }
+
+  return state;
 }
 
 export function loadProgress(): ProgressState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaultProgress();
-    const parsed = JSON.parse(raw);
-    if (parsed.version !== 1) return defaultProgress();
-    return parsed as ProgressState;
+    if (!raw) return createDefaultProgress();
+    return migrateProgress(JSON.parse(raw));
   } catch {
-    return defaultProgress();
+    return createDefaultProgress();
   }
 }
 
-function saveProgress(state: ProgressState): void {
+export function saveProgress(state: ProgressState): void {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   } catch {

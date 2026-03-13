@@ -11,6 +11,7 @@ import fs from "fs";
 import path from "path";
 import crypto from "crypto";
 import { fileURLToPath } from "url";
+import { sanitizeOutputName } from "./ingest-utils.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,14 +41,6 @@ function loadManifest() {
 function saveManifest(manifest) {
   manifest.lastRun = new Date().toISOString();
   fs.writeFileSync(MANIFEST_PATH, JSON.stringify(manifest, null, 2) + "\n");
-}
-
-function sanitizeOutputName(filename) {
-  // Replace the original extension with .txt
-  const ext = path.extname(filename);
-  const base = filename.slice(0, filename.length - ext.length);
-  // Keep the name but make it filesystem-safe for the output
-  return base + ".txt";
 }
 
 function stripHtmlTags(html) {

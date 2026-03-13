@@ -6,11 +6,6 @@ const totalMinutes = getTotalReadingTime();
 const totalHours = (totalMinutes / 60).toFixed(1);
 const totalArticles = learningPaths.reduce((sum, p) => sum + p.steps.length, 0);
 
-const difficultyColors: Record<string, { bg: string; text: string; darkBg: string; darkText: string }> = {
-  Beginner: { bg: 'var(--color-pale-mint)', text: 'var(--color-racing-green)', darkBg: 'rgba(76, 175, 80, 0.15)', darkText: 'var(--color-night-accent)' },
-  Intermediate: { bg: 'var(--color-peach)', text: 'var(--color-racing-green)', darkBg: 'rgba(255, 183, 77, 0.15)', darkText: 'var(--color-peach)' },
-  Advanced: { bg: 'var(--color-peach-dark)', text: 'var(--color-white)', darkBg: 'rgba(255, 152, 0, 0.2)', darkText: 'var(--color-peach-dark)' },
-};
 ---
 
 <BaseLayout title="Learning Paths" description="Guided learning paths through the payments ecosystem">

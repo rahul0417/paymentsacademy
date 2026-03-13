@@ -237,7 +237,6 @@ const navItems = [
   // Sticky header scroll effect
   const header = document.getElementById('site-header');
   if (header) {
-    let lastScroll = 0;
     window.addEventListener('scroll', () => {
       const scrollY = window.scrollY;
       if (scrollY > 10) {
@@ -245,7 +244,6 @@ const navItems = [
       } else {
         header.classList.remove('header-scrolled');
       }
-      lastScroll = scrollY;
     }, { passive: true });
   }
 

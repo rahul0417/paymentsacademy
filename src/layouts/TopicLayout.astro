@@ -46,7 +46,7 @@ const hasMicroLesson = !!getMicroLessonBySlug(slug);
 ---
 
 <BaseLayout title={title} description={description}>
-  <div class="topic-page">
+  <div class="topic-page" data-topic-slug={slug}>
     <Sidebar currentSlug={slug} />
 
     <article class="topic-content">
@@ -131,6 +131,8 @@ const hasMicroLesson = !!getMicroLessonBySlug(slug);
     class="sidebar-mobile-toggle"
     id="sidebar-toggle"
     aria-label="Open topic navigation"
+    aria-controls="sidebar-mobile"
+    aria-expanded="false"
   >
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
       <path d="M3 5h14M3 10h10M3 15h12" />
@@ -140,7 +142,7 @@ const hasMicroLesson = !!getMicroLessonBySlug(slug);
 
   <!-- Mobile sidebar overlay -->
   <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
-  <div class="sidebar-mobile" id="sidebar-mobile">
+  <div class="sidebar-mobile" id="sidebar-mobile" aria-hidden="true" hidden>
     <div class="sidebar-mobile-header">
       <span class="font-heading font-semibold">Navigate</span>
       <button type="button" class="sidebar-close" id="sidebar-close" aria-label="Close navigation">
@@ -456,48 +458,75 @@ const hasMicroLesson = !!getMicroLessonBySlug(slug);
 </style>
 
 <script>
+  let lastFocusedElement: HTMLElement | null = null;
+
   const toggle = document.getElementById('sidebar-toggle');
   const overlay = document.getElementById('sidebar-overlay');
   const mobile = document.getElementById('sidebar-mobile');
   const close = document.getElementById('sidebar-close');
+  const focusableSelector = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
   function openSidebar() {
+    lastFocusedElement = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    mobile?.removeAttribute('hidden');
     overlay?.classList.add('open');
     mobile?.classList.add('open');
+    toggle?.setAttribute('aria-expanded', 'true');
+    mobile?.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => {
+      (close || mobile?.querySelector(focusableSelector))?.focus();
+    });
   }
 
   function closeSidebar() {
     overlay?.classList.remove('open');
     mobile?.classList.remove('open');
+    toggle?.setAttribute('aria-expanded', 'false');
+    mobile?.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    window.setTimeout(() => mobile?.setAttribute('hidden', ''), 300);
+    lastFocusedElement?.focus();
   }
 
   toggle?.addEventListener('click', openSidebar);
   overlay?.addEventListener('click', closeSidebar);
   close?.addEventListener('click', closeSidebar);
+
+  document.addEventListener('keydown', (event) => {
+    if (!mobile?.classList.contains('open')) return;
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      closeSidebar();
+      return;
+    }
+
+    if (event.key !== 'Tab') return;
+
+    const focusable = Array.from(mobile.querySelectorAll<HTMLElement>(focusableSelector));
+    if (focusable.length === 0) return;
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  });
 </script>
 
-<script define:vars={{ slug }}>
-  // Mark topic as read in progress
-  try {
-    const STORAGE_KEY = 'fa-progress';
-    const raw = localStorage.getItem(STORAGE_KEY);
-    const state = raw ? JSON.parse(raw) : { version: 1, topicsRead: {}, quizResults: {}, microLearningCompleted: {}, streak: { currentStreak: 0, longestStreak: 0, lastVisitDate: '' } };
-    if (!state.topicsRead[slug]) {
-      state.topicsRead[slug] = Date.now();
-    }
-    // Update streak
-    const today = new Date();
-    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
-    if (state.streak.lastVisitDate !== todayStr) {
-      state.streak.currentStreak = state.streak.lastVisitDate === yesterdayStr ? state.streak.currentStreak + 1 : 1;
-      if (state.streak.currentStreak > state.streak.longestStreak) {
-        state.streak.longestStreak = state.streak.currentStreak;
-      }
-      state.streak.lastVisitDate = todayStr;
-    }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch {}
+<script>
+  import { markTopicRead } from '../data/progress';
+
+  const topicPage = document.querySelector('.topic-page[data-topic-slug]') as HTMLElement | null;
+  const topicSlug = topicPage?.dataset.topicSlug;
+
+  if (topicSlug) {
+    markTopicRead(topicSlug);
+  }
 </script>

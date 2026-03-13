@@ -1,0 +1,142 @@
+---
+import { getAllNuggets, getNuggetForDate } from '../data/nuggets';
+
+// Bake in today's nugget at build time
+const buildNugget = getNuggetForDate(new Date());
+const now = new Date();
+const buildDateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+const allNuggets = getAllNuggets();
+---
+
+<section class="nugget-section" data-build-date={buildDateStr} data-nuggets={JSON.stringify(allNuggets)}>
+  <div class="nugget-card">
+    <div class="nugget-icon" aria-hidden="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 18h6" />
+        <path d="M10 22h4" />
+        <path d="M12 2a7 7 0 00-4 12.7V17a1 1 0 001 1h6a1 1 0 001-1v-2.3A7 7 0 0012 2z" />
+      </svg>
+    </div>
+    <div class="nugget-content">
+      <span class="nugget-label">Today's Insight</span>
+      <p class="nugget-text" id="nugget-text">{buildNugget.text}</p>
+      <a class="nugget-link" id="nugget-link" href={`/topics/${buildNugget.topicSlug}`}>
+        Read more &rarr; {buildNugget.topicTitle}
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .nugget-section {
+    max-width: 42rem;
+    margin: 0 auto 2rem;
+    padding: 0 1.5rem;
+  }
+
+  .nugget-card {
+    display: flex;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    background-color: var(--color-pale-mint);
+    border-radius: 0.75rem;
+    border-left: 3px solid var(--color-peach);
+  }
+
+  .nugget-icon {
+    flex-shrink: 0;
+    color: var(--color-peach-dark);
+    margin-top: 0.15rem;
+  }
+
+  .nugget-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .nugget-label {
+    display: inline-block;
+    font-family: var(--font-heading);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-peach-dark);
+    margin-bottom: 0.35rem;
+  }
+
+  .nugget-text {
+    font-size: 0.95rem;
+    color: var(--color-text-medium);
+    line-height: 1.6;
+    margin: 0 0 0.5rem;
+  }
+
+  .nugget-link {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--color-racing-green);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .nugget-link:hover {
+    color: var(--color-racing-green-light);
+  }
+
+  html[data-theme="dark"] {
+    .nugget-card {
+      background-color: var(--color-night-surface);
+      border-left-color: var(--color-night-accent);
+    }
+
+    .nugget-icon {
+      color: var(--color-night-accent);
+    }
+
+    .nugget-label {
+      color: var(--color-night-accent);
+    }
+
+    .nugget-text {
+      color: var(--color-night-text-muted);
+    }
+
+    .nugget-link {
+      color: var(--color-night-accent);
+    }
+
+    .nugget-link:hover {
+      color: var(--color-peach-dark);
+    }
+  }
+</style>
+
+<script>
+  const section = document.querySelector('.nugget-section') as HTMLElement;
+  if (section) {
+    const buildDate = section.dataset.buildDate || '';
+    const rawNuggets = section.dataset.nuggets || '[]';
+    const today = new Date();
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+    if (buildDate !== todayStr) {
+      try {
+        const nuggets = JSON.parse(rawNuggets);
+        if (Array.isArray(nuggets) && nuggets.length > 0) {
+          const epoch = new Date(2024, 0, 1).getTime();
+          const daysSinceEpoch = Math.floor((today.getTime() - epoch) / (1000 * 60 * 60 * 24));
+          const nugget = nuggets[Math.abs(daysSinceEpoch) % nuggets.length];
+          const text = document.getElementById('nugget-text');
+          const link = document.getElementById('nugget-link') as HTMLAnchorElement | null;
+
+          if (nugget && text && link) {
+            text.textContent = nugget.text;
+            link.href = `/topics/${nugget.topicSlug}`;
+            link.textContent = `Read more -> ${nugget.topicTitle}`;
+          }
+        }
+      } catch {}
+    }
+  }
+</script>

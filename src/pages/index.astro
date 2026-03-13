@@ -2,6 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro';
 import TopicCard from '../components/TopicCard.astro';
+import DailyNugget from '../components/DailyNugget.astro';
 import { themes, getTopicsByTheme } from '../data/themes';
 
 const { topicsByTheme } = await getTopicsByTheme();
@@ -12,6 +13,8 @@ const { topicsByTheme } = await getTopicsByTheme();
   description="A free, open knowledge base that explains the payments ecosystem — from card swipes to cross-border settlements — in plain language."
 >
   <Hero />
+
+  <DailyNugget />
 
   <!-- Topics Grid Section -->
   <section id="topics" class="topics-section">
@@ -39,13 +42,15 @@ const { topicsByTheme } = await getTopicsByTheme();
 
             <div class="topic-grid">
               {publishedTopics.map((topic) => (
-                <TopicCard
-                  title={topic.data.title}
-                  description={topic.data.description}
-                  theme={topic.data.theme}
-                  readingTime={topic.data.readingTime}
-                  href={`/topics/${topic.id}`}
-                />
+                <div class="topic-card-wrapper" data-topic-slug={topic.id}>
+                  <TopicCard
+                    title={topic.data.title}
+                    description={topic.data.description}
+                    theme={topic.data.theme}
+                    readingTime={topic.data.readingTime}
+                    href={`/topics/${topic.id}`}
+                  />
+                </div>
               ))}
             </div>
           </div>
@@ -163,4 +168,78 @@ const { topicsByTheme } = await getTopicsByTheme();
       padding: 3rem 2rem 6rem;
     }
   }
+
+  /* Progress badges on topic cards */
+  .topic-card-wrapper {
+    position: relative;
+  }
+
+  .topic-card-badges {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    display: flex;
+    gap: 0.25rem;
+    z-index: 1;
+  }
+
+  .card-badge-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    line-height: 1;
+  }
+
+  .card-badge-read {
+    background-color: var(--color-pale-mint);
+    color: var(--color-racing-green);
+  }
+
+  .card-badge-quiz {
+    background-color: var(--color-peach-light);
+    color: var(--color-peach-dark);
+  }
+
+  html[data-theme="dark"] {
+    .card-badge-read {
+      background-color: var(--color-night-elevated);
+      color: var(--color-night-text);
+    }
+
+    .card-badge-quiz {
+      background-color: rgba(255, 183, 77, 0.2);
+      color: var(--color-night-accent);
+    }
+  }
 </style>
+
+<script>
+  import { loadProgress } from '../data/progress';
+
+  // Show progress badges on topic cards
+  try {
+    const state = loadProgress();
+    document.querySelectorAll('.topic-card-wrapper[data-topic-slug]').forEach((wrapper) => {
+      const slug = (wrapper as HTMLElement).dataset.topicSlug || '';
+      const isRead = !!state.topicsRead[slug];
+      const quizResult = state.quizResults?.[slug];
+      const quizPassed = quizResult?.passed;
+
+      if (isRead || quizPassed) {
+        const badges = document.createElement('div');
+        badges.className = 'topic-card-badges';
+        if (isRead) {
+          badges.innerHTML += '<span class="card-badge-icon card-badge-read" title="Read">&#10003;</span>';
+        }
+        if (quizPassed) {
+          badges.innerHTML += '<span class="card-badge-icon card-badge-quiz" title="Quiz passed">&#9733;</span>';
+        }
+        wrapper.appendChild(badges);
+      }
+    });
+  } catch {}
+</script>

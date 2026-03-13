@@ -1,0 +1,431 @@
+---
+import { themes, getTopicsByTheme } from '../data/themes';
+import { getAllQuizSlugs } from '../data/quizzes';
+import { getAllFlashcardSlugs } from '../data/flashcards';
+
+const { topicsByTheme, allTopics } = await getTopicsByTheme();
+const quizSlugs = getAllQuizSlugs();
+const flashcardSlugs = getAllFlashcardSlugs();
+const totalTopics = allTopics.length;
+const totalQuizzes = quizSlugs.length;
+const totalFlashcardDecks = flashcardSlugs.length;
+
+// Build theme data for client-side rendering
+const themeData = themes.map((theme) => {
+  const topics = topicsByTheme.get(theme.name) || [];
+  return {
+    name: theme.name,
+    topics: topics.map((t) => ({
+      slug: t.id,
+      title: t.data.title,
+      hasQuiz: quizSlugs.includes(t.id),
+      hasFlashcards: flashcardSlugs.includes(t.id),
+    })),
+  };
+});
+---
+
+<div class="progress-dashboard" data-themes={JSON.stringify(themeData)} data-total-topics={totalTopics} data-total-quizzes={totalQuizzes} data-total-flashcards={totalFlashcardDecks}>
+  <!-- Stats row -->
+  <div class="progress-stats">
+    <div class="stat-card">
+      <span class="stat-number" id="stat-topics-read">0</span>
+      <span class="stat-label">Topics Read</span>
+      <span class="stat-detail" id="stat-topics-detail">of {totalTopics}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-number" id="stat-quizzes">0</span>
+      <span class="stat-label">Quizzes Passed</span>
+      <span class="stat-detail" id="stat-quizzes-detail">of {totalQuizzes}</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-number" id="stat-flashcards">0</span>
+      <span class="stat-label">Decks Reviewed</span>
+      <span class="stat-detail" id="stat-flashcards-detail">of {totalFlashcardDecks}</span>
+    </div>
+    <div class="stat-card stat-streak">
+      <span class="stat-number" id="stat-streak">0</span>
+      <span class="stat-label">Day Streak</span>
+      <span class="stat-detail" id="stat-streak-detail">longest: 0</span>
+    </div>
+  </div>
+
+  <!-- Overall progress bar -->
+  <div class="progress-overall">
+    <div class="progress-overall-label">
+      <span>Overall Progress</span>
+      <span id="progress-pct">0%</span>
+    </div>
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progress-bar" style="width: 0%"></div>
+    </div>
+  </div>
+
+  <!-- Per-theme breakdown -->
+  <div class="progress-themes" id="progress-themes">
+    <!-- Rendered by script -->
+  </div>
+</div>
+
+<style>
+  .progress-dashboard {
+    max-width: 100%;
+  }
+
+  .progress-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  @media (min-width: 640px) {
+    .progress-stats {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .stat-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.25rem 1rem;
+    background-color: var(--color-pale-mint);
+    border-radius: 0.75rem;
+    text-align: center;
+  }
+
+  .stat-number {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-racing-green);
+    line-height: 1.1;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-medium);
+    margin-top: 0.25rem;
+  }
+
+  .stat-detail {
+    font-size: 0.7rem;
+    color: var(--color-text-light);
+    margin-top: 0.15rem;
+  }
+
+  .stat-streak .stat-number {
+    color: var(--color-peach-dark);
+  }
+
+  .progress-overall {
+    margin-bottom: 2rem;
+  }
+
+  .progress-overall-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text-medium);
+    margin-bottom: 0.5rem;
+  }
+
+  .progress-bar-track {
+    height: 8px;
+    background-color: var(--color-pale-mint);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background-color: var(--color-racing-green);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+
+  .progress-themes {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  /* Dark mode */
+  html[data-theme="dark"] {
+    .stat-card {
+      background-color: var(--color-night-surface);
+    }
+
+    .stat-number {
+      color: var(--color-night-text);
+    }
+
+    .stat-label {
+      color: var(--color-night-text-muted);
+    }
+
+    .stat-detail {
+      color: var(--color-night-text-muted);
+    }
+
+    .stat-streak .stat-number {
+      color: var(--color-night-accent);
+    }
+
+    .progress-overall-label {
+      color: var(--color-night-text-muted);
+    }
+
+    .progress-bar-track {
+      background-color: var(--color-night-surface);
+    }
+
+    .progress-bar-fill {
+      background-color: var(--color-night-accent);
+    }
+  }
+</style>
+
+<style is:global>
+  .theme-progress-card {
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--color-pale-mint-dark);
+    border-radius: 0.75rem;
+    background-color: var(--color-white);
+  }
+
+  .theme-progress-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+
+  .theme-progress-name {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-racing-green);
+  }
+
+  .theme-progress-count {
+    font-size: 0.75rem;
+    color: var(--color-text-light);
+  }
+
+  .theme-progress-bar {
+    height: 4px;
+    background-color: var(--color-pale-mint);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 0.75rem;
+  }
+
+  .theme-progress-fill {
+    height: 100%;
+    background-color: var(--color-racing-green);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+
+  .theme-topic-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .theme-topic-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .theme-topic-item a {
+    color: var(--color-text-medium);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .theme-topic-item a:hover {
+    color: var(--color-racing-green);
+  }
+
+  .topic-status-icon {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+  }
+
+  .topic-status-icon.read {
+    color: var(--color-racing-green);
+  }
+
+  .topic-status-icon.unread {
+    color: var(--color-pale-mint-dark);
+  }
+
+  .topic-quiz-score {
+    margin-left: auto;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.1rem 0.4rem;
+    border-radius: 9999px;
+  }
+
+  .topic-quiz-score.passed {
+    background-color: var(--color-pale-mint);
+    color: var(--color-racing-green);
+  }
+
+  .topic-quiz-score.failed {
+    background-color: var(--color-peach-light);
+    color: var(--color-peach-dark);
+  }
+
+  /* Dark mode */
+  html[data-theme="dark"] {
+    .theme-progress-card {
+      background-color: var(--color-night-surface);
+      border-color: var(--color-night-elevated);
+    }
+
+    .theme-progress-name {
+      color: var(--color-night-text);
+    }
+
+    .theme-progress-count {
+      color: var(--color-night-text-muted);
+    }
+
+    .theme-progress-bar {
+      background-color: var(--color-night-elevated);
+    }
+
+    .theme-progress-fill {
+      background-color: var(--color-night-accent);
+    }
+
+    .theme-topic-item a {
+      color: var(--color-night-text-muted);
+    }
+
+    .theme-topic-item a:hover {
+      color: var(--color-night-accent);
+    }
+
+    .topic-status-icon.read {
+      color: var(--color-night-accent);
+    }
+
+    .topic-status-icon.unread {
+      color: var(--color-night-elevated);
+    }
+
+    .topic-quiz-score.passed {
+      background-color: rgba(184, 232, 192, 0.15);
+      color: var(--color-pale-mint);
+    }
+
+    .topic-quiz-score.failed {
+      background-color: rgba(255, 183, 77, 0.15);
+      color: var(--color-night-accent);
+    }
+  }
+</style>
+
+<script>
+  const dashboard = document.querySelector('.progress-dashboard') as HTMLElement;
+  if (dashboard) {
+    const themeData = JSON.parse(dashboard.dataset.themes || '[]');
+    const totalTopics = parseInt(dashboard.dataset.totalTopics || '0');
+    const totalQuizzes = parseInt(dashboard.dataset.totalQuizzes || '0');
+
+    const totalFlashcards = parseInt(dashboard.dataset.totalFlashcards || '0');
+    let state = { topicsRead: {} as Record<string, number>, quizResults: {} as Record<string, any>, microLessonsCompleted: {} as Record<string, number>, flashcardsReviewed: {} as Record<string, any>, streak: { currentStreak: 0, longestStreak: 0, lastVisitDate: '' } };
+    try {
+      const raw = localStorage.getItem('fa-progress');
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed.version === 1) state = parsed;
+      }
+    } catch {}
+
+    // Stats
+    const topicsReadCount = Object.keys(state.topicsRead).length;
+    const quizResults = state.quizResults;
+    const passedQuizzes = Object.values(quizResults).filter((r: any) => r.passed).length;
+    const flashcardsReviewedCount = Object.keys(state.flashcardsReviewed || {}).length;
+
+    (document.getElementById('stat-topics-read') as HTMLElement).textContent = String(topicsReadCount);
+    (document.getElementById('stat-quizzes') as HTMLElement).textContent = String(passedQuizzes);
+    (document.getElementById('stat-flashcards') as HTMLElement).textContent = String(flashcardsReviewedCount);
+    (document.getElementById('stat-streak') as HTMLElement).textContent = String(state.streak.currentStreak);
+    (document.getElementById('stat-streak-detail') as HTMLElement).textContent = `longest: ${state.streak.longestStreak}`;
+
+    // Overall progress (topics read / total)
+    const pct = totalTopics > 0 ? Math.round((topicsReadCount / totalTopics) * 100) : 0;
+    (document.getElementById('progress-pct') as HTMLElement).textContent = `${pct}%`;
+    (document.getElementById('progress-bar') as HTMLElement).style.width = `${pct}%`;
+
+    // Per-theme breakdown
+    const themesContainer = document.getElementById('progress-themes') as HTMLElement;
+    let themesHtml = '';
+
+    for (const theme of themeData) {
+      const readInTheme = theme.topics.filter((t: any) => state.topicsRead[t.slug]).length;
+      const themePct = theme.topics.length > 0 ? Math.round((readInTheme / theme.topics.length) * 100) : 0;
+
+      let topicListHtml = '';
+      for (const topic of theme.topics) {
+        const isRead = !!state.topicsRead[topic.slug];
+        const quizResult = quizResults[topic.slug];
+        let quizBadge = '';
+        if (quizResult) {
+          const qPct = Math.round((quizResult.score / quizResult.total) * 100);
+          quizBadge = `<span class="topic-quiz-score ${quizResult.passed ? 'passed' : 'failed'}">${qPct}%</span>`;
+        } else if (topic.hasQuiz) {
+          quizBadge = `<a href="/micro/quiz/${topic.slug}" class="topic-quiz-score" style="background: var(--color-pale-mint); color: var(--color-text-light); text-decoration: none;">Quiz</a>`;
+        }
+
+        const fcResult = (state.flashcardsReviewed || {})[topic.slug];
+        let fcBadge = '';
+        if (fcResult) {
+          fcBadge = `<span class="topic-quiz-score passed" title="${fcResult.cardsGotIt}/${fcResult.cardsTotal} got it">&#10003;</span>`;
+        } else if (topic.hasFlashcards) {
+          fcBadge = `<a href="/micro/review/${topic.slug}" class="topic-quiz-score" style="background: var(--color-pale-mint); color: var(--color-text-light); text-decoration: none;">Review</a>`;
+        }
+
+        topicListHtml += `
+          <div class="theme-topic-item">
+            <span class="topic-status-icon ${isRead ? 'read' : 'unread'}">${isRead ? '&#10003;' : '&#9675;'}</span>
+            <a href="/topics/${topic.slug}">${topic.title}</a>
+            ${fcBadge}${quizBadge}
+          </div>
+        `;
+      }
+
+      themesHtml += `
+        <div class="theme-progress-card">
+          <div class="theme-progress-header">
+            <span class="theme-progress-name">${theme.name}</span>
+            <span class="theme-progress-count">${readInTheme} / ${theme.topics.length}</span>
+          </div>
+          <div class="theme-progress-bar">
+            <div class="theme-progress-fill" style="width: ${themePct}%"></div>
+          </div>
+          <div class="theme-topic-list">${topicListHtml}</div>
+        </div>
+      `;
+    }
+
+    themesContainer.innerHTML = themesHtml;
+  }
+</script>

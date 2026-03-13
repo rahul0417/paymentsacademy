@@ -1,5 +1,7 @@
 ---
 import { themeNames, getTopicsByTheme } from '../data/themes';
+import { getAllQuizSlugs } from '../data/quizzes';
+import { getAllFlashcardSlugs } from '../data/flashcards';
 
 interface Props {
   currentSlug: string;
@@ -8,6 +10,8 @@ interface Props {
 const { currentSlug } = Astro.props;
 
 const { topicsByTheme } = await getTopicsByTheme();
+const quizSlugs = getAllQuizSlugs();
+const flashcardSlugs = getAllFlashcardSlugs();
 
 const groupedTopics = themeNames
   .map((theme) => ({ theme, topics: topicsByTheme.get(theme) || [] }))
@@ -33,15 +37,38 @@ const groupedTopics = themeNames
           <ul class="sidebar-topic-list">
             {topics.map((topic) => {
               const isActive = topic.id === currentSlug;
+              const hasQuiz = quizSlugs.includes(topic.id);
+              const hasFlashcards = flashcardSlugs.includes(topic.id);
               return (
                 <li>
-                  <a
-                    href={`/topics/${topic.id}`}
-                    class:list={['sidebar-link', { active: isActive }]}
-                    aria-current={isActive ? 'page' : undefined}
-                  >
-                    {topic.data.title}
-                  </a>
+                  <div class="sidebar-link-row">
+                    <a
+                      href={`/topics/${topic.id}`}
+                      class:list={['sidebar-link', { active: isActive }]}
+                      aria-current={isActive ? 'page' : undefined}
+                    >
+                      {topic.data.title}
+                    </a>
+                    <div class="sidebar-link-icons">
+                      {hasQuiz && (
+                        <a href={`/micro/quiz/${topic.id}`} class="sidebar-icon-link" title="Take quiz" aria-label={`Quiz: ${topic.data.title}`}>
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+                            <circle cx="6" cy="6" r="4.5" />
+                            <path d="M5 5a1.2 1.2 0 012.2.5c0 .8-1.2 1.2-1.2 1.2" />
+                            <circle cx="6" cy="8.5" r="0.3" fill="currentColor" />
+                          </svg>
+                        </a>
+                      )}
+                      {hasFlashcards && (
+                        <a href={`/micro/review/${topic.id}`} class="sidebar-icon-link" title="Quick review" aria-label={`Review: ${topic.data.title}`}>
+                          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+                            <rect x="1" y="3" width="8" height="6" rx="1" />
+                            <rect x="3" y="1" width="8" height="6" rx="1" />
+                          </svg>
+                        </a>
+                      )}
+                    </div>
+                  </div>
                 </li>
               );
             })}
@@ -153,6 +180,40 @@ const groupedTopics = themeNames
     font-weight: 500;
   }
 
+  .sidebar-link-row {
+    display: flex;
+    align-items: center;
+  }
+
+  .sidebar-link-icons {
+    display: flex;
+    gap: 0.15rem;
+    margin-left: auto;
+    flex-shrink: 0;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+
+  .sidebar-link-row:hover .sidebar-link-icons {
+    opacity: 1;
+  }
+
+  .sidebar-icon-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 0.25rem;
+    color: var(--color-text-light);
+    transition: color 0.15s ease, background-color 0.15s ease;
+  }
+
+  .sidebar-icon-link:hover {
+    color: var(--color-racing-green);
+    background-color: var(--color-pale-mint);
+  }
+
   @media (max-width: 1023px) {
     .sidebar {
       display: none;
@@ -186,6 +247,15 @@ const groupedTopics = themeNames
       color: var(--color-night-accent);
       background-color: var(--color-night-surface);
       border-left-color: var(--color-night-accent);
+    }
+
+    .sidebar-icon-link {
+      color: var(--color-night-text-muted);
+    }
+
+    .sidebar-icon-link:hover {
+      color: var(--color-night-accent);
+      background-color: var(--color-night-surface);
     }
   }
 </style>

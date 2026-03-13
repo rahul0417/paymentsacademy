@@ -1,0 +1,121 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import FlashcardViewer from '../../../components/FlashcardViewer.astro';
+import { getAllFlashcardDecks } from '../../../data/flashcards';
+
+export function getStaticPaths() {
+  const decks = getAllFlashcardDecks();
+  return decks.map((deck) => ({
+    params: { slug: deck.topicSlug },
+    props: { deck },
+  }));
+}
+
+const { deck } = Astro.props;
+---
+
+<BaseLayout title={`Review: ${deck.topicTitle}`} description={`Review ${deck.cards.length} flashcards about ${deck.topicTitle}.`}>
+  <div class="review-page">
+    <div class="review-page-header">
+      <a href={`/topics/${deck.topicSlug}`} class="review-back-link">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 4l-4 4 4 4" />
+        </svg>
+        Back to {deck.topicTitle}
+      </a>
+      <span class="review-page-badge">{deck.theme}</span>
+    </div>
+
+    <h1 class="review-page-title">Quick Review</h1>
+    <p class="review-page-desc">Test your understanding of {deck.topicTitle} with {deck.cards.length} conceptual flashcards.</p>
+
+    <FlashcardViewer
+      topicSlug={deck.topicSlug}
+      topicTitle={deck.topicTitle}
+      theme={deck.theme}
+      keyTakeaways={deck.keyTakeaways}
+      cards={deck.cards}
+    />
+  </div>
+</BaseLayout>
+
+<style>
+  .review-page {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 5rem;
+  }
+
+  .review-page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .review-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.85rem;
+    color: var(--color-text-light);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .review-back-link:hover {
+    color: var(--color-racing-green);
+  }
+
+  .review-page-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-racing-green);
+    background-color: var(--color-pale-mint);
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+  }
+
+  .review-page-title {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-racing-green);
+    margin: 0 0 0.5rem;
+    line-height: 1.2;
+  }
+
+  .review-page-desc {
+    font-size: 0.95rem;
+    color: var(--color-text-medium);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+
+  html[data-theme="dark"] {
+    .review-back-link {
+      color: var(--color-night-text-muted);
+    }
+
+    .review-back-link:hover {
+      color: var(--color-night-accent);
+    }
+
+    .review-page-badge {
+      color: var(--color-night-text);
+      background-color: var(--color-night-surface);
+    }
+
+    .review-page-title {
+      color: var(--color-night-text);
+    }
+
+    .review-page-desc {
+      color: var(--color-night-text-muted);
+    }
+  }
+</style>

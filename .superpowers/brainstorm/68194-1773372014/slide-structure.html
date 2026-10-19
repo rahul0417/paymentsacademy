@@ -1,0 +1,62 @@
+<h2>Proposed Slide Structure: "Anatomy of a Swipe"</h2>
+<p class="subtitle">Each box represents one slide in the micro-learning deck. Click the approach that feels right.</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Detailed Flow (8-10 slides)</h3>
+      <p style="text-align:left; font-size: 0.9em; line-height: 1.7;">
+        <strong>1. What You'll Learn</strong> — overview of the module + learning objectives<br>
+        <strong>2. The Big Picture</strong> — "What happens when you tap your card?" simple narrative<br>
+        <strong>3. The Players</strong> — the 5 parties + 2 processors explained simply<br>
+        <strong>4. Act 1: Authorization</strong> — real-time approval flow with sequence diagram<br>
+        <strong>5. Act 2: Clearing</strong> — end-of-day batching explained with diagram<br>
+        <strong>6. Act 3: Settlement</strong> — money movement + fee breakdown visual<br>
+        <strong>7. Key Terms</strong> — glossary cards for new terms (BIN, ISO 8583, interchange, etc.)<br>
+        <strong>8. Quick Quiz</strong> — 4 multiple-choice questions embedded inline
+      </p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Each concept gets breathing room</li><li>Diagrams don't feel rushed</li><li>Natural pacing</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>More slides to click through</li><li>Some topics might need 12+ slides</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Compact Flow (5-6 slides)</h3>
+      <p style="text-align:left; font-size: 0.9em; line-height: 1.7;">
+        <strong>1. What You'll Learn</strong> — overview + learning objectives<br>
+        <strong>2. The Concept</strong> — full explanation in 1-2 dense slides with inline diagrams<br>
+        <strong>3. Visual Walkthrough</strong> — sequence diagram + flow diagram on one slide<br>
+        <strong>4. Key Terms</strong> — glossary definitions<br>
+        <strong>5. Quick Quiz</strong> — questions
+      </p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Faster to complete</li><li>Consistent slide count across topics</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Slides may feel dense</li><li>Diagrams compete with text for space</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Adaptive Flow (varies per topic)</h3>
+      <p style="text-align:left; font-size: 0.9em; line-height: 1.7;">
+        <strong>1. What You'll Learn</strong> — always present<br>
+        <strong>2-N. Concept slides</strong> — as many as needed, one idea per slide, diagrams get their own slide<br>
+        <strong>N+1. Key Terms</strong> — always present<br>
+        <strong>N+2. Quick Quiz</strong> — always present<br>
+        <br>
+        Simple topics get 5 slides. Complex topics like cross-border payments might get 10+. Each slide is focused — never more than one concept or one diagram per slide.
+      </p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul><li>Each slide is digestible</li><li>Diagrams get full attention</li><li>Truly "micro" — one idea at a time</li></ul></div>
+        <div class="cons"><h4>Cons</h4><ul><li>Slide count varies (users can't predict length)</li><li>More authoring effort per topic</li></ul></div>
+      </div>
+    </div>
+  </div>
+</div>

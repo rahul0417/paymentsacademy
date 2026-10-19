@@ -35,3 +35,21 @@ Source/*.pptx
 # Extracted source text (generated)
 Source/extracted/*.txt
 Source/extracted/manifest.json
+.venv/
+venv/
+__pycache__/
+*.pyc
+.next/
+out/
+.turbo/
+.cache/
+!.env.example
+*.pem
+*.key
+*.mp4
+*.mov
+*.m4v
+*.wav
+*.zip
+*.wpress
+*.crdownload
